@@ -26,7 +26,10 @@ class VulkanUIRender final : public IUIRender
                    UiDescriptorLeases leases = {});
     void setup_states();
     void reset_frame();
-    bool record(const FrameRecordingContext &frame, std::string &error);
+    bool record(const FrameRecordingContext &frame, std::string &error,
+        bool distortion = false, VkDescriptorSet scene = VK_NULL_HANDLE);
+    void set_distortion(bool enabled) { distortion_ = enabled; }
+    bool has_distortion() const;
     void append_imgui(ImDrawData* data);
     VulkanUIShader* current_shader() const { return shader_; }
     uint32_t draw_calls() const { return static_cast<uint32_t>(batches_.size()); }
@@ -54,6 +57,7 @@ private:
         bool has_scissor{};
         float alpha_ref{};
         int blend_mode{1};
+        bool distortion{};
     };
     struct FrameBuffers
     {
@@ -84,6 +88,7 @@ private:
     uint32_t first_vertex_{}, limit_{};
     int alpha_ref_{};
     int blend_mode_{1};
+    bool distortion_{};
     int material_alpha_ref_{};
     CullMode cull_{cmNONE};
     Fmatrix world_{};

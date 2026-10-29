@@ -31,6 +31,7 @@ void VulkanUIRender::reset_frame()
     if (leases_.release)
         for (const auto &batch : batches_)
             leases_.release(batch.texture);
+    distortion_ = false;
     vertices_.clear();
     world_positions_.clear();
     visible_.clear();
@@ -63,13 +64,22 @@ bool VulkanUIRender::ensure(BufferResource& buffer, VkDeviceSize bytes,
         memory_, dispatch_, error);
 }
 
-bool VulkanUIRender::record(const FrameRecordingContext& frame, std::string& error)
+bool VulkanUIRender::has_distortion() const
+{
+    return std::any_of(batches_.begin(), batches_.end(),
+        [](const Batch& batch) { return batch.distortion; });
+}
+
+bool VulkanUIRender::record(const FrameRecordingContext& frame, std::string& error,
+    bool distortion, VkDescriptorSet scene)
 {
     if (primitive_ != ptNone || !pass_ || !device_ || frame.frame_index >= frames_.size())
     {
         error = "Vulkan UI frame is not initialized or has an unfinished primitive";
         return false;
     }
+    if (distortion && !scene)
+    { error = "UI distortion requires a captured menu image"; return false; }
     if (indices_.empty()) return true;
     FrameBuffers& buffers = frames_[frame.frame_index];
     const VkDeviceSize vertex_bytes = vertices_.size() * sizeof(UiVertex);
@@ -80,6 +90,7 @@ bool VulkanUIRender::record(const FrameRecordingContext& frame, std::string& err
         !buffers.indices.write(0, indices_.data(), index_bytes, error)) return false;
     for (const Batch& batch : batches_)
     {
+        if (batch.distortion != distortion) continue;
         RenderPassGraph graph;
         if (!build_render_pass_graph({RenderConsumer::Ui, SurfaceMode::Transparent,
                 false, false, false, false, 0, batch.blend_mode}, graph, error)) return false;
@@ -88,7 +99,8 @@ bool VulkanUIRender::record(const FrameRecordingContext& frame, std::string& err
                 VK_INDEX_TYPE_UINT32, batch.count, batch.texture,
                 batch.has_scissor ? &batch.scissor : nullptr, 0,
                 VkDeviceSize(batch.first_index) * sizeof(uint32_t), batch.alpha_ref,
-                {Device.dwWidth, Device.dwHeight}, batch.blend_mode))
+                {Device.dwWidth, Device.dwHeight}, batch.distortion ? 1 : batch.blend_mode,
+                batch.distortion ? scene : VK_NULL_HANDLE))
         {
             error = "Vulkan UI draw command recording failed";
             return false;
@@ -253,7 +265,7 @@ void VulkanUIRender::FlushPrimitive()
         batches_.push_back({first_index, static_cast<uint32_t>(indices_.size()) - first_index,
             texture_, scissor_, has_scissor_,
             alpha_test ? float(std::max(alpha_ref_, blend_mode_ == 7 ? 0 : material_alpha_ref_)) / 255.0f : 0.f,
-            blend_mode_});
+            blend_mode_, distortion_});
     }
     primitive_ = ptNone;
     world_positions_.resize(vertices_.size());

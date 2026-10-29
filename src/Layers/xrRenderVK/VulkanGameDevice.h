@@ -110,6 +110,10 @@ public:
 
 private:
     static void record_ui(const FrameRecordingContext& frame, void* user);
+    static void capture_ui(VkCommandBuffer command, VkImage image, uint32_t index, void* user);
+    static void record_ui_distortion(const FrameRecordingContext& frame, void* user);
+    bool create_ui_scene_sets(std::string& error);
+    void release_ui_scene_sets();
     static void record_hud(const FrameRecordingContext& frame, void* user);
     static void record_models(const FrameRecordingContext& frame, void* user);
     static void record_transparent(const FrameRecordingContext& frame, void* user);
@@ -172,6 +176,7 @@ private:
     DeferredPass deferred_;
     GameShaderResources shader_resources_;
     ScenePass ui_pass_;
+    std::vector<VkDescriptorSet> ui_scene_sets_;
     GameTextureFactory textures_;
     std::unordered_map<std::string, VkDescriptorSet> glow_textures_;
     VulkanUIRender ui_;

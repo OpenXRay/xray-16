@@ -98,9 +98,10 @@ bool WaterTargets::capture(VkCommandBuffer command, VkImage source, uint32_t ind
         transitions[i].subresourceRange.levelCount = transitions[i].subresourceRange.layerCount = 1;
         transitions[i].oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         transitions[i].newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        transitions[i].srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
         transitions[i].dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     }
-    vk_.cmd_pipeline_barrier(command, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+    vk_.cmd_pipeline_barrier(command, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
         VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 2, transitions);
     VkImageCopy region{};
     region.srcSubresource.aspectMask = region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;

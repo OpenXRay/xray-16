@@ -271,6 +271,7 @@ bool VulkanGameDevice::initialize(SDL_Window* window, VkExtent2D extent, std::st
             if (!deferred_.water_set(i, water_targets_.refraction(i), water_targets_.reflection(i),
                     targets_.sampled_depth_view(i), textures_.sampler(), targets_.sampler(), water_targets_.uniform(i), error)) goto failed;
         ui_pass_.rebind_render_pass(frame.render_pass(), frame.overlay_render_pass());
+        if (!create_ui_scene_sets(error)) goto failed;
         Msg("[renderer-vulkan] device.passes ready water-overlay=%d images=%zu",
             frame.overlay_render_pass() != VK_NULL_HANDLE, frame.image_count());
     }
@@ -302,6 +303,34 @@ bool VulkanGameDevice::reload_game_shaders(std::string& error)
     DeferredShaderFactory factory;
     shader_resources_.clear();
     return factory.reload_game_pipelines(device, shaders, deferred_, shader_resources_, error);
+}
+
+bool VulkanGameDevice::create_ui_scene_sets(std::string& error)
+{
+    ui_scene_sets_.resize(window_.frame().image_count());
+    for (uint32_t i = 0; i < ui_scene_sets_.size(); ++i)
+        if (!ui_pass_.create_ui_texture_set(water_targets_.refraction(i),
+                targets_.sampler(), ui_scene_sets_[i], error)) return false;
+    return true;
+}
+
+void VulkanGameDevice::release_ui_scene_sets()
+{
+    for (auto& set : ui_scene_sets_) ui_pass_.release_ui_texture_set(set);
+    ui_scene_sets_.clear();
+}
+
+void VulkanGameDevice::capture_ui(VkCommandBuffer command, VkImage image, uint32_t index, void* user)
+{
+    auto& owner = *static_cast<VulkanGameDevice*>(user);
+    owner.ui_recorded_ &= owner.water_targets_.capture(command, image, index);
+}
+
+void VulkanGameDevice::record_ui_distortion(const FrameRecordingContext& frame, void* user)
+{
+    auto& owner = *static_cast<VulkanGameDevice*>(user);
+    owner.ui_recorded_ &= owner.ui_.record(frame, owner.ui_error_, true,
+        owner.ui_scene_sets_.at(frame.image_index));
 }
 
 void VulkanGameDevice::record_ui(const FrameRecordingContext &frame, void *user)
@@ -1180,7 +1209,9 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             screenshot_requested_ && readback_enabled_ ? record_readback : nullptr, this,
             record_postprocess, this, &sun_shadows_, &sun_uniform,
             &local_shadows_, &local_uniforms_, record_local_lights, this,
-            render_world && (level.has_water() || particle_refraction) ? &water_targets_ : nullptr, &water_uniform))
+            render_world && (level.has_water() || particle_refraction) ? &water_targets_ : nullptr, &water_uniform,
+            ui_.has_distortion() ? capture_ui : nullptr, this,
+            ui_.has_distortion() ? record_ui_distortion : nullptr, this))
     {
         if (!window_.frame().device_lost())
             reset_required_ = true;
@@ -1244,6 +1275,7 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error,
     const bool replace_surface = recreate_surface || window_.frame().surface_lost();
     targets_.release_lighting(deferred_);
     deferred_.release_water_sets();
+    release_ui_scene_sets();
     for (auto& image : local_sets_)
         for (auto& set : image) deferred_.release_gbuffer(set);
     local_sets_.clear();
@@ -1300,6 +1332,7 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string& error,
     deferred_.rebind_compatible_render_passes(targets_.render_pass(), frame.render_pass(),
         sun_shadows_.render_pass(), local_shadows_.render_pass(), frame.overlay_render_pass());
     ui_pass_.rebind_render_pass(frame.render_pass(), frame.overlay_render_pass());
+    if (!create_ui_scene_sets(error)) return false;
     if (!targets_.bind_lighting(deferred_, error))
         return false;
     targets_.bind_sun_shadow(deferred_, sun_shadows_);
@@ -1361,6 +1394,7 @@ void VulkanGameDevice::destroy()
     active_map_names_[1].clear();
     targets_.release_lighting(deferred_);
     deferred_.release_water_sets();
+    release_ui_scene_sets();
     release_forward_targets();
     release_level_glows();
     Msg("[renderer-vulkan] teardown textures begin");

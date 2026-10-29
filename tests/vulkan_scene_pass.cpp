@@ -160,7 +160,7 @@ int main()
     for (int mode = 0; mode < 10; ++mode)
         assert(pass.record_ui(frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
             VK_INDEX_TYPE_UINT16, 6, texture, &clipped, 0, 0, 0.f, {}, mode));
-    assert(geometry_draws == 1 && ui_draws == 11 && scissor_width == 100 && descriptor_binds == 11);
+    assert(geometry_draws == 1 && ui_draws == 11 && scissor_width == 100 && descriptor_binds == 22);
     auto wrong = frame;
     wrong.render_pass = handle<VkRenderPass>(9);
     assert(!pass.record_geometry(wrong, handle<VkBuffer>(20), handle<VkBuffer>(21),

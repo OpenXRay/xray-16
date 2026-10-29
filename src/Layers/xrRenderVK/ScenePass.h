@@ -80,7 +80,8 @@ public:
         VkIndexType index_type, uint32_t index_count, VkDescriptorSet texture_set,
         const VkRect2D* scissor = nullptr,
         VkDeviceSize vertex_offset = 0, VkDeviceSize index_offset = 0,
-        float alpha_ref = 0.0f, VkExtent2D logical_extent = {}, int blend_mode = 1) const;
+        float alpha_ref = 0.0f, VkExtent2D logical_extent = {}, int blend_mode = 1,
+        VkDescriptorSet distortion_scene = VK_NULL_HANDLE) const;
     bool create_ui_texture_set(VkImageView view, VkSampler sampler, VkDescriptorSet& result,
         std::string& error);
     void update_ui_texture_set(VkDescriptorSet set, VkImageView view, VkSampler sampler);

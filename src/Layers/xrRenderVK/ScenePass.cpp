@@ -204,8 +204,9 @@ bool ScenePass::initialize(VkDevice device, VkRenderPass render_pass,
         return false;
     }
     layout.pPushConstantRanges = &ui_range;
-    layout.setLayoutCount = 1;
-    layout.pSetLayouts = &m_ui_descriptor_layout;
+    const VkDescriptorSetLayout ui_layouts[]{m_ui_descriptor_layout, m_ui_descriptor_layout};
+    layout.setLayoutCount = 2;
+    layout.pSetLayouts = ui_layouts;
     if (m_vk.create_pipeline_layout(device, &layout, nullptr, &m_ui_layout) != VK_SUCCESS ||
         !make_pipeline(device, render_pass, m_scene_layout, scene_vertex, scene_fragment,
             false, use_depth, m_vk, 0, m_scene_pipeline))
@@ -258,7 +259,7 @@ bool ScenePass::record_ui(const FrameRecordingContext& frame, VkBuffer vertices,
     VkIndexType index_type, uint32_t index_count, VkDescriptorSet texture_set,
     const VkRect2D* requested_scissor,
     VkDeviceSize vertex_offset, VkDeviceSize index_offset, float alpha_ref,
-    VkExtent2D logical_extent, int blend_mode) const
+    VkExtent2D logical_extent, int blend_mode, VkDescriptorSet distortion_scene) const
 {
     if (!valid_frame(frame) || !vertices || !indices || !texture_set || !index_count ||
         blend_mode < 0 || blend_mode >= 11 || !m_ui_pipelines[blend_mode] ||
@@ -288,7 +289,7 @@ bool ScenePass::record_ui(const FrameRecordingContext& frame, VkBuffer vertices,
         static_cast<float>(frame.extent.height), 0, 1};
     const float constants[]{static_cast<float>(logical_extent.width),
         static_cast<float>(logical_extent.height), std::clamp(alpha_ref, 0.0f, 1.0f),
-        static_cast<float>(blend_mode)};
+        distortion_scene ? -1.f : static_cast<float>(blend_mode)};
     m_vk.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_ui_pipelines[blend_mode]);
     m_vk.cmd_set_viewport(frame.command_buffer, 0, 1, &viewport);
     m_vk.cmd_set_scissor(frame.command_buffer, 0, 1, &scissor);
@@ -296,6 +297,9 @@ bool ScenePass::record_ui(const FrameRecordingContext& frame, VkBuffer vertices,
     m_vk.cmd_bind_index_buffer(frame.command_buffer, indices, index_offset, index_type);
     m_vk.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
         m_ui_layout, 0, 1, &texture_set, 0, nullptr);
+    const VkDescriptorSet scene_set = distortion_scene ? distortion_scene : texture_set;
+    m_vk.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        m_ui_layout, 1, 1, &scene_set, 0, nullptr);
     m_vk.cmd_push_constants(frame.command_buffer, m_ui_layout,
         VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         0, sizeof(constants), constants);

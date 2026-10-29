@@ -30,7 +30,9 @@ public:
         LocalShadowTargets* local_shadows = nullptr,
         const std::vector<LocalLightUniform>* local_lights = nullptr,
         FrameRecorder local_lighting = nullptr, void* local_data = nullptr,
-        WaterTargets* water = nullptr, const WaterSceneUniform* water_uniform = nullptr);
+        WaterTargets* water = nullptr, const WaterSceneUniform* water_uniform = nullptr,
+        FrameInterpassRecorder final_capture = nullptr, void* final_capture_data = nullptr,
+        FrameRecorder final_overlay = nullptr, void* final_overlay_data = nullptr);
 
 private:
     static void geometry(const FrameRecordingContext& frame, void* user_data);

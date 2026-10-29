@@ -1022,10 +1022,12 @@ void VulkanLevelRender::RenderMenu()
     if (!g_pGamePersistent)
         return;
 
-    // Match the engine's menu callback order. Both callbacks enqueue ordinary
-    // UI batches; DeferredFrame records those batches after deferred lighting.
+    // PP UI contains a distortion field, not displayable RGB. Keep its
+    // batches separate so they can sample the completed menu image.
     g_pGamePersistent->OnRenderPPUI_main();
+    game_device_->ui().set_distortion(true);
     g_pGamePersistent->OnRenderPPUI_PP();
+    game_device_->ui().set_distortion(false);
 }
 
 void VulkanLevelRender::Clear()

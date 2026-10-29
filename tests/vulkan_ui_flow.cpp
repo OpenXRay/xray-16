@@ -136,11 +136,11 @@ VkResult VKAPI_PTR free_descriptor(VkDevice, VkDescriptorPool, uint32_t, const V
 void VKAPI_PTR update(VkDevice, uint32_t, const VkWriteDescriptorSet *, uint32_t, const VkCopyDescriptorSet *)
 {
 }
-void VKAPI_PTR bind_descriptor(VkCommandBuffer, VkPipelineBindPoint, VkPipelineLayout, uint32_t, uint32_t count, const VkDescriptorSet *set, uint32_t,
+void VKAPI_PTR bind_descriptor(VkCommandBuffer, VkPipelineBindPoint, VkPipelineLayout, uint32_t first, uint32_t count, const VkDescriptorSet *set, uint32_t,
                                const uint32_t *)
 {
     assert(count == 1 && refs.at(*set) > 0);
-    bound_textures.push_back(*set);
+    if (first == 0) bound_textures.push_back(*set);
 }
 
 void quad(VulkanUIRender &ui, VkDescriptorSet texture, float x)
@@ -225,6 +225,20 @@ int main()
     quad(ui, progress, 10);
     frame.frame_index = 0;
     assert(ui.record(frame, error) && phase.end());
+    ui.setup_states();
+    const auto scene_texture = handle<VkDescriptorSet>(99);
+    refs[scene_texture] = 1;
+    quad(ui, progress, 10);
+    ui.set_distortion(true);
+    quad(ui, progress, 40);
+    ui.set_distortion(false);
+    assert(ui.has_distortion());
+    assert(!ui.record(frame, error, true));
+    const auto before = draws;
+    assert(ui.record(frame, error) && draws == before + 1);
+    assert(ui.record(frame, error, true, scene_texture) && draws == before + 2);
+    ui.reset_frame();
+    assert(!ui.has_distortion());
     ui.DestroyUIGeom();
     assert(refs[progress] == 1 && buffers.empty() && allocations.empty() && buffers_destroyed == 4);
     ui.CreateUIGeom();

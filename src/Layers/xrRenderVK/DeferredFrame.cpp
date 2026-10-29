@@ -132,7 +132,9 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     SunShadowTargets* shadows, const SunShadowUniform* shadow_uniform,
     LocalShadowTargets* local_shadows, const std::vector<LocalLightUniform>* local_lights,
     FrameRecorder local_lighting, void* local_data,
-    WaterTargets* water, const WaterSceneUniform* water_uniform)
+    WaterTargets* water, const WaterSceneUniform* water_uniform,
+    FrameInterpassRecorder final_capture, void* final_capture_data,
+    FrameRecorder final_overlay, void* final_overlay_data)
 {
     targets_ = &targets;
     shadows_ = shadows;
@@ -168,7 +170,8 @@ bool DeferredFrame::render(FrameContext& frame, GBufferTargets& targets, const G
     if (!frame.render_frame(clear, status, error, lighting, this,
             readback, readback_data, geometry, this, clear_target,
             compositor_, compositor_data_,
-            water_ ? capture : nullptr, this, water_ ? overlay : nullptr, this)) return false;
+            water_ ? capture : nullptr, this, water_ ? overlay : nullptr, this,
+            final_capture, final_capture_data, final_overlay, final_overlay_data)) return false;
     if (!recorded_)
     {
         error = "Vulkan deferred level command recording failed";

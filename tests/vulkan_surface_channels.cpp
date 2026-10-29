@@ -2,7 +2,9 @@
 // sampled slots. Run with a software Vulkan ICD when no physical GPU exists.
 #include <vulkan/vulkan.h>
 #include "../src/Layers/xrRenderVK/DistortionShaders.h"
+#include "../src/Layers/xrRenderVK/SceneShaders.h"
 #include <array>
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cmath>
@@ -94,7 +96,7 @@ int main(int argc, char** argv)
 {
     try
     {
-        if (argc != 2) throw std::runtime_error("usage: vulkan_surface_channels <vk shader directory>");
+        if (argc < 2 || argc > 3) throw std::runtime_error("usage: vulkan_surface_channels <vk shader directory> [menu-preview.ppm]");
         VkInstance instance{}; VkInstanceCreateInfo instance_info{VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
         check(vkCreateInstance(&instance_info, nullptr, &instance));
         uint32_t count{}; check(vkEnumeratePhysicalDevices(instance, &count, nullptr));
@@ -128,7 +130,7 @@ int main(int argc, char** argv)
         for (auto& target : output)
             target = image(memory, format, VK_IMAGE_TILING_OPTIMAL,
                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
-                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 1, 128);
         // Each slot and each channel has a different value; neutral slots are
         // overridden for the variant under test below.
         std::array<std::array<float, 4>, 20> pixels{};
@@ -229,7 +231,7 @@ int main(int argc, char** argv)
         std::array<VkImageView, 3> views{output[0].view, output[1].view, output[2].view};
         VkFramebufferCreateInfo framebuffer_info{VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO};
         framebuffer_info.renderPass = render_pass; framebuffer_info.attachmentCount = 3;
-        framebuffer_info.pAttachments = views.data(); framebuffer_info.width = framebuffer_info.height = 1;
+        framebuffer_info.pAttachments = views.data(); framebuffer_info.width = 128; framebuffer_info.height = 1;
         framebuffer_info.layers = 1;
         VkFramebuffer framebuffer{}; check(vkCreateFramebuffer(device, &framebuffer_info, nullptr, &framebuffer));
         VkBufferCreateInfo buffer_info{VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
@@ -256,7 +258,7 @@ int main(int argc, char** argv)
         triangle[2].uv[0] = 0; triangle[2].uv[1] = 2;
         void* mapped{}; check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
         std::memcpy(mapped, triangle.data(), sizeof(triangle)); vkUnmapMemory(device, vertex_memory);
-        buffer_info.size = 3 * 16; buffer_info.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+        buffer_info.size = 128 * 3 * 16; buffer_info.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
         VkBuffer readback{}; check(vkCreateBuffer(device, &buffer_info, nullptr, &readback));
         vkGetBufferMemoryRequirements(device, readback, &required);
         VkDeviceMemory readback_memory = memory.allocate(required,
@@ -323,6 +325,9 @@ int main(int argc, char** argv)
         using namespace xray::render::vulkan;
         const auto distort_vs = embedded(distortion_shaders::Vertex, sizeof(distortion_shaders::Vertex));
         const auto distort_ps = embedded(distortion_shaders::Fragment, sizeof(distortion_shaders::Fragment));
+        const auto ui_vs = embedded(scene_shaders::UiVertex, sizeof(scene_shaders::UiVertex));
+        const auto ui_ps = embedded(scene_shaders::UiFragment, sizeof(scene_shaders::UiFragment));
+        std::array<std::array<float, 4>, 128> last_ui_pixels{};
         bool inputs_initialized = false;
         bool cube_initialized = false;
         auto execute = [&](VkShaderModule fragment, const Push& push, bool use_cube = false, VkShaderModule custom_vertex = VK_NULL_HANDLE) {
@@ -331,6 +336,15 @@ int main(int argc, char** argv)
             stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT; stages[0].module = custom_vertex ? custom_vertex : vs; stages[0].pName = "main";
             stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT; stages[1].module = fragment; stages[1].pName = "main";
             pipeline_info.stageCount = 2; pipeline_info.pStages = stages;
+            const VkVertexInputAttributeDescription ui_attributes[]{
+                {0, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, position)},
+                {1, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)},
+                {2, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(Vertex, baked)}};
+            const bool ui = custom_vertex == ui_vs;
+            viewport.width = ui ? 128.f : 1.f;
+            scissor.extent.width = ui ? 128 : 1;
+            vertex_input.vertexAttributeDescriptionCount = ui ? 3 : 5;
+            vertex_input.pVertexAttributeDescriptions = ui ? ui_attributes : attributes;
             VkPipeline pipeline{}; check(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &pipeline));
             check(vkResetCommandPool(device, commands, 0));
             VkCommandBufferBeginInfo begin{VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO}; check(vkBeginCommandBuffer(cmd, &begin));
@@ -371,6 +385,7 @@ int main(int argc, char** argv)
             std::array<VkClearValue, 3> clear{};
             VkRenderPassBeginInfo rp{VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
             rp.renderPass = render_pass; rp.framebuffer = framebuffer; rp.renderArea.extent = {1, 1};
+            rp.renderArea.extent.width = ui ? 128 : 1;
             rp.clearValueCount = 3; rp.pClearValues = clear.data();
             vkCmdBeginRenderPass(cmd, &rp, VK_SUBPASS_CONTENTS_INLINE);
             vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
@@ -382,17 +397,17 @@ int main(int argc, char** argv)
             std::array<VkBufferImageCopy, 3> copies{};
             for (uint32_t i = 0; i < 3; ++i)
             {
-                copies[i].bufferOffset = i * 16;
+                copies[i].bufferOffset = i * 128 * 16;
                 copies[i].imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
                 copies[i].imageSubresource.layerCount = 1;
-                copies[i].imageExtent = {1, 1, 1};
+                copies[i].imageExtent = {ui ? 128u : 1u, 1, 1};
             }
             for (uint32_t i = 0; i < 3; ++i)
                 vkCmdCopyImageToBuffer(cmd, output[i].image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                     readback, 1, &copies[i]);
             VkBufferMemoryBarrier host{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER};
             host.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT; host.dstAccessMask = VK_ACCESS_HOST_READ_BIT;
-            host.buffer = readback; host.size = 48;
+            host.buffer = readback; host.size = 128 * 48;
             vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_HOST_BIT,
                 0, 0, nullptr, 1, &host, 0, nullptr);
             check(vkEndCommandBuffer(cmd));
@@ -400,7 +415,10 @@ int main(int argc, char** argv)
             check(vkQueueSubmit(queue, 1, &submit, VK_NULL_HANDLE)); check(vkQueueWaitIdle(queue));
             std::array<std::array<float, 4>, 3> result{};
             void* data{}; check(vkMapMemory(device, readback_memory, 0, VK_WHOLE_SIZE, 0, &data));
-            std::memcpy(result.data(), data, sizeof(result)); vkUnmapMemory(device, readback_memory);
+            for (unsigned i = 0; i < 3; ++i)
+                std::memcpy(result[i].data(), static_cast<uint8_t*>(data) + i * 128 * 16, 16);
+            if (ui) std::memcpy(last_ui_pixels.data(), data, sizeof(last_ui_pixels));
+            vkUnmapMemory(device, readback_memory);
             vkDestroyPipeline(device, pipeline, nullptr); return result;
         };
         Push push{}; for (int i = 0; i < 16; ++i) push.mvp[i] = (i % 5 == 0 ? 1.f : 0.f);
@@ -546,9 +564,69 @@ int main(int argc, char** argv)
         fill(memory, input[0], {.8f, .7f, .1f, 0.f});
         auto no_distortion = execute(distort_ps, distort, false, distort_vs);
         near(no_distortion[0][0], 0.f, "zero-weight distortion is discarded");
+        // Execute the actual UI stages with a deliberately purple/yellow
+        // distortion atlas and a differently colored completed-menu snapshot.
+        // The old path displayed the atlas itself. The fixed path samples scene.
+        for (unsigned i = 0; i < triangle.size(); ++i)
+        {
+            triangle[i].position[0] = i == 1 ? 256.f : 0.f;
+            triangle[i].position[1] = i == 2 ? 2.f : 0.f;
+            for (float& tint : triangle[i].baked) tint = 1.f;
+        }
+        check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        std::memcpy(mapped, triangle.data(), sizeof(triangle));
+        vkUnmapMemory(device, vertex_memory);
+        Push ui_push{};
+        ui_push.mvp[0] = 128.f; ui_push.mvp[1] = 1.f;
+        ui_push.mvp[3] = -1.f;
+        fill(memory, input[0], {.8f, .1f, .9f, .5f});
+        fill(memory, input[3], {.12f, .65f, .23f, 1.f}, 1, 128);
+        auto menu = execute(ui_ps, ui_push, false, ui_vs);
+        near(menu[0][0], .12f, "menu PP red comes from scene, not distortion atlas");
+        near(menu[0][1], .65f, "menu PP green comes from scene");
+        near(menu[0][2], .23f, "menu PP blue comes from scene");
+        near(menu[0][3], 1.f, "menu PP replaces the scene sample");
+        ui_push.mvp[3] = 1.f;
+        auto ordinary_ui = execute(ui_ps, ui_push, false, ui_vs);
+        near(ordinary_ui[0][0], .8f, "ordinary UI still draws its color texture");
+        near(ordinary_ui[0][3], .5f, "ordinary UI retains alpha");
+        ui_push.mvp[3] = -1.f;
+        // Validate displacement over the entire menu strip, including clamped edges.
+        check(vkMapMemory(device, input[3].memory, 0, VK_WHOLE_SIZE, 0, &gradient));
+        for (unsigned x = 0; x < 128; ++x)
+        {
+            const float rgba[]{float(x) / 127.f, .3f, .4f, 1.f};
+            std::memcpy(static_cast<uint8_t*>(gradient) + gradient_layout.offset + x * sizeof(rgba), rgba, sizeof(rgba));
+        }
+        vkUnmapMemory(device, input[3].memory);
+        fill(memory, input[0], {127.f/255.f, 127.f/255.f, .9f, 1.f});
+        execute(ui_ps, ui_push, false, ui_vs);
+        for (unsigned x = 0; x < 128; ++x)
+            near(last_ui_pixels[x][0], float(x) / 127.f, "neutral menu field preserves all scene coordinates");
+        fill(memory, input[0], {1.f, 127.f/255.f, .9f, .5f});
+        execute(ui_ps, ui_push, false, ui_vs);
+        for (unsigned x = 0; x < 128; ++x)
+            near(last_ui_pixels[x][0], float(std::min(x + 2, 127u)) / 127.f, "menu displacement uses alpha weight and clamps edges");
+        if (argc == 3)
+        {
+            std::ofstream preview(argv[2], std::ios::binary);
+            preview << "P6\n128 96\n255\n";
+            for (unsigned y = 0; y < 96; ++y)
+                for (unsigned x = 0; x < 128; ++x)
+                {
+                    const std::array<float, 3> rgb = y < 32 ? std::array<float, 3>{float(x)/127.f,.3f,.4f} :
+                        y < 64 ? std::array<float, 3>{1.f,127.f/255.f,.9f} :
+                        std::array<float, 3>{last_ui_pixels[x][0],last_ui_pixels[x][1],last_ui_pixels[x][2]};
+                    for (float value : rgb) preview.put(static_cast<char>(std::clamp(value,0.f,1.f)*255.f+.5f));
+                }
+            if (!preview) throw std::runtime_error("cannot save menu GPU preview");
+        }
+        fill(memory, input[0], {.8f, .1f, .9f, 0.f});
+        auto transparent_ui = execute(ui_ps, ui_push, false, ui_vs);
+        near(transparent_ui[0][3], 0.f, "transparent PP atlas texels leave scene untouched");
         std::cout << "surface channel readback: base/lightmap sun+hemi/material/bump/aux/normal/detail/terrain/emission/environment2D/cube/particle OK\n";
         check(vkDeviceWaitIdle(device));
-        for (auto module_handle : {vs, terrain, detail, flat, laemb, reflection, deferred_particle, additive_particle, additive_world_set, distort_vs, distort_ps})
+        for (auto module_handle : {vs, terrain, detail, flat, laemb, reflection, deferred_particle, additive_particle, additive_world_set, distort_vs, distort_ps, ui_vs, ui_ps})
             vkDestroyShaderModule(device, module_handle, nullptr);
         vkDestroyCommandPool(device, commands, nullptr);
         vkDestroyBuffer(device, readback, nullptr); vkFreeMemory(device, readback_memory, nullptr);

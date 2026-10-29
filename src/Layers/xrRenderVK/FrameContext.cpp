@@ -929,7 +929,9 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     FramePrepassRecorder prepass, void* prepass_data, bool clear_target,
     FrameRecorder compositor, void* compositor_data,
     FrameInterpassRecorder interpass, void* interpass_data,
-    FrameRecorder overlay, void* overlay_data)
+    FrameRecorder overlay, void* overlay_data,
+    FrameInterpassRecorder final_capture, void* final_capture_data,
+    FrameRecorder final_overlay, void* final_overlay_data)
 {
     status = FrameStatus::Presented;
     if (!m_device || !m_swapchain)
@@ -942,6 +944,8 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
         error = "Vulkan swapchain has no attached scene depth";
         return false;
     }
+    if ((final_capture || final_overlay) && (!m_overlay_pass || !final_capture || !final_overlay))
+    { error = "UI distortion requires capture and overlay recorders"; return false; }
     if ((interpass || overlay) && (!m_overlay_pass || !interpass || !overlay))
     { error = "water overlay pass requires capture and overlay recorders"; return false; }
 
@@ -1077,6 +1081,16 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
         const FrameRecordingContext overlay_frame{command, m_overlay_pass,
             m_framebuffers[image_index], m_extent, image_index, m_current_frame};
         overlay(overlay_frame, overlay_data);
+        m_vk.cmd_end_render_pass(command);
+    }
+    if (final_capture)
+    {
+        final_capture(command, m_images[image_index], image_index, final_capture_data);
+        render_info.renderPass = m_overlay_pass;
+        m_vk.cmd_begin_render_pass(command, &render_info, VK_SUBPASS_CONTENTS_INLINE);
+        const FrameRecordingContext final_frame{command, m_overlay_pass,
+            m_framebuffers[image_index], m_extent, image_index, m_current_frame};
+        final_overlay(final_frame, final_overlay_data);
         m_vk.cmd_end_render_pass(command);
     }
     if (m_postprocess)
