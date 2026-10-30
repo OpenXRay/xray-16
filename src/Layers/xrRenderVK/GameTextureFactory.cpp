@@ -8,6 +8,7 @@
 #include <cctype>
 #include <cmath>
 #include <cstring>
+#include <chrono>
 
 namespace xray::render::vulkan
 {
@@ -122,6 +123,7 @@ bool GameTextureFactory::load(const std::string& name, Asset*& asset, std::strin
         error.clear();
         return true;
     }
+    const auto load_begin=std::chrono::steady_clock::now();
     IReader* reader = FS.r_open(path);
     if (!reader)
     {
@@ -136,6 +138,9 @@ bool GameTextureFactory::load(const std::string& name, Asset*& asset, std::strin
         reader->pointer(), reader->length(), bc_supported_, texture, pending_, states_, error, &extent, &cube,
         maximum_dimension);
     FS.r_close(reader);
+    const auto elapsed=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-load_begin).count();
+    if (elapsed>20.) Msg("[renderer-vulkan] texture.slow name='%s' ms=%.2f limit=%u extent=%ux%u success=%d",
+        normalized.c_str(),elapsed,maximum_dimension,extent.width,extent.height,uploaded);
     if (!uploaded)
     {
         error = "texture '" + normalized + "': " + error;

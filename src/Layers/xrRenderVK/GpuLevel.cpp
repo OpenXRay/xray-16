@@ -180,6 +180,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     PackedLevelGeometry packing;
     std::vector<Mesh*> awaiting_batch;
     std::unordered_map<uint32_t, const Mesh*> material_cache;
+    std::unordered_set<uint16_t> reported_multiply;
     const auto flush_geometry = [&]() -> bool
     {
         if (awaiting_batch.empty()) return true;
@@ -302,6 +303,9 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
                 material.shader + "/" + material.textures + "): " + error;
             return false;
         }
+        if ((blend_mode==3 || blend_mode==4 || blend_mode==6) && reported_multiply.insert(model.material).second)
+            Msg("[renderer-vulkan] level.multiply material=%u shader='%s' textures='%s' blend=%d flags=0x%x",
+                model.material,material.shader.c_str(),material.textures.c_str(),blend_mode,material_flags);
         if (definition.class_name == "MODELEbB")
         {
             error = "level material id=" + std::to_string(model.material) +

@@ -4,11 +4,21 @@
 #include "src/Layers/xrRenderVK/LevelLightmap.h"
 #include "src/Layers/xrRenderVK/ModelPoseConstants.h"
 #include "src/Layers/xrRenderVK/ShaderPairCache.h"
+#include "src/Layers/xrRenderVK/VulkanSettings.h"
 #include <cassert>
 #include <array>
 #include <cmath>
 using namespace xray::render::vulkan;
 int main() {
+    quality_preset=4;detail_radius=80;ambient_scale=.1f;hemisphere_scale=.2f;
+    apply_vulkan_launch_settings("-cop -android-mobile-preset Minimum -vk-detail-distance 0 -vk-ambient-scale 1 -vk-hemi-scale 1");
+    assert(quality_preset==0 && detail_radius==0 && ambient_scale==1 && hemisphere_scale==1);
+    quality_preset=0;
+    apply_vulkan_launch_settings("-android-mobile-preset Default");assert(quality_preset==2);
+    apply_vulkan_launch_settings("-android-mobile-preset Extreme -vk-detail-distance 20");
+    assert(quality_preset==4 && detail_radius==20);
+    apply_vulkan_launch_settings("-vk-hemi-scale nan -vk-detail-distance invalid");
+    assert(hemisphere_scale==1 && detail_radius==20);
     ShaderPairCache<int> pair_cache;int first=11, replacement=22;
     assert(!pair_cache.find("model.vs","flat.ps"));
     pair_cache.remember("model.vs","flat.ps",&first);

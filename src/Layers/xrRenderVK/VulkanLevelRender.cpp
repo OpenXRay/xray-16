@@ -892,7 +892,7 @@ void VulkanLevelRender::Calculate()
     std::vector<VulkanLightSnapshot> light_snapshots;
     light_snapshots.reserve(lights_.size());
     for (const VulkanLight* light : lights_)
-        if (light) light_snapshots.push_back(light->snapshot());
+        if (light && light->snapshot().active) light_snapshots.push_back(light->snapshot());
     game_device_->queue_lights(light_snapshots);
     for (VulkanObjectSpecific* object : object_specifics_)
         if (object)
@@ -1408,6 +1408,16 @@ std::unique_ptr<VulkanModelVisual> VulkanLevelRender::load_model_base(pcstr name
     const bool parsed = data ? load_engine_model_reader(*data, name, record, error) : load_engine_model_visual(name, record, error);
     if (!parsed)
         return nullptr;
+    if (name && (std::strstr(name,"kitchen_") || std::strstr(name,"door_")))
+    {
+        const auto describe = [&](const auto& self, const VisualRecord& node, unsigned depth) -> void
+        {
+            Msg("[renderer-vulkan] model.material name='%s' child-depth=%u type=%u shader='%s' texture='%s'",
+                name,depth,node.type,node.shader.c_str(),node.texture.c_str());
+            for (const auto& child:node.embedded_children) self(self,child,depth+1);
+        };
+        describe(describe,record,0);
+    }
     auto result = create_model_tree(record, "", cache_name, error, skeletal_child);
     if (!result)
         error = std::string(name && *name ? name : "<reader>.ogf") + " / type=" + std::to_string(record.type) +
@@ -1734,10 +1744,16 @@ void VulkanLevelRender::add_Visual(u32, IRenderable* root, IRenderVisual* visual
             hud, distance_squared(center, camera_position));
         return;
     }
-    const int visual_index = level_.find_visual_index(visual);
+    const auto direct_model = models_.find(visual);
+    const int visual_index = direct_model == models_.end() ? level_.find_visual_index(visual) : -1;
     const VulkanModelVisual* model = nullptr;
     const void* model_owner = nullptr;
-    for (const auto& entry : models_)
+    if (direct_model != models_.end())
+    {
+        model=direct_model->second.get();
+        model_owner=direct_model->first;
+    }
+    else if (visual_index < 0) for (const auto& entry : models_)
         if ((model = entry.second->find(visual)))
         {
             model_owner = entry.first;

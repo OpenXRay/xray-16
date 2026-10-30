@@ -188,6 +188,7 @@ private:
     std::string active_map_names_[2];
     VkImageView color_map_views_[2]{};
     bool ui_recorded_{true};
+    bool launch_settings_applied_{};
     std::string ui_error_;
     std::vector<ModelDraw> model_draws_;
     std::vector<ParticleDraw> particle_draws_;

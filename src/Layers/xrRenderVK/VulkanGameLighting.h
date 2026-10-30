@@ -90,6 +90,6 @@ private:
     u32 mode_{TRACE_ALL};
     float luminocity_{};
     float hemi_luminocity_{};
-    std::array<float, 6> hemi_cube_{};
+    std::array<float, 6> hemi_cube_{.5f,.5f,.5f,.5f,.5f,.5f};
 };
 }

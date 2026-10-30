@@ -31,6 +31,10 @@ int main()
         VulkanTraceAll, {point});
     assert(unlit.luminocity < lit.luminocity);
     assert(unlit.hemi_cube[4] == unlit.hemi_cube[5]);
+    const float dark_sky[]{.001f,.002f,.003f};
+    const auto dark=evaluate_object_lighting(origin,ambient,dark_sky,sun,VulkanTraceAll,{});
+    assert(dark.hemi_cube==unlit.hemi_cube);
+    assert(dark.hemi_cube[0]==.5f && dark.luminocity<unlit.luminocity);
 
     // A light on +Z must reach the shader's positive Z face, not negative X.
     assert(lit.hemi_cube[VulkanShaderHemiFaceOrder[2]] >

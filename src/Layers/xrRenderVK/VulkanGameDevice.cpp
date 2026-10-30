@@ -891,6 +891,13 @@ void VulkanGameDevice::record_models(const FrameRecordingContext& frame, void* u
 
 void VulkanGameDevice::begin_frame()
 {
+    if (!launch_settings_applied_)
+    {
+        apply_vulkan_launch_settings(Core.Params);
+        launch_settings_applied_=true;
+        Msg("[renderer-vulkan] launcher.settings preset=%u detail=%d ambient=%.3f hemi=%.3f sun=%.3f",
+            quality_preset, detail_radius, ambient_scale, hemisphere_scale, sun_scale);
+    }
     discard_scene_draws();
     light_snapshots_.clear();
     ui_.reset_frame();
@@ -1409,6 +1416,7 @@ bool VulkanGameDevice::prepare_for_reset(std::string& error)
 
 void VulkanGameDevice::destroy()
 {
+    launch_settings_applied_=false;
     Msg("[renderer-vulkan] teardown game device begin");
     if (window_.device() && frame_dispatch_.device_wait_idle)
         frame_dispatch_.device_wait_idle(window_.device());

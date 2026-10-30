@@ -39,7 +39,11 @@ VulkanObjectLighting evaluate_object_lighting(const std::array<float, 3>& positi
         {{0.f, -1.f, 0.f}}, {{0.f, 0.f, 1.f}}, {{0.f, 0.f, -1.f}}
     }};
     VulkanObjectLighting result;
-    result.hemi_cube.fill(ambient_light);
+    // The shader consumes visibility, then applies the weather's RGB hemi.
+    // Feeding radiance here multiplies the sky intensity a second time. Until
+    // sky ray tracing is implemented, keep the same neutral 0.5 visibility as
+    // an untraced desktop ROS, independent of weather color/intensity.
+    result.hemi_cube.fill(mode & VulkanTraceHemi ? .5f : 0.f);
     if ((mode & VulkanTraceLights) && finite3(position))
     {
         for (const VulkanLightSnapshot& light : lights)
