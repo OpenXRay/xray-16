@@ -34,18 +34,20 @@ float sun_visibility(float depth, vec2 screen_uv)
     // blocks on low sun angles as the camera moved.
     ivec2 size = textureSize(sun_shadow, 0);
     vec2 grid = uv * vec2(size) - 0.5;
-    ivec2 base = ivec2(floor(grid));
-    vec2 weight = fract(grid);
-    float visibility[4];
-    for (int y = 0; y < 2; ++y)
-        for (int x = 0; x < 2; ++x)
+    ivec2 center = ivec2(floor(grid + 0.5));
+    vec2 fraction = grid - vec2(center);
+    float lit = 0.0, total = 0.0;
+    for (int y = -1; y <= 1; ++y)
+        for (int x = -1; x <= 1; ++x)
         {
-            ivec2 pixel = clamp(base + ivec2(x, y), ivec2(0), size - 1);
-            visibility[y * 2 + x] = coord.z - shadow.options.x <=
-                texelFetch(sun_shadow, pixel, 0).r ? 1.0 : 0.0;
+            vec2 weight = max(vec2(1.5) - abs(vec2(x, y) - fraction), vec2(0.0));
+            float w = weight.x * weight.y;
+            ivec2 pixel = clamp(center + ivec2(x, y), ivec2(0), size - 1);
+            float visibility = coord.z - shadow.options.x <= texelFetch(sun_shadow, pixel, 0).r ? 1.0 : 0.0;
+            lit += visibility * w;
+            total += w;
         }
-    return mix(mix(visibility[0], visibility[1], weight.x),
-        mix(visibility[2], visibility[3], weight.x), weight.y);
+    return lit / max(total, 1e-6);
 }
 void main()
 {

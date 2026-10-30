@@ -136,6 +136,7 @@ private:
         VkExtent2D extent{};
         bool cube{};
         uint64_t bytes{};
+        uint32_t maximum_dimension{};
         size_t material_refs{};
         size_t clamp_material_refs{};
         size_t lightmap_refs{};
@@ -176,6 +177,7 @@ private:
     PFN_vkDeviceWaitIdle wait_idle_{};
     VkSampler sampler_{};
     VkSampler ui_sampler_{};
+    VkSampler lightmap_sampler_{};
     ImageStateTracker states_;
     std::vector<PendingTextureUpload> pending_;
     std::unordered_map<std::string, Asset> assets_;

@@ -196,9 +196,9 @@ bool upload_texture(VkDevice device, VkQueue queue, VkCommandPool pool,
     android_set_load_context("vulkan texture: transfer write -> shader read in general layout");
 #endif
     // Keep immutable game textures in GENERAL. The affected Adreno driver
-    // faults here even for a memory-only barrier. Wait for the submission's
-    // fence before exposing its image view on that driver: fence signal/wait
-    // makes transfer writes visible to later queue submissions. Other drivers
+    // faults here even for a memory-only barrier. Complete the copy fences
+    // before any draw samples the image: either here or at the owner's frame
+    // boundary. This makes writes visible to later submissions. Other drivers
     // retain the asynchronous upload and explicit memory barrier.
     if (!vk.fence_after_copy)
     {
@@ -245,7 +245,7 @@ bool upload_texture(VkDevice device, VkQueue queue, VkCommandPool pool,
 #endif
     if (vk.queue_submit(queue, 1, &submit, upload.fence) != VK_SUCCESS)
         return fail("Vulkan texture upload submission failed");
-    if (vk.fence_after_copy)
+    if (vk.fence_after_copy && !vk.defer_fence_wait)
     {
 #if defined(XR_PLATFORM_ANDROID)
         android_set_vulkan_stage("texture upload fence wait");
@@ -298,14 +298,14 @@ void collect_completed_uploads(VkDevice device, VkCommandPool pool, const Textur
 bool wait_for_uploads(VkDevice device, VkCommandPool pool, const TextureUploadDispatch& vk,
     std::vector<PendingTextureUpload>& pending_uploads)
 {
-    bool device_lost = false;
-    for (const auto& upload : pending_uploads)
-    {
-        const VkResult result = vk.wait_for_fences(device, 1, &upload.fence, VK_TRUE, UINT64_MAX);
-        if (result == VK_ERROR_DEVICE_LOST) device_lost = true;
-        else if (result != VK_SUCCESS)
-            return false;
-    }
+    if (pending_uploads.empty()) return true;
+    std::vector<VkFence> fences;
+    fences.reserve(pending_uploads.size());
+    for (const auto& upload : pending_uploads) fences.push_back(upload.fence);
+    const VkResult waited = vk.wait_for_fences(device, static_cast<uint32_t>(fences.size()),
+        fences.data(), VK_TRUE, UINT64_MAX);
+    const bool device_lost = waited == VK_ERROR_DEVICE_LOST;
+    if (waited != VK_SUCCESS && !device_lost) return false;
     for (auto& upload : pending_uploads)
         release_upload(device, pool, vk, upload);
     pending_uploads.clear();

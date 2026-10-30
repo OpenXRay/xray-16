@@ -91,9 +91,9 @@ public:
         VkShaderModule water_fragment = VK_NULL_HANDLE);
     bool material(VkImageView albedo, VkSampler sampler, VkDescriptorSet& set, std::string& error);
     bool lightmapped_material(VkImageView albedo, VkImageView lightmap,
-        VkSampler sampler, VkDescriptorSet& set, std::string& error);
+        VkSampler sampler, VkDescriptorSet& set, std::string& error, VkSampler lightmap_sampler = VK_NULL_HANDLE);
     bool terrain_material(const std::array<VkImageView, 7>& views,
-        VkSampler sampler, VkDescriptorSet& set, std::string& error);
+        VkSampler sampler, VkDescriptorSet& set, std::string& error, VkSampler lightmap_sampler = VK_NULL_HANDLE);
     void update_surface_textures(VkDescriptorSet set, const std::array<VkImageView, 13>& views,
         VkSampler sampler);
     void set_surface_parameters(VkDescriptorSet set, const SurfaceParameters& parameters)
@@ -130,9 +130,9 @@ public:
         const TextureMatrixSet* matrices = nullptr) const;
     void update_material(VkDescriptorSet set, VkImageView view, VkSampler sampler);
     void update_lightmapped_material(VkDescriptorSet set, VkImageView albedo,
-        VkImageView lightmap, VkSampler sampler);
+        VkImageView lightmap, VkSampler sampler, VkSampler lightmap_sampler = VK_NULL_HANDLE);
     void update_terrain_material(VkDescriptorSet set, const std::array<VkImageView, 7>& views,
-        VkSampler sampler);
+        VkSampler sampler, VkSampler lightmap_sampler = VK_NULL_HANDLE);
     bool gbuffer(VkImageView albedo, VkImageView normal, VkImageView depth,
         VkImageView surface, VkSampler sampler,
         VkDescriptorSet& set, std::string& error);

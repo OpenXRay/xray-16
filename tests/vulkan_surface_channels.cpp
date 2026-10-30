@@ -2,6 +2,7 @@
 // sampled slots. Run with a software Vulkan ICD when no physical GPU exists.
 #include <vulkan/vulkan.h>
 #include "../src/Layers/xrRenderVK/DistortionShaders.h"
+#include "../src/Layers/xrRenderVK/ParticleSprite.h"
 #include "../src/Layers/xrRenderVK/SceneShaders.h"
 #include "../src/Layers/xrRenderVK/WeatherShaders.h"
 #include "../src/Layers/xrRenderVK/DeferredShaders.h"
@@ -44,14 +45,15 @@ struct Memory
         VkDeviceMemory result{}; check(vkAllocateMemory(device, &info, nullptr, &result)); return result;
     }
 };
-struct Image { VkImage image{}; VkImageView view{}; VkDeviceMemory memory{}; };
+struct Image { VkImage image{}; VkImageView view{}; VkDeviceMemory memory{}; uint32_t width{1}, height{1}; };
 static Image image(Memory& memory, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
-    VkMemoryPropertyFlags flags, uint32_t layers = 1, uint32_t width = 1, uint32_t levels = 1)
+    VkMemoryPropertyFlags flags, uint32_t layers = 1, uint32_t width = 1, uint32_t levels = 1, uint32_t height = 1)
 {
     Image result;
     VkImageCreateInfo info{VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
     info.imageType = VK_IMAGE_TYPE_2D; info.format = format;
-    info.extent = {width, layers == 6 ? width : 1, 1}; info.mipLevels = levels; info.arrayLayers = layers;
+    info.extent = {width, layers == 6 ? width : height, 1};
+    result.width=width;result.height=info.extent.height; info.mipLevels = levels; info.arrayLayers = layers;
     if (layers == 6) info.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
     info.samples = VK_SAMPLE_COUNT_1_BIT; info.tiling = tiling; info.usage = usage;
     info.initialLayout = tiling == VK_IMAGE_TILING_LINEAR ?
@@ -79,8 +81,9 @@ static void fill(Memory& memory, const Image& image, const std::array<float, 4>&
         VkImageSubresource subresource{VK_IMAGE_ASPECT_COLOR_BIT, 0, face};
         VkSubresourceLayout layout{};
         vkGetImageSubresourceLayout(memory.device, image.image, &subresource, &layout);
-        for (uint32_t x = 0; x < width; ++x)
-            std::memcpy(static_cast<uint8_t*>(mapped) + layout.offset + x * sizeof(float) * 4, rgba.data(), sizeof(float) * 4);
+        for (uint32_t y = 0; y < image.height; ++y)
+            for (uint32_t x = 0; x < image.width; ++x)
+                std::memcpy(static_cast<uint8_t*>(mapped) + layout.offset + y*layout.rowPitch + x * sizeof(float) * 4, rgba.data(), sizeof(float) * 4);
     }
     vkUnmapMemory(memory.device, image.memory);
 }
@@ -127,12 +130,12 @@ int main(int argc, char** argv)
         std::array<Image, 20> input;
         for (size_t i = 0; i < input.size(); ++i)
             input[i] = image(memory, format, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_SAMPLED_BIT,
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 1, i == 3 ? 128 : 1);
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 1, i == 3 ? 128 : i == 0 ? 2 : 1, 1, i == 0 ? 2 : 1);
         std::array<Image, 3> output;
         for (auto& target : output)
             target = image(memory, format, VK_IMAGE_TILING_OPTIMAL,
                 VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
-                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 1, 128);
+                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 1, 128, 1, 2);
         // Each slot and each channel has a different value; neutral slots are
         // overridden for the variant under test below.
         std::array<std::array<float, 4>, 20> pixels{};
@@ -148,7 +151,7 @@ int main(int argc, char** argv)
         pixels[6] = {.8f, .7f, .5f, .5f};
         pixels[7] = {.3f, .4f, .5f, .6f};
         pixels[8] = {.1f, .2f, .7f, .4f};
-        for (size_t i = 0; i < input.size(); ++i) fill(memory, input[i], pixels[i], 1, i == 3 ? 128 : 1);
+        for (size_t i = 0; i < input.size(); ++i) fill(memory, input[i], pixels[i]);
         const Image cube = image(memory, format, VK_IMAGE_TILING_LINEAR,
             VK_IMAGE_USAGE_SAMPLED_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 6);
@@ -234,11 +237,11 @@ int main(int argc, char** argv)
         std::array<VkImageView, 3> views{output[0].view, output[1].view, output[2].view};
         VkFramebufferCreateInfo framebuffer_info{VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO};
         framebuffer_info.renderPass = render_pass; framebuffer_info.attachmentCount = 3;
-        framebuffer_info.pAttachments = views.data(); framebuffer_info.width = 128; framebuffer_info.height = 1;
+        framebuffer_info.pAttachments = views.data(); framebuffer_info.width = 128; framebuffer_info.height = 2;
         framebuffer_info.layers = 1;
         VkFramebuffer framebuffer{}; check(vkCreateFramebuffer(device, &framebuffer_info, nullptr, &framebuffer));
         VkBufferCreateInfo buffer_info{VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
-        buffer_info.size = sizeof(Vertex) * 3; buffer_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        buffer_info.size = sizeof(Vertex) * 6; buffer_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
         VkBuffer vertices{}; check(vkCreateBuffer(device, &buffer_info, nullptr, &vertices));
         VkMemoryRequirements required{}; vkGetBufferMemoryRequirements(device, vertices, &required);
         VkDeviceMemory vertex_memory = memory.allocate(required,
@@ -261,7 +264,7 @@ int main(int argc, char** argv)
         triangle[2].uv[0] = 0; triangle[2].uv[1] = 2;
         void* mapped{}; check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
         std::memcpy(mapped, triangle.data(), sizeof(triangle)); vkUnmapMemory(device, vertex_memory);
-        buffer_info.size = 128 * 3 * 16; buffer_info.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+        buffer_info.size = 256 * 3 * 16; buffer_info.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
         VkBuffer readback{}; check(vkCreateBuffer(device, &buffer_info, nullptr, &readback));
         vkGetBufferMemoryRequirements(device, readback, &required);
         VkDeviceMemory readback_memory = memory.allocate(required,
@@ -331,9 +334,12 @@ int main(int argc, char** argv)
         const auto ui_vs = embedded(scene_shaders::UiVertex, sizeof(scene_shaders::UiVertex));
         const auto ui_ps = embedded(scene_shaders::UiFragment, sizeof(scene_shaders::UiFragment));
         std::array<std::array<float, 4>, 128> last_ui_pixels{};
+        std::array<std::array<float, 4>,4> sprite_pixels{};
         const auto weather_ps = embedded(weather_shaders::Fragment, sizeof(weather_shaders::Fragment));
         const auto weather_vs = embedded(deferred_shaders::LightVertex, sizeof(deferred_shaders::LightVertex));
         const Image weather_normal = image(memory, format, VK_IMAGE_TILING_LINEAR,
+            VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 1, 128);
+        const Image weather_shadow = image(memory, format, VK_IMAGE_TILING_LINEAR,
             VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 1, 128);
         const Image weather_cube = image(memory, format, VK_IMAGE_TILING_LINEAR,
             VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 6, 64, 7);
@@ -360,6 +366,14 @@ int main(int argc, char** argv)
             std::memcpy(static_cast<uint8_t*>(mapped)+normal_layout.offset+x*16,rgba,16);
         }
         vkUnmapMemory(device, weather_normal.memory);
+        check(vkMapMemory(device,weather_shadow.memory,0,VK_WHOLE_SIZE,0,&mapped));
+        VkSubresourceLayout shadow_layout{};
+        vkGetImageSubresourceLayout(device,weather_shadow.image,&normal_sub,&shadow_layout);
+        for(unsigned x=0;x<128;++x) {
+            const float rgba[]{x%2?.75f:.25f,0,0,1};
+            std::memcpy(static_cast<uint8_t*>(mapped)+shadow_layout.offset+x*16,rgba,16);
+        }
+        vkUnmapMemory(device,weather_shadow.memory);
         VkBuffer weather_uniform{}; buffer_info.size=176; buffer_info.usage=VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
         check(vkCreateBuffer(device,&buffer_info,nullptr,&weather_uniform));
         vkGetBufferMemoryRequirements(device,weather_uniform,&required);
@@ -384,7 +398,7 @@ int main(int argc, char** argv)
             {sampler,input[0].view,VK_IMAGE_LAYOUT_GENERAL},
             {sampler,weather_normal.view,VK_IMAGE_LAYOUT_GENERAL},
             {sampler,input[19].view,VK_IMAGE_LAYOUT_GENERAL},
-            {sampler,input[19].view,VK_IMAGE_LAYOUT_GENERAL},
+            {sampler,weather_shadow.view,VK_IMAGE_LAYOUT_GENERAL},
             {},{sampler,input[2].view,VK_IMAGE_LAYOUT_GENERAL}};
         VkDescriptorBufferInfo uniform_info{weather_uniform,0,176};
         for(unsigned i=0;i<6;++i)
@@ -407,7 +421,7 @@ int main(int argc, char** argv)
         bool weather_initialized=false;
         bool inputs_initialized = false;
         bool cube_initialized = false;
-        auto execute = [&](VkShaderModule fragment, const Push& push, bool use_cube = false, VkShaderModule custom_vertex = VK_NULL_HANDLE) {
+        auto execute = [&](VkShaderModule fragment, const Push& push, bool use_cube = false, VkShaderModule custom_vertex = VK_NULL_HANDLE, bool sprite = false) {
             VkPipelineShaderStageCreateInfo stages[2]{};
             for (auto& stage : stages) stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
             stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT; stages[0].module = custom_vertex ? custom_vertex : vs; stages[0].pName = "main";
@@ -420,8 +434,9 @@ int main(int argc, char** argv)
             const bool ui = custom_vertex == ui_vs;
             const bool weather = fragment == weather_ps;
             const bool wide = ui || weather;
-            viewport.width = wide ? 128.f : 1.f;
-            scissor.extent.width = wide ? 128 : 1;
+            viewport.width = wide ? 128.f : sprite ? 2.f : 1.f;
+            scissor.extent.width = wide ? 128 : sprite ? 2 : 1;
+            viewport.height = sprite ? 2.f : 1.f; scissor.extent.height = sprite ? 2 : 1;
             pipeline_info.layout = weather ? weather_pipeline_layout : pipeline_layout;
             vertex_input.vertexAttributeDescriptionCount = ui ? 3 : 5;
             vertex_input.pVertexAttributeDescriptions = ui ? ui_attributes : attributes;
@@ -430,17 +445,17 @@ int main(int argc, char** argv)
             VkCommandBufferBeginInfo begin{VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO}; check(vkBeginCommandBuffer(cmd, &begin));
             if (weather && !weather_initialized)
             {
-                VkImageMemoryBarrier barriers[2]{};
-                for(unsigned i=0;i<2;++i) {
+                VkImageMemoryBarrier barriers[3]{};
+                for(unsigned i=0;i<3;++i) {
                     auto& b=barriers[i];b.sType=VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
                     b.srcAccessMask=VK_ACCESS_HOST_WRITE_BIT;b.dstAccessMask=VK_ACCESS_SHADER_READ_BIT;
                     b.oldLayout=VK_IMAGE_LAYOUT_PREINITIALIZED;b.newLayout=VK_IMAGE_LAYOUT_GENERAL;
-                    b.image=i?weather_cube.image:weather_normal.image;
-                    b.subresourceRange={VK_IMAGE_ASPECT_COLOR_BIT,0,i?7u:1u,0,i?6u:1u};
+                    b.image=i==0?weather_normal.image:i==1?weather_cube.image:weather_shadow.image;
+                    b.subresourceRange={VK_IMAGE_ASPECT_COLOR_BIT,0,i==1?7u:1u,0,i==1?6u:1u};
                     b.srcQueueFamilyIndex=b.dstQueueFamilyIndex=VK_QUEUE_FAMILY_IGNORED;
                 }
                 vkCmdPipelineBarrier(cmd,VK_PIPELINE_STAGE_HOST_BIT,VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-                    0,0,nullptr,0,nullptr,2,barriers);
+                    0,0,nullptr,0,nullptr,3,barriers);
                 weather_initialized=true;
             }
             if (use_cube && !cube_initialized)
@@ -480,7 +495,8 @@ int main(int argc, char** argv)
             std::array<VkClearValue, 3> clear{};
             VkRenderPassBeginInfo rp{VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
             rp.renderPass = render_pass; rp.framebuffer = framebuffer; rp.renderArea.extent = {1, 1};
-            rp.renderArea.extent.width = wide ? 128 : 1;
+            rp.renderArea.extent.width = wide ? 128 : sprite ? 2 : 1;
+            rp.renderArea.extent.height = sprite ? 2 : 1;
             rp.clearValueCount = 3; rp.pClearValues = clear.data();
             vkCmdBeginRenderPass(cmd, &rp, VK_SUBPASS_CONTENTS_INLINE);
             vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
@@ -488,21 +504,21 @@ int main(int argc, char** argv)
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_info.layout, 0, 2, draw_sets, 0, nullptr);
             VkDeviceSize offset{}; vkCmdBindVertexBuffers(cmd, 0, 1, &vertices, &offset);
             vkCmdPushConstants(cmd, pipeline_info.layout, range.stageFlags, 0, weather ? 128 : sizeof(push), &push);
-            vkCmdDraw(cmd, 3, 1, 0, 0); vkCmdEndRenderPass(cmd);
+            vkCmdDraw(cmd, sprite ? 6 : 3, 1, 0, 0); vkCmdEndRenderPass(cmd);
             std::array<VkBufferImageCopy, 3> copies{};
             for (uint32_t i = 0; i < 3; ++i)
             {
-                copies[i].bufferOffset = i * 128 * 16;
+                copies[i].bufferOffset = i * 256 * 16;
                 copies[i].imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
                 copies[i].imageSubresource.layerCount = 1;
-                copies[i].imageExtent = {wide ? 128u : 1u, 1, 1};
+                copies[i].imageExtent = {wide ? 128u : sprite ? 2u : 1u, sprite ? 2u : 1u, 1};
             }
             for (uint32_t i = 0; i < 3; ++i)
                 vkCmdCopyImageToBuffer(cmd, output[i].image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                     readback, 1, &copies[i]);
             VkBufferMemoryBarrier host{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER};
             host.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT; host.dstAccessMask = VK_ACCESS_HOST_READ_BIT;
-            host.buffer = readback; host.size = 128 * 48;
+            host.buffer = readback; host.size = 256 * 48;
             vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_HOST_BIT,
                 0, 0, nullptr, 1, &host, 0, nullptr);
             check(vkEndCommandBuffer(cmd));
@@ -511,8 +527,9 @@ int main(int argc, char** argv)
             std::array<std::array<float, 4>, 3> result{};
             void* data{}; check(vkMapMemory(device, readback_memory, 0, VK_WHOLE_SIZE, 0, &data));
             for (unsigned i = 0; i < 3; ++i)
-                std::memcpy(result[i].data(), static_cast<uint8_t*>(data) + i * 128 * 16, 16);
+                std::memcpy(result[i].data(), static_cast<uint8_t*>(data) + i * 256 * 16, 16);
             if (wide) std::memcpy(last_ui_pixels.data(), data, sizeof(last_ui_pixels));
+            if (sprite) std::memcpy(sprite_pixels.data(),data,sizeof(sprite_pixels));
             vkUnmapMemory(device, readback_memory);
             vkDestroyPipeline(device, pipeline, nullptr); return result;
         };
@@ -686,7 +703,17 @@ int main(int argc, char** argv)
         near(ordinary_ui[0][0], .8f, "ordinary UI still draws its color texture");
         near(ordinary_ui[0][3], .5f, "ordinary UI retains alpha");
         ui_push.mvp[3] = -1.f;
-        // Validate displacement over the entire menu strip, including clamped edges.
+        check(vkMapMemory(device, input[3].memory, 0, VK_WHOLE_SIZE, 0, &gradient));
+        for(unsigned x=0;x<128;++x) {
+            const float c=x%5<2?.8f:.05f;const float rgba[]{c,c,c,1};
+            std::memcpy(static_cast<uint8_t*>(gradient)+gradient_layout.offset+x*16,rgba,16);
+        }
+        vkUnmapMemory(device,input[3].memory);
+        fill(memory,input[0],{1.f,0.f,.9f,.5f});
+        execute(ui_ps,ui_push,false,ui_vs);
+        for(unsigned x=0;x<128;++x)
+            near(last_ui_pixels[x][0],(x%5<2?.8f:.05f)*1.02f,"menu selector preserves every glyph-pattern coordinate");
+        // Selection can change brightness slightly, but never shift labels.
         check(vkMapMemory(device, input[3].memory, 0, VK_WHOLE_SIZE, 0, &gradient));
         for (unsigned x = 0; x < 128; ++x)
         {
@@ -697,11 +724,11 @@ int main(int argc, char** argv)
         fill(memory, input[0], {127.f/255.f, 127.f/255.f, .9f, 1.f});
         execute(ui_ps, ui_push, false, ui_vs);
         for (unsigned x = 0; x < 128; ++x)
-            near(last_ui_pixels[x][0], float(x) / 127.f, "neutral menu field preserves all scene coordinates");
+            near(last_ui_pixels[x][0], float(x) / 127.f * 1.04f, "neutral menu field preserves all scene coordinates");
         fill(memory, input[0], {1.f, 127.f/255.f, .9f, .5f});
         execute(ui_ps, ui_push, false, ui_vs);
         for (unsigned x = 0; x < 128; ++x)
-            near(last_ui_pixels[x][0], float(std::min(x + 2, 127u)) / 127.f, "menu displacement uses alpha weight and clamps edges");
+            near(last_ui_pixels[x][0], float(x) / 127.f * 1.02f, "menu selection never displaces label pixels");
         if (argc >= 3)
         {
             std::ofstream preview(argv[2], std::ios::binary);
@@ -719,6 +746,29 @@ int main(int argc, char** argv)
         fill(memory, input[0], {.8f, .1f, .9f, 0.f});
         auto transparent_ui = execute(ui_ps, ui_push, false, ui_vs);
         near(transparent_ui[0][3], 0.f, "transparent PP atlas texels leave scene untouched");
+        std::array<Vertex,6> sprite_vertices{};
+        const unsigned order[]{0,1,2,0,2,3};
+        for(unsigned i=0;i<6;++i) {
+            const auto c=particle_sprite_corner(order[i],1.f,1.f,0.f);
+            auto& v=sprite_vertices[i];v.position[0]=c.right;v.position[1]=c.up;
+            v.normal[2]=1;v.uv[0]=c.u;v.uv[1]=c.v;
+            for(float& color:v.baked)color=1;
+        }
+        check(vkMapMemory(device,vertex_memory,0,VK_WHOLE_SIZE,0,&mapped));
+        std::memcpy(mapped,sprite_vertices.data(),sizeof(sprite_vertices));vkUnmapMemory(device,vertex_memory);
+        check(vkMapMemory(device,input[0].memory,0,VK_WHOLE_SIZE,0,&mapped));
+        VkImageSubresource sprite_sub{VK_IMAGE_ASPECT_COLOR_BIT,0,0};VkSubresourceLayout sprite_layout{};
+        vkGetImageSubresourceLayout(device,input[0].image,&sprite_sub,&sprite_layout);
+        for(unsigned y=0;y<2;++y)for(unsigned x=0;x<2;++x) {
+            const float rgba[]{y==0?.9f:.1f,0.f,y==0?.1f:.9f,1.f};
+            std::memcpy(static_cast<uint8_t*>(mapped)+sprite_layout.offset+y*sprite_layout.rowPitch+x*16,rgba,16);
+        }
+        vkUnmapMemory(device,input[0].memory);
+        execute(additive_particle,push,false,VK_NULL_HANDLE,true);
+        for(unsigned x=0;x<2;++x) {
+            near(sprite_pixels[x][0],.9f,"upright particle: atlas top is camera-up");
+            near(sprite_pixels[x+2][2],.9f,"upright particle: atlas bottom is camera-down");
+        }
         // Run the actual weather combine. Rapidly varying normals must not
         // select dark lower cube mips: the original hmodel explicitly uses LOD 0.
         sampler_info.maxLod=6; // The original sampler used maxLod=0; use an unrestricted sampler below.
@@ -753,6 +803,13 @@ int main(int argc, char** argv)
         for(unsigned x=0;x<128;++x)
             for(unsigned channel=0;channel<3;++channel)
                 near(last_ui_pixels[x][channel],expected_lighting[channel],"weather diffuse reads cube mip zero across rapidly changing normals");
+        w[16]=w[17]=w[18]=1.f;
+        execute(weather_ps,weather_push,false,weather_vs);
+        for(unsigned x=0;x<128;++x) {
+            const float visibility=x==0?.2f:x==127?.8f:x%2?.6f:.4f;
+            for(unsigned c=0;c<3;++c)
+                near(last_ui_pixels[x][c],expected_lighting[c]+pixels[0][c]*.6f*visibility,"shadow checker comparisons use continuous weighted PCF");
+        }
         vkDestroySampler(device,environment_sampler,nullptr);
         std::cout << "surface channel readback: base/lightmap sun+hemi/material/bump/aux/normal/detail/terrain/emission/environment2D/cube/particle OK\n";
         check(vkDeviceWaitIdle(device));
@@ -764,7 +821,7 @@ int main(int argc, char** argv)
         vkDestroyFramebuffer(device, framebuffer, nullptr);
         vkDestroyRenderPass(device, render_pass, nullptr);
         vkDestroyBuffer(device,weather_uniform,nullptr);vkFreeMemory(device,weather_memory,nullptr);
-        for(auto target : {weather_normal,weather_cube}) {
+        for(auto target : {weather_normal,weather_cube,weather_shadow}) {
             vkDestroyImageView(device,target.view,nullptr);vkDestroyImage(device,target.image,nullptr);
             vkFreeMemory(device,target.memory,nullptr);
         }

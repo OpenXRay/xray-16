@@ -1,5 +1,6 @@
 #include "xrEngine/stdafx.h"
 #include "GpuLevel.h"
+#include "LevelLightmap.h"
 #include "PackedLevelGeometry.h"
 #include "LevelVisibility.h"
 #include "VulkanVisual.h"
@@ -78,16 +79,7 @@ std::string lightmap_texture(const std::string& textures, const MaterialDefiniti
     const std::string& cls = definition.class_name;
     if (cls != "LM      " && cls != "LM_AREF " && cls != "BmmD    " && cls != "BmmDold " &&
         cls != "LmBmmD  " && cls != "LmEbB   " && cls != "LaEmB   ") return {};
-    const size_t comma = textures.find(',');
-    if (comma == std::string::npos) return {};
-    const size_t next = textures.find(',', comma + 1);
-    std::string name = textures.substr(comma + 1, next == std::string::npos ? next : next - comma - 1);
-    const size_t start = name.find_first_not_of(" \t");
-    if (start == std::string::npos) return {};
-    name.erase(0, start);
-    const size_t end = name.find_last_not_of(" \t");
-    name.resize(end + 1);
-    return name;
+    return select_level_lightmap(textures, cls == "LaEmB   ");
 }
 }
 GpuLevel::~GpuLevel() { destroy(); }
@@ -758,6 +750,7 @@ bool GpuLevel::record(const FrameRecordingContext& frame, const DeferredPass& pa
 bool GpuLevel::record_sun_shadow(const FrameRecordingContext& frame, const DeferredPass& pass,
     const float (&sun_mvp)[16]) const
 {
+    auto command_batch = pass.geometry_batch();
     Fmatrix transform;
     std::memcpy(&transform, sun_mvp, sizeof(transform));
     const auto visible = [&](const LevelVisual& visual)

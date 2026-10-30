@@ -149,6 +149,9 @@ int main()
     std::vector<char> dds;
     assert(gli::save_dds(image, dds));
     save(directory / "fixture.dds", Bytes(dds.begin(), dds.end()));
+    save(directory / "hemi_lmap.dds", Bytes(dds.begin(), dds.end()));
+    // Deliberately no color_lmap.dds: the CoP hemi path must not load slot 1.
+    std::filesystem::remove(directory / "color_lmap.dds");
     FS.append_path("$level$", directory.string().c_str(), nullptr, false);
     FS.append_path("$game_textures$", base_textures.string().c_str(), nullptr, false);
     FS.append_path("$game_meshes$", directory.string().c_str(), nullptr, false);
@@ -370,16 +373,17 @@ int main()
         CallOfPripyatMode = profile == LevelGameProfile::CoP;
         Bytes vb, ib, geom, level, shaders, visual, container, header(44, 0), table;
         put32(vb, 1);
-        auto decl = [&](uint16_t offset, uint8_t type, uint8_t usage) {
-            vb.insert(vb.end(), {0, 0, uint8_t(offset), uint8_t(offset >> 8), type, 0, usage, 0});
+        auto decl = [&](uint16_t offset, uint8_t type, uint8_t usage, uint8_t index=0) {
+            vb.insert(vb.end(), {0, 0, uint8_t(offset), uint8_t(offset >> 8), type, 0, usage, index});
         };
         decl(0, 2, 0);
         decl(12, 2, 3);
         decl(24, 1, 5);
+        if(profile==LevelGameProfile::CoP) decl(32,1,5,1);
         vb.insert(vb.end(), {0xff, 0, 0, 0, 17, 0, 0, 0});
         put32(vb, 3);
         for (unsigned v = 0; v < 3; ++v)
-            for (unsigned f = 0; f < 8; ++f)
+            for (unsigned f = 0; f < (profile==LevelGameProfile::CoP?10u:8u); ++f)
                 putfloat(vb, f == 0 ? float(v) : f == 5 ? 1.f : 0.f);
         put32(ib, 1);
         put32(ib, 3);
@@ -391,8 +395,9 @@ int main()
         save(directory / "level.geom", geom);
         FS.rescan_path(FS.get_path("$level$")->m_Path, false);
         put32(shaders, 1);
-        const char material[] = "default/fixture";
-        shaders.insert(shaders.end(), material, material + sizeof(material));
+        const std::string material = profile==LevelGameProfile::CoP?
+            "default/fixture, color_lmap, hemi_lmap":"default/fixture";
+        shaders.insert(shaders.end(),material.c_str(),material.c_str()+material.size()+1);
         header[0] = 4;
         chunk(visual, 1, header);
         for (unsigned n : {0u, 0u, 3u, 0u, 0u, 3u})
@@ -408,6 +413,9 @@ int main()
         assert(load_engine_level_models(reader, data, error) && data.models.size() == 1);
         std::vector<VisualRecord> catalog;
         assert(load_engine_visual_catalog(reader, catalog, error) && catalog.size() == 1);
+        if(profile==LevelGameProfile::CoP)
+            assert(pass.create_game_pipeline("vk\\level_lightmap.vs","vk\\level_lightmap.ps",
+                handle<VkShaderModule>(5),handle<VkShaderModule>(6),SurfaceMode::Opaque,false,error));
         GpuLevel gpu;
         assert(gpu.load(reader, device, queue, pool_handle, memory, upload_dispatch(), textures, pass, error));
         assert(gpu.visual_count() == 1 && gpu.model_count() == 1 && textures.finish_uploads());
@@ -433,6 +441,13 @@ int main()
         }
         const auto before = draws;
         assert(gpu.record(frame, pass, mvp) && draws == before + 1);
+        if(profile==LevelGameProfile::CoP) {
+            const auto set=bound_textures.back();
+            assert(sampler_address.at(sampled_bindings.at(set).at(0))==VK_SAMPLER_ADDRESS_MODE_REPEAT);
+            const auto hemi_sampler=sampled_bindings.at(set).at(1);
+            assert(sampler_address.at(hemi_sampler)==VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE);
+            assert(sampler_max_lod.at(hemi_sampler)==0.f);
+        }
         // A mod may supply an incomplete optional geomX. Keep the valid
         // primary geometry for each profile and report the fallback at VFS load.
         Bytes partial_fast;

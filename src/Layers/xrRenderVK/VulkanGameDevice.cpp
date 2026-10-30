@@ -1,5 +1,6 @@
 #include "xrEngine/stdafx.h"
 #include "VulkanGameDevice.h"
+#include "ShadowStability.h"
 #include "ParticleVisual.h"
 #include "VulkanRainRender.h"
 #include "VulkanThunderboltRender.h"
@@ -1083,6 +1084,7 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         sun_view.build_camera_dir(origin, direction, up);
         sun_projection.build_projection_ortho(180.f, 180.f, 1.f, 320.f);
         sun_vp.mul(sun_projection, sun_view);
+        stabilize_shadow_projection(reinterpret_cast<float*>(&sun_vp), SunShadowTargets::Size);
         std::memcpy(sun_uniform.sun_view_projection, &sun_vp, sizeof(sun_vp));
     }
     local_uniforms_.clear();
@@ -1204,6 +1206,11 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
             static_cast<VulkanParticleEffect*>(particle.visual)->distortion() :
             static_cast<VulkanParticleGroup*>(particle.visual)->has_distortion())
         { particle_refraction = true; break; }
+    // All gameplay texture requests for this frame have now been gathered.
+    // The completed copy fences provide the Adreno transfer visibility before
+    // any rendering command can sample a newly loaded image.
+    if (!textures_.finish_uploads())
+    { error = "Vulkan gameplay texture batch did not complete"; reset_required_ = true; return false; }
     if (!frame_.render(window_.frame(), targets_, level, deferred_, mvp,
             light, status, error, record_ui, this, record_hud, this, record_models, this,
             record_transparent, this,

@@ -21,5 +21,5 @@ struct DdsTexture
 };
 
 // Accepts the same DDS bytes returned by the game's virtual filesystem.
-bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& result, std::string& error);
+bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& result, std::string& error, uint32_t maximum_dimension = 0);
 }

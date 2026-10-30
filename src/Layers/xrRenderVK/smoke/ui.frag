@@ -13,12 +13,11 @@ void main()
         float weight = clamp(sample_color.a * fragment_color.a, 0.0, 1.0);
         if (weight < 0.01 / 255.0) discard;
         vec2 extent = vec2(textureSize(scene_map, 0));
-        // Desktop first alpha-blends the field over (127,127,0,127),
-        // then samples the scene at its displaced screen coordinate.
-        vec2 offset = (sample_color.xy * fragment_color.xy - vec2(127.0 / 255.0)) * weight * 0.05;
-        vec2 uv = clamp(gl_FragCoord.xy / extent + offset, 0.5 / extent, 1.0 - 0.5 / extent);
+        vec2 uv = clamp(gl_FragCoord.xy / extent, 0.5 / extent, 1.0 - 0.5 / extent);
         vec3 scene = texture(scene_map, uv).rgb;
-        pixel_color = vec4(scene, 1.0);
+        // A menu selector must not move or duplicate glyphs in the captured UI.
+        // Retain its alpha mask as a subtle neutral highlight, not vector RGB.
+        pixel_color = vec4(scene * (1.0 + weight * 0.04), 1.0);
         return;
     }
     pixel_color = fragment_color * sample_color;

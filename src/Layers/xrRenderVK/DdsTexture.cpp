@@ -62,7 +62,7 @@ bool contiguous(uint32_t mask)
 
 bool decode_legacy_pixels(const uint8_t* bytes, size_t size, uint32_t width,
     uint32_t height, uint32_t mip_count, uint32_t faces, DdsTexture& result,
-    std::string& error)
+    std::string& error, uint32_t maximum_dimension)
 {
     const uint32_t flags = read32(bytes, 80);
     const uint32_t bits = read32(bytes, 88);
@@ -112,10 +112,13 @@ bool decode_legacy_pixels(const uint8_t* bytes, size_t size, uint32_t width,
         return false;
     }
 
+    uint32_t first_mip=0;
+    while(maximum_dimension && faces==1 && first_mip+1<mip_count &&
+        std::max(width>>first_mip,height>>first_mip)>maximum_dimension) ++first_mip;
     DdsTexture decoded;
     decoded.format = VK_FORMAT_R8G8B8A8_UNORM;
-    decoded.extent = {width, height, 1};
-    decoded.mip_levels = mip_count;
+    decoded.extent = {std::max(1u,width>>first_mip),std::max(1u,height>>first_mip),1};
+    decoded.mip_levels = mip_count-first_mip;
     decoded.layers = faces;
     decoded.cube = faces == 6;
     size_t source = 128;
@@ -125,9 +128,10 @@ bool decode_legacy_pixels(const uint8_t* bytes, size_t size, uint32_t width,
         const uint32_t w = std::max(1u, width >> level), h = std::max(1u, height >> level);
         const size_t row = (size_t(w) * bits + 7u) / 8u;
         const size_t stride = (row + alignment - 1u) / alignment * alignment;
+        if(level<first_mip) { source += stride*h; continue; }
         VkBufferImageCopy copy{};
         copy.bufferOffset = decoded.pixels.size();
-        copy.imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, level, face, 1};
+        copy.imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, level-first_mip, face, 1};
         copy.imageExtent = {w, h, 1};
         decoded.copies.push_back(copy);
         decoded.pixels.reserve(decoded.pixels.size() + size_t(w) * h * 4u);
@@ -152,7 +156,7 @@ bool decode_legacy_pixels(const uint8_t* bytes, size_t size, uint32_t width,
 }
 }
 
-bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& result, std::string& error) try
+bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& result, std::string& error, uint32_t maximum_dimension) try
 {
     result = {};
     const auto* bytes = static_cast<const std::uint8_t*>(data);
@@ -208,7 +212,7 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
         !(read32(bytes, 92) == 0x00ff0000u && read32(bytes, 96) == 0x0000ff00u &&
           read32(bytes, 100) == 0x000000ffu && read32(bytes, 104) == 0xff000000u)))
     {
-        return decode_legacy_pixels(bytes, size, width, height, mip_count, faces, result, error);
+        return decode_legacy_pixels(bytes, size, width, height, mip_count, faces, result, error, maximum_dimension);
     }
 
     size_t expected = header_size;
@@ -240,6 +244,16 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
         return false;
     }
 
+    uint32_t first_mip = 0;
+    while (maximum_dimension && !cube && first_mip + 1 < mip_count &&
+        std::max(width >> first_mip, height >> first_mip) > maximum_dimension) ++first_mip;
+    if (first_mip)
+        loaded = gli::texture(loaded, loaded.target(), loaded.format(), 0, 0, 0, 0,
+            first_mip, mip_count - 1);
+    const uint32_t output_mips = mip_count - first_mip;
+    const uint32_t output_width = std::max(1u, width >> first_mip);
+    const uint32_t output_height = std::max(1u, height >> first_mip);
+
     if (!bc_supported && compressed(format))
     {
         const bool srgb = gli::is_srgb(loaded.format());
@@ -247,7 +261,7 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
         loaded = cube ? gli::texture(gli::convert(gli::texture_cube(loaded), decodedFormat)) :
             gli::texture(gli::convert(gli::texture2d(loaded), decodedFormat));
         if (loaded.empty() || loaded.layers() != 1 || loaded.faces() != faces ||
-            loaded.levels() != mip_count)
+            loaded.levels() != output_mips)
         {
             error = "DDS decompression did not produce all faces and mips";
             return false;
@@ -257,29 +271,29 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
 
     DdsTexture decoded;
     decoded.format = format;
-    decoded.extent = { width, height, 1 };
-    decoded.mip_levels = mip_count;
+    decoded.extent = { output_width, output_height, 1 };
+    decoded.mip_levels = output_mips;
     decoded.layers = faces;
     decoded.cube = cube;
     // Copy each mip into one allocation. Repeated vector growth temporarily
     // keeps both the old and new buffers resident on 32-bit Android.
-    const size_t alignment_bytes = size_t(faces) * mip_count * 3u;
+    const size_t alignment_bytes = size_t(faces) * output_mips * 3u;
     if (loaded.size() > decoded.pixels.max_size() - alignment_bytes)
     {
         error = "DDS decoded payload is too large";
         return false;
     }
     decoded.pixels.reserve(loaded.size() + alignment_bytes);
-    decoded.copies.reserve(size_t(faces) * mip_count);
+    decoded.copies.reserve(size_t(faces) * output_mips);
     for (uint32_t face = 0; face < faces; ++face)
-    for (uint32_t level = 0; level < mip_count; ++level)
+    for (uint32_t level = 0; level < output_mips; ++level)
     {
         const size_t offset = (decoded.pixels.size() + 3u) & ~size_t(3u);
         decoded.pixels.resize(offset, 0);
         VkBufferImageCopy copy{};
         copy.bufferOffset = offset;
         copy.imageSubresource = { VK_IMAGE_ASPECT_COLOR_BIT, level, face, 1 };
-        copy.imageExtent = { std::max(1u, width >> level), std::max(1u, height >> level), 1 };
+        copy.imageExtent = { std::max(1u, output_width >> level), std::max(1u, output_height >> level), 1 };
         decoded.copies.push_back(copy);
         const size_t bytes = loaded.size(level);
         const size_t w = copy.imageExtent.width, h = copy.imageExtent.height;

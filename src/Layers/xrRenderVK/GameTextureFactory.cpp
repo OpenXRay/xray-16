@@ -2,6 +2,7 @@
 #include "GameTextureFactory.h"
 
 #include "ScenePass.h"
+#include "TextureQuality.h"
 
 #include <algorithm>
 #include <cctype>
@@ -48,6 +49,8 @@ bool GameTextureFactory::initialize(VkDevice device, VkQueue queue, VkCommandPoo
     memory_ = memory;
     bc_supported_ = bc_supported;
     dispatch_ = dispatch;
+    // Preserve the Adreno no-barrier workaround, but wait once per batch.
+    dispatch_.defer_fence_wait = dispatch_.fence_after_copy;
     destroy_sampler_ = destroy_sampler;
     wait_idle_ = wait_idle;
     VkSamplerCreateInfo info{VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO};
@@ -76,6 +79,9 @@ bool GameTextureFactory::initialize(VkDevice device, VkQueue queue, VkCommandPoo
         destroy();
         return false;
     }
+    info.maxLod = 0.f;
+    if(create_sampler(device_, &info, nullptr, &lightmap_sampler_) != VK_SUCCESS)
+    { error = "could not create lightmap sampler"; destroy(); return false; }
     error.clear();
     return true;
 }
@@ -125,8 +131,10 @@ bool GameTextureFactory::load(const std::string& name, Asset*& asset, std::strin
     UploadedTexture texture;
     VkExtent3D extent{};
     bool cube = false;
+    const uint32_t maximum_dimension=world_texture_limit(normalized,Core.Params?Core.Params:"");
     const bool uploaded = upload_engine_texture(device_, queue_, pool_, memory_, dispatch_,
-        reader->pointer(), reader->length(), bc_supported_, texture, pending_, states_, error, &extent, &cube);
+        reader->pointer(), reader->length(), bc_supported_, texture, pending_, states_, error, &extent, &cube,
+        maximum_dimension);
     FS.r_close(reader);
     if (!uploaded)
     {
@@ -138,6 +146,7 @@ bool GameTextureFactory::load(const std::string& name, Asset*& asset, std::strin
     inserted->second.texture = texture;
     inserted->second.extent = {extent.width, extent.height};
     inserted->second.cube = cube;
+    inserted->second.maximum_dimension = maximum_dimension;
     // Conservative RGBA-equivalent residency estimate for DDS mip chains.
     inserted->second.bytes = uint64_t(extent.width) * extent.height * 4;
     asset = &inserted->second;
@@ -212,7 +221,7 @@ bool GameTextureFactory::lightmapped_material(const std::string& diffuse_name,
     {
         VkDescriptorSet descriptor{};
         if (!pass.lightmapped_material(diffuse->texture.view, lightmap->texture.view,
-                sampler_, descriptor, error)) return false;
+                sampler_, descriptor, error, lightmap_sampler_)) return false;
         LightmappedMaterial pair;
         pair.set = descriptor;
         pair.diffuse = diffuse;
@@ -287,7 +296,7 @@ bool GameTextureFactory::terrain_material(const std::string& diffuse_name,
     {
         std::array<VkImageView, 7> views{};
         for (size_t i = 0; i < views.size(); ++i) views[i] = item.assets[i]->texture.view;
-        if (!pass.terrain_material(views, sampler_, item.set, error)) return false;
+        if (!pass.terrain_material(views, sampler_, item.set, error, lightmap_sampler_)) return false;
         item.pass = &pass;
         for (size_t i = 0; i < item.count; ++i)
             if (std::find(item.assets.begin(), item.assets.begin() + i, item.assets[i]) == item.assets.begin() + i)
@@ -336,7 +345,7 @@ bool GameTextureFactory::detail_material(const std::string& diffuse_name,
     {
         std::array<VkImageView, 7> views{};
         for (size_t i = 0; i < views.size(); ++i) views[i] = item.assets[i]->texture.view;
-        if (!pass.terrain_material(views, sampler_, item.set, error)) return false;
+        if (!pass.terrain_material(views, sampler_, item.set, error, lightmap_sampler_)) return false;
         item.pass = &pass;
         for (size_t i = 0; i < item.count; ++i)
             if (std::find(item.assets.begin(), item.assets.begin() + i, item.assets[i]) == item.assets.begin() + i)
@@ -390,7 +399,7 @@ bool GameTextureFactory::environment_material(const std::string& diffuse_name,
     {
         std::array<VkImageView, 7> views{};
         for (size_t i = 0; i < views.size(); ++i) views[i] = item.assets[i]->texture.view;
-        if (!pass.terrain_material(views, sampler_, item.set, error)) return false;
+        if (!pass.terrain_material(views, sampler_, item.set, error, lightmap_sampler_)) return false;
         item.pass = &pass;
         for (size_t i = 0; i < item.count; ++i)
             if (std::find(item.assets.begin(), item.assets.begin() + i, item.assets[i]) == item.assets.begin() + i)
@@ -463,7 +472,7 @@ bool GameTextureFactory::surface_material(const std::array<std::string, 20>& nam
         for (size_t i = 0; i < first.size(); ++i) first[i] = item.assets[i]->texture.view;
         for (size_t i = 0; i < extra.size(); ++i) extra[i] = item.assets[i + 7]->texture.view;
         const VkSampler material_sampler = clamp ? ui_sampler_ : sampler_;
-        if (!pass.terrain_material(first, material_sampler, item.set, error)) return false;
+        if (!pass.terrain_material(first, material_sampler, item.set, error, lightmap_sampler_)) return false;
         pass.update_surface_textures(item.set, extra, material_sampler);
         pass.set_surface_parameters(item.set, parameters);
         item.pass = &pass;
@@ -847,6 +856,7 @@ void GameTextureFactory::destroy()
         }
         if (sampler_ && destroy_sampler_) destroy_sampler_(device_, sampler_, nullptr);
         if (ui_sampler_ && destroy_sampler_) destroy_sampler_(device_, ui_sampler_, nullptr);
+        if (lightmap_sampler_ && destroy_sampler_) destroy_sampler_(device_, lightmap_sampler_, nullptr);
     }
     assets_.clear();
     lightmapped_.clear();
@@ -860,6 +870,7 @@ void GameTextureFactory::destroy()
     pool_ = VK_NULL_HANDLE;
     sampler_ = VK_NULL_HANDLE;
     ui_sampler_ = VK_NULL_HANDLE;
+    lightmap_sampler_ = VK_NULL_HANDLE;
     destroy_sampler_ = nullptr;
     wait_idle_ = nullptr;
     dispatch_ = {};
@@ -926,7 +937,7 @@ bool GameTextureFactory::reload_assets(std::string& error,
         VkExtent3D extent{};
         const bool loaded = upload_engine_texture(device_, queue_, pool_, memory_, dispatch_,
             source->pointer(), source->length(), bc_supported_, replacement, pending_, states_,
-            error, &extent);
+            error, &extent, nullptr, asset.maximum_dimension);
         FS.r_close(source);
         if (!loaded)
         {
@@ -967,13 +978,13 @@ bool GameTextureFactory::reload_assets(std::string& error,
     }
     for (auto& [name, pair] : lightmapped_)
         pair.pass->update_lightmapped_material(pair.set, pair.diffuse->texture.view,
-            pair.lightmap->texture.view, sampler_);
+            pair.lightmap->texture.view, sampler_, lightmap_sampler_);
     for (auto& [name, item] : terrain_)
     {
         std::array<VkImageView, 7> views{};
         for (size_t i = 0; i < views.size(); ++i) views[i] = item.assets[i]->texture.view;
         const VkSampler material_sampler = item.clamp ? ui_sampler_ : sampler_;
-        item.pass->update_terrain_material(item.set, views, material_sampler);
+        item.pass->update_terrain_material(item.set, views, material_sampler, lightmap_sampler_);
         if (item.count == 20)
         {
             std::array<VkImageView, 13> extra{};

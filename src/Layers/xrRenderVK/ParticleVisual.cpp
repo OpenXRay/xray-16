@@ -1,5 +1,6 @@
 #include "xrEngine/stdafx.h"
 #include "ParticleVisual.h"
+#include "ParticleSprite.h"
 #include "LevelPassGraph.h"
 
 #include "xrParticles/psystem.h"
@@ -281,20 +282,18 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
         const float u0 = (sprite_frame % def_->frame_columns) * def_->frame_size[0];
         const float v0 = (sprite_frame / def_->frame_columns) * def_->frame_size[1];
         const float du = def_->frame_size[0], dv = def_->frame_size[1];
-        const float sine = std::sin(p.rot.x), cosine = std::cos(p.rot.x);
+
         for (u32 corner = 0; corner < 4; ++corner)
         {
-            const float x = (corner == 0 || corner == 3) ? -sx : sx;
-            const float y = corner < 2 ? -sy : sy;
+            const auto sprite = particle_sprite_corner(corner, sx, sy, p.rot.x);
             auto& v = vertices[i * 4 + corner];
-            const float rotated_x = cosine * x - sine * y;
-            const float rotated_y = sine * x + cosine * y;
+            const float rotated_x = sprite.right, rotated_y = sprite.up;
             v.position[0] = center.x + right.x * rotated_x + up.x * rotated_y;
             v.position[1] = center.y + right.y * rotated_x + up.y * rotated_y;
             v.position[2] = center.z + right.z * rotated_x + up.z * rotated_y;
             v.normal[0] = 0.f; v.normal[1] = 1.f; v.normal[2] = 0.f;
-            v.uv[0] = u0 + (corner == 0 || corner == 3 ? 0.f : du);
-            v.uv[1] = v0 + (corner < 2 ? 0.f : dv);
+            v.uv[0] = u0 + sprite.u * du;
+            v.uv[1] = v0 + sprite.v * dv;
             // FVF::LIT sends the simulation's ARGB tint to the particle
             // shader. Ignoring it turns a translucent muzzle sprite into a
             // large opaque patch and loses its animated fade-out.

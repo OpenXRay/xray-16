@@ -54,6 +54,16 @@ int main()
             const auto level=copy.imageSubresource.mipLevel, face=copy.imageSubresource.baseArrayLayer;
             assert(!std::memcmp(decoded.pixels.data()+copy.bufferOffset, original.data(0,face,level), original.size(level)));
         }
+        DdsTexture reduced;
+        assert(decode_dds(bytes.data(),bytes.size(),true,reduced,error,2));
+        assert(reduced.extent.width==(cube?8u:2u) && reduced.mip_levels==(cube?4u:2u));
+        for(const auto& copy:reduced.copies) {
+            const unsigned mip=copy.imageSubresource.mipLevel+(cube?0:2);
+            const unsigned face=copy.imageSubresource.baseArrayLayer;
+            assert(!std::memcmp(reduced.pixels.data()+copy.bufferOffset,original.data(0,face,mip),original.size(mip)));
+        }
+        assert(decode_dds(bytes.data(),bytes.size(),false,reduced,error,2));
+        assert(reduced.extent.width==(cube?8u:2u) && reduced.mip_levels==(cube?4u:2u));
         assert(!decode_dds(bytes.data(),bytes.size()-1,true,decoded,error));
         if (format==gli::FORMAT_RGBA_DXT5_UNORM_BLOCK16 || format==gli::FORMAT_RGBA_DXT5_SRGB_BLOCK16)
         {
@@ -77,6 +87,15 @@ int main()
         assert(decoded.pixels.size() == 4);
         assert(!decode_dds(sample.data(), sample.size() - 1, true, decoded, error));
     }
+    // Real-sized BC fallback: trimming happens before expansion to RGBA.
+    gli::texture large(gli::TARGET_2D,gli::FORMAT_RGBA_DXT5_UNORM_BLOCK16,{1024,1024,1},1,1,11);
+    std::memset(large.data(),0,large.size());
+    std::vector<char> large_bytes;assert(gli::save_dds(large,large_bytes));
+    DdsTexture large_full,large_small;std::string large_error;
+    assert(decode_dds(large_bytes.data(),large_bytes.size(),false,large_full,large_error));
+    assert(decode_dds(large_bytes.data(),large_bytes.size(),false,large_small,large_error,256));
+    assert(large_small.extent.width==256 && large_small.mip_levels==9);
+    assert(large_small.pixels.size()*15<large_full.pixels.size());
     auto font = legacy_dds(0x2, 8, 0, 0, 0, 0xff, {0x80});
     DdsTexture decoded;
     std::string error;

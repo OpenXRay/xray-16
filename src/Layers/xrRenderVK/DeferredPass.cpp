@@ -522,18 +522,21 @@ bool DeferredPass::material(VkImageView albedo, VkSampler sampler, VkDescriptorS
 }
 
 bool DeferredPass::lightmapped_material(VkImageView albedo, VkImageView lightmap,
-    VkSampler sampler, VkDescriptorSet& set, std::string& error)
+    VkSampler sampler, VkDescriptorSet& set, std::string& error, VkSampler lightmap_sampler)
 {
     if (!albedo || !lightmap)
     {
         error = "lightmapped material needs both textures";
         return false;
     }
-    return allocate(material_layout_, albedo, lightmap, sampler, set, error);
+    if(!allocate(material_layout_, albedo, lightmap, sampler, set, error)) return false;
+    std::array<VkImageView,7> views; views.fill(albedo);views[1]=lightmap;
+    update_terrain_material(set,views,sampler,lightmap_sampler);
+    return true;
 }
 
 bool DeferredPass::terrain_material(const std::array<VkImageView, 7>& views,
-    VkSampler sampler, VkDescriptorSet& set, std::string& error)
+    VkSampler sampler, VkDescriptorSet& set, std::string& error, VkSampler lightmap_sampler)
 {
     if (std::any_of(views.begin(), views.end(), [](VkImageView view) { return !view; }))
     {
@@ -541,7 +544,7 @@ bool DeferredPass::terrain_material(const std::array<VkImageView, 7>& views,
         return false;
     }
     if (!allocate(material_layout_, views[0], views[1], sampler, set, error)) return false;
-    update_terrain_material(set, views, sampler);
+    update_terrain_material(set, views, sampler, lightmap_sampler);
     return true;
 }
 
@@ -911,12 +914,12 @@ void DeferredPass::update_material(VkDescriptorSet set, VkImageView view, VkSamp
 }
 
 void DeferredPass::update_lightmapped_material(VkDescriptorSet set, VkImageView albedo,
-    VkImageView lightmap, VkSampler sampler)
+    VkImageView lightmap, VkSampler sampler, VkSampler lightmap_sampler)
 {
     if (!device_ || !set || !albedo || !lightmap) return;
     const VkDescriptorImageInfo images[]{
         {sampler, albedo, VK_IMAGE_LAYOUT_GENERAL},
-        {sampler, lightmap, VK_IMAGE_LAYOUT_GENERAL}
+        {lightmap_sampler ? lightmap_sampler : sampler, lightmap, VK_IMAGE_LAYOUT_GENERAL}
     };
     VkWriteDescriptorSet writes[2]{};
     for (uint32_t i = 0; i < 2; ++i)
@@ -932,21 +935,21 @@ void DeferredPass::update_lightmapped_material(VkDescriptorSet set, VkImageView 
     std::array<VkImageView, 7> base{};
     base.fill(albedo);
     base[1] = lightmap;
-    update_terrain_material(set, base, sampler);
+    update_terrain_material(set, base, sampler, lightmap_sampler);
     std::array<VkImageView, 13> fallback{};
     fallback.fill(albedo);
     update_surface_textures(set, fallback, sampler);
 }
 
 void DeferredPass::update_terrain_material(VkDescriptorSet set,
-    const std::array<VkImageView, 7>& views, VkSampler sampler)
+    const std::array<VkImageView, 7>& views, VkSampler sampler, VkSampler lightmap_sampler)
 {
     if (!device_ || !set) return;
     std::array<VkDescriptorImageInfo, 7> images{};
     std::array<VkWriteDescriptorSet, 7> writes{};
     for (uint32_t i = 0; i < views.size(); ++i)
     {
-        images[i] = {sampler, views[i], VK_IMAGE_LAYOUT_GENERAL};
+        images[i] = {i == 1 && lightmap_sampler ? lightmap_sampler : sampler, views[i], VK_IMAGE_LAYOUT_GENERAL};
         writes[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         writes[i].dstSet = set;
         writes[i].dstBinding = i;
@@ -1216,18 +1219,11 @@ bool DeferredPass::record_sun_shadow(const FrameRecordingContext& frame, VkBuffe
     VkBuffer indices, uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material,
     bool alpha_test, uint32_t first_index, float alpha_ref, int32_t vertex_base) const
 {
-    command_cache_.end();
     const VkPipeline pipeline = alpha_test ? shadow_cutout_ : shadow_opaque_;
     if (!pipeline || !frame.command_buffer ||
         (frame.render_pass != shadow_pass_ && frame.render_pass != local_shadow_pass_) ||
         !vertices || !indices || !material || !index_count) return false;
-    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-    viewport_scissor(frame, vk_);
-    const VkDeviceSize offset = 0;
-    vk_.cmd_bind_vertex_buffers(frame.command_buffer, 0, 1, &vertices, &offset);
-    vk_.cmd_bind_index_buffer(frame.command_buffer, indices, 0, VK_INDEX_TYPE_UINT32);
-    vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-        geometry_layout_, 0, 1, &material, 0, nullptr);
+    command_cache_.bind(vk_, frame, pipeline, geometry_layout_, vertices, indices, material);
     command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
         0, sizeof(mvp), mvp);
     if (alpha_test)

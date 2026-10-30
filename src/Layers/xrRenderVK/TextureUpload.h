@@ -37,6 +37,8 @@ struct TextureUploadDispatch
     // Some Adreno drivers fault when recording the post-copy memory barrier.
     // A completed upload fence provides the transfer-to-sampling dependency.
     bool fence_after_copy = false;
+    // Owner must finish_uploads before submitting any draw using these images.
+    bool defer_fence_wait = false;
 };
 
 struct UploadedTexture
