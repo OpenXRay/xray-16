@@ -639,8 +639,30 @@ bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes
             fast_indices.clear();
             error.clear();
         }
-        if (!read_visuals(visuals, vertices, indices, loaded.materials.size(), loaded,
-            has_fast ? &fast_vertices : nullptr, has_fast ? &fast_indices : nullptr, tree_windows, error))
+        bool valid_visuals = read_visuals(visuals, vertices, indices, loaded.materials.size(), loaded,
+            has_fast ? &fast_vertices : nullptr, has_fast ? &fast_indices : nullptr, tree_windows, error);
+        if (!valid_visuals && has_fast)
+        {
+            // A valid geomX buffer table does not guarantee that every visual's
+            // optional FASTPATH container/SWI is supported. Validate the entire
+            // primary scene independently before accepting a fallback. Rebuild
+            // transactionally: the failed pass may already have appended meshes,
+            // embedded children and LOD facets.
+            const std::string fast_error = error;
+            LevelModelData primary;
+            primary.materials = std::move(loaded.materials);
+            error.clear();
+            valid_visuals = read_visuals(visuals, vertices, indices, primary.materials.size(),
+                primary, nullptr, nullptr, tree_windows, error);
+            if (valid_visuals)
+            {
+                loaded = std::move(primary);
+                if (skipped_fast_geometry) *skipped_fast_geometry = true;
+                if (fast_fallback_reason)
+                    *fast_fallback_reason = "optional FASTPATH rejected: " + fast_error;
+            }
+        }
+        if (!valid_visuals)
         {
             if (error.empty()) error = "unsupported or invalid level OGF visual table";
         }

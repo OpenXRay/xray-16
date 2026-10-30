@@ -405,13 +405,41 @@ int main()
         result.models[0].indices.size() == 6 && !result.models[0].fast);
     assert(load_level_models(input(shaders), input(vb), input(progressive_ib), input(fast_visuals),
         result, error, input(vb), input(progressive_ib)));
-    fast_chunks.pop_back(); // Corrupt fast SWI: fail rather than draw a partial model.
+    fast_chunks.pop_back(); // Bad optional SWI must not reject valid primary geometry.
     fast_visual = progressive_visual;
     fast_visuals.clear();
     part(fast_visual, 22, fast_chunks);
     part(fast_visuals, 0, fast_visual);
-    assert(!load_level_models(input(shaders), input(vb), input(progressive_ib), input(fast_visuals), result, error, input(vb), input(progressive_ib)));
-    assert(result.models[0].fast && result.models[0].fast->windows.size() == 2);
+    assert(load_level_models(input(shaders), input(vb), input(progressive_ib), input(fast_visuals),
+        result, error, input(positions_only), input(progressive_ib), {},
+        &skipped_fast_geometry, &fallback_reason));
+    assert(error.empty() && skipped_fast_geometry && result.models.size() == 1 &&
+        !result.models[0].fast && result.models[0].windows.size() == 2);
+    assert(fallback_reason.find("optional FASTPATH rejected: level OGF visual id=0 type=2") == 0);
+    // Failure after a valid mesh was appended must not duplicate it on retry.
+    // Include the reported visual ID to exercise diagnostics past the first mesh.
+    Bytes mixed;
+    for (unsigned id=0; id<91; ++id) part(mixed,id,progressive_visual);
+    part(mixed,91,fast_visual);
+    assert(load_level_models(input(shaders),input(vb),input(progressive_ib),input(mixed),
+        result,error,input(positions_only),input(progressive_ib),{},
+        &skipped_fast_geometry,&fallback_reason));
+    assert(result.models.size()==92 && result.visuals.size()==92 && result.roots.size()==92);
+    assert(fallback_reason.find("visual id=91 type=2")!=std::string::npos);
+    for(size_t id=0;id<92;++id) assert(result.visuals[id].mesh==int32_t(id) && !result.models[id].fast);
+    // A missing fast SWI or an invalid fast container also uses primary geometry.
+    for(bool bad_container : {false,true}) {
+        Bytes optional, bad_visual=progressive_visual, table;
+        Bytes proxy_container=progressive_container;
+        if(bad_container) proxy_container[0]=0x7f;
+        part(optional,21,proxy_container);
+        if(bad_container) part(optional,6,progressive_swi);
+        part(bad_visual,22,optional);part(table,0,bad_visual);
+        assert(load_level_models(input(shaders),input(vb),input(progressive_ib),input(table),
+            result,error,input(positions_only),input(progressive_ib),{},
+            &skipped_fast_geometry,&fallback_reason));
+        assert(skipped_fast_geometry && error.empty() && !result.models[0].fast);
+    }
     progressive_swi[20 + 8 + 6] = 2; // Index 2 is inactive with only two vertices.
     progressive_visual.clear(); progressive_visuals.clear();
     part(progressive_visual, 1, header);
@@ -421,6 +449,12 @@ int main()
     assert(!load_level_models(input(shaders), input(vb), input(progressive_ib),
         input(progressive_visuals), result, error));
     assert(result.models[0].windows.size() == 2); // Failed load keeps the old model.
+    // geomX fallback never masks a broken primary SWI or replaces the good scene.
+    assert(!load_level_models(input(shaders),input(vb),input(progressive_ib),
+        input(progressive_visuals),result,error,input(positions_only),input(progressive_ib),{},
+        &skipped_fast_geometry,&fallback_reason));
+    assert(!skipped_fast_geometry && fallback_reason.empty() && !error.empty() &&
+        result.models[0].windows.size()==2);
     assert(load_level_models(input(shaders), input(vb), input(ib), input(visuals), result, error));
     Bytes embedded;
     part(embedded, 0, visual);
