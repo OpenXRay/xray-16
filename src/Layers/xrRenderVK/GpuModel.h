@@ -90,8 +90,6 @@ private:
         int screen_blend{-1};
         bool gpu_skinning{};
         uint16_t max_bone_index{};
-        size_t fast_index = SIZE_MAX;
-        bool fast_variant = false;
         bool environment{};
         bool surface{};
         bool detail{};

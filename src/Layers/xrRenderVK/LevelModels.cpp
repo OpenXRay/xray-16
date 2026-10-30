@@ -125,9 +125,10 @@ struct VertexBuffer
 {
     std::vector<LevelVertex> vertices;
     bool lightmap_uv{};
+    bool depth_only{};
 };
 
-bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers, std::string& error)
+bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers, std::string& error, bool depth_only = false)
 {
     Cursor c{bytes};
     uint32_t count;
@@ -210,7 +211,7 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers, std::st
             }
         }
         uint32_t vertex_count;
-        if (!ended || position < 0 || normal < 0 || uv < 0 || !stride)
+        if (!ended || position < 0 || (!depth_only && (normal < 0 || uv < 0)) || !stride)
         { error = "unsupported vertex semantics buffer=" + std::to_string(i) + " (POSITION0/NORMAL0/TEXCOORD0 required)"; return false; }
         if (!c.u32(vertex_count))
         { error = "truncated vertex count buffer=" + std::to_string(i); return false; }
@@ -220,6 +221,7 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers, std::st
         if (!c.take(stride * vertex_count, data))
         { error = "truncated vertex payload buffer=" + std::to_string(i); return false; }
         VertexBuffer buffer;
+        buffer.depth_only = depth_only;
         buffer.lightmap_uv = uv1 >= 0;
         buffer.vertices.reserve(vertex_count);
         for (uint32_t v = 0; v < vertex_count; ++v)
@@ -227,15 +229,15 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer>& buffers, std::st
             LevelVertex vertex;
             const uint8_t* source = data.data + stride * v;
             std::memcpy(vertex.position, source + position, sizeof(vertex.position));
-            if (normal_type == 2)
+            if (normal >= 0 && normal_type == 2)
                 std::memcpy(vertex.normal, source + normal, sizeof(vertex.normal));
-            else
+            else if (normal >= 0)
             {
                 const uint32_t packed = uint32_t(source[normal]) | (uint32_t(source[normal + 1]) << 8) | (uint32_t(source[normal + 2]) << 16);
                 for (int axis = 0; axis < 3; ++axis)
                     vertex.normal[axis] = float((packed >> ((2 - axis) * 8)) & 255) * (2.f / 255.f) - 1.f;
             }
-            if (uv_type == 1)
+            if (uv >= 0 && uv_type == 1)
                 std::memcpy(vertex.uv, source + uv, sizeof(vertex.uv));
             else if (uv_type == 6 || uv_type == 7)
                 for (int axis = 0; axis < 2; ++axis)
@@ -432,6 +434,7 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
     LevelModel model;
     model.material = material;
     model.lightmap_uv = vertices[vb].lightmap_uv;
+    model.depth_only = vertices[vb].depth_only;
     model.vertices.assign(vertices[vb].vertices.begin() + vbase,
         vertices[vb].vertices.begin() + vbase + vcount);
     model.indices.reserve(icount);
@@ -463,6 +466,9 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer>& vertices,
         if (!chunk(visual, ogf_swi, swi) ||
             !decode_slide_windows(swi.data, swi.size, model.indices,
                 model.vertices.size(), model.windows, error)) return false;
+    }
+    if (type == 0 || type == 2)
+    {
         LevelBytes fast;
         if (fast_vertices && fast_indices && chunk(visual, ogf_fastpath, fast))
         {
@@ -616,7 +622,7 @@ bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes
     else
     {
         const bool valid_fast_vertices = !has_fast ||
-            (fast_vertex_buffers.data && read_vertices(fast_vertex_buffers, fast_vertices, error));
+            (fast_vertex_buffers.data && read_vertices(fast_vertex_buffers, fast_vertices, error, true));
         const std::string fast_vertex_error = error;
         const bool valid_fast_indices = !has_fast ||
             (fast_index_buffers.data && read_indices(fast_index_buffers, fast_indices, error));
@@ -649,7 +655,7 @@ bool load_level_models(LevelBytes shaders, LevelBytes vertex_buffers, LevelBytes
 }
 
 bool load_container_model(LevelBytes vertex_buffers, LevelBytes index_buffers, const VisualRecord& visual, LevelModel& result, std::string& error,
-    LevelBytes tree_windows)
+    LevelBytes tree_windows, bool depth_only)
 {
     if (visual.type != 0 && visual.type != 2 && visual.type != 7 && visual.type != 11)
     {
@@ -660,7 +666,7 @@ bool load_container_model(LevelBytes vertex_buffers, LevelBytes index_buffers, c
     std::vector<std::vector<uint16_t>> indices;
     std::vector<LevelModel> models;
     std::vector<LevelVisual> nodes(1);
-    if (!read_vertices(vertex_buffers, vertices, error) ||
+    if (!read_vertices(vertex_buffers, vertices, error, depth_only) ||
         !read_indices(index_buffers, indices, error) ||
         !decode_visual({ visual.source.data(), visual.source.size() }, vertices, indices,
             size_t(visual.shader_id) + 1, models, nodes, 0, 0, nullptr, nullptr, tree_windows) ||

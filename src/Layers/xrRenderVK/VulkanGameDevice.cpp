@@ -309,9 +309,12 @@ bool VulkanGameDevice::reload_game_shaders(std::string& error)
 bool VulkanGameDevice::create_ui_scene_sets(std::string& error)
 {
     ui_scene_sets_.resize(window_.frame().image_count());
+    ui_depth_sets_.resize(window_.frame().image_count());
     for (uint32_t i = 0; i < ui_scene_sets_.size(); ++i)
         if (!ui_pass_.create_ui_texture_set(water_targets_.refraction(i),
-                targets_.sampler(), ui_scene_sets_[i], error)) return false;
+                targets_.sampler(), ui_scene_sets_[i], error) ||
+            !ui_pass_.create_ui_texture_set(targets_.sampled_depth_view(i),
+                targets_.sampler(), ui_depth_sets_[i], error, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)) return false;
     return true;
 }
 
@@ -319,6 +322,8 @@ void VulkanGameDevice::release_ui_scene_sets()
 {
     for (auto& set : ui_scene_sets_) ui_pass_.release_ui_texture_set(set);
     ui_scene_sets_.clear();
+    for (auto& set : ui_depth_sets_) ui_pass_.release_ui_texture_set(set);
+    ui_depth_sets_.clear();
 }
 
 void VulkanGameDevice::capture_ui(VkCommandBuffer command, VkImage image, uint32_t index, void* user)
@@ -337,7 +342,8 @@ void VulkanGameDevice::record_ui_distortion(const FrameRecordingContext& frame, 
 void VulkanGameDevice::record_ui(const FrameRecordingContext &frame, void *user)
 {
     auto& owner = *static_cast<VulkanGameDevice*>(user);
-    owner.ui_recorded_ = owner.ui_.record(frame, owner.ui_error_);
+    owner.ui_recorded_ &= owner.ui_.record(frame, owner.ui_error_, false, VK_NULL_HANDLE,
+        frame.image_index < owner.ui_depth_sets_.size() ? owner.ui_depth_sets_[frame.image_index] : VK_NULL_HANDLE);
     if (!owner.ui_recorded_)
         Msg("! [renderer-vulkan] ui.record failed image=%u frame=%u overlay=%d draws=%u reason=%s",
             frame.image_index, frame.frame_index,
@@ -501,9 +507,16 @@ void VulkanGameDevice::discard_model_draws(const void* instance)
                                return draw.instance == instance;
                            }),
         model_draws_.end());
+    const size_t previous_level_count=level_draws_.size();
     level_draws_.erase(std::remove_if(level_draws_.begin(), level_draws_.end(),
                            [instance](const LevelDraw& draw) { return draw.instance == instance; }),
         level_draws_.end());
+    if (level_draws_.size()==previous_level_count) return;
+    // Erasure shifts vector indices. Rebuild before another submission can
+    // consult the deduplication table in this same frame.
+    level_draw_lookup_.clear();
+    for (size_t index=0; index<level_draws_.size(); ++index)
+        level_draw_lookup_.emplace(level_draws_[index].index,index);
 }
 
 void VulkanGameDevice::queue_level_visual(uint32_t index, const float (&mvp)[16],
@@ -730,6 +743,11 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
             owner.models_recorded_ = false;
             return;
         }
+    // World-space IUIRender effects belong before the HUD clears depth and
+    // paints the weapon. Overlay UI is recorded separately after the HUD.
+    owner.ui_recorded_ &= owner.ui_.record(frame, owner.ui_error_, false, VK_NULL_HANDLE,
+        frame.image_index < owner.ui_depth_sets_.size() ? owner.ui_depth_sets_[frame.image_index] : VK_NULL_HANDLE,
+        true);
 }
 
 void VulkanGameDevice::record_local_lights(const FrameRecordingContext& frame, void* user)

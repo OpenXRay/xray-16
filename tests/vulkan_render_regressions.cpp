@@ -3,11 +3,26 @@
 #include "src/Layers/xrRenderVK/TextureQuality.h"
 #include "src/Layers/xrRenderVK/LevelLightmap.h"
 #include "src/Layers/xrRenderVK/ModelPoseConstants.h"
+#include "src/Layers/xrRenderVK/ShaderPairCache.h"
 #include <cassert>
 #include <array>
 #include <cmath>
 using namespace xray::render::vulkan;
 int main() {
+    ShaderPairCache<int> pair_cache;int first=11, replacement=22;
+    assert(!pair_cache.find("model.vs","flat.ps"));
+    pair_cache.remember("model.vs","flat.ps",&first);
+    for(unsigned i=0;i<5000;++i)assert(pair_cache.find("model.vs","flat.ps")==&first);
+    assert(!pair_cache.find("model.vs","other.ps"));
+    for(unsigned i=0;i<1000;++i) {
+        const std::string name="collision_"+std::to_string(i);
+        pair_cache.remember(name.c_str(),"flat.ps",&replacement);
+        const int* hit=pair_cache.find("model.vs","flat.ps");assert(!hit || hit==&first);
+    }
+    pair_cache.clear();assert(!pair_cache.find("model.vs","flat.ps"));
+    pair_cache.remember("model.vs","flat.ps",&replacement);
+    assert(pair_cache.find("model.vs","flat.ps")==&replacement);
+
     const float rotation_rows[]{0,0,1,.2f, 0,1,0,.4f, -1,0,0,.6f};
     const auto q=model_rotation_quaternion(rotation_rows);
     assert(std::abs(q[1]-.70710678f)<1e-5f && std::abs(q[3]-.70710678f)<1e-5f);

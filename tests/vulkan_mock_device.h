@@ -17,6 +17,7 @@ template <class T> T handle(uintptr_t n)
 }
 uintptr_t next_handle = 100;
 uint32_t draws{}, total_indices{}, buffers_destroyed{}, images_destroyed{}, submits{}, descriptor_frees{};
+int32_t last_vertex_base{};
 std::unordered_map<VkBuffer, VkDeviceSize> buffers;
 std::unordered_map<VkDeviceMemory, std::vector<uint8_t>> allocations;
 std::vector<VkDescriptorSet> bound_textures;
@@ -106,10 +107,11 @@ void VKAPI_PTR push(VkCommandBuffer, VkPipelineLayout, VkShaderStageFlags, uint3
 {
     assert(size && data);
 }
-void VKAPI_PTR draw(VkCommandBuffer, uint32_t count, uint32_t instances, uint32_t, int32_t, uint32_t)
+void VKAPI_PTR draw(VkCommandBuffer, uint32_t count, uint32_t instances, uint32_t, int32_t vertex_base, uint32_t)
 {
     assert(instances == 1 && count % 3 == 0);
     ++draws;
+    last_vertex_base=vertex_base;
     total_indices += count;
 }
 VkResult VKAPI_PTR descriptor_layout(VkDevice, const VkDescriptorSetLayoutCreateInfo *, const VkAllocationCallbacks *, VkDescriptorSetLayout *out)

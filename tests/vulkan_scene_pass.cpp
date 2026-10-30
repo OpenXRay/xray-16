@@ -32,10 +32,12 @@ void VKAPI_CALL destroy_layout(VkDevice, VkPipelineLayout, const VkAllocationCal
 VkResult VKAPI_CALL create_pipeline(VkDevice, VkPipelineCache, uint32_t,
     const VkGraphicsPipelineCreateInfo* info, const VkAllocationCallbacks*, VkPipeline* pipeline)
 {
-    const bool ui = pipelines % 12 != 0;
-    const int mode = static_cast<int>(pipelines % 12) - 1;
+    const bool ui=info->pVertexInputState->vertexAttributeDescriptionCount==4;
+    static unsigned ui_mode=0;if(!ui)ui_mode=0;
+    const int mode=ui?int(ui_mode++%11):-1;
+    const bool world=ui && info->pDepthStencilState && info->pDepthStencilState->depthTestEnable;
     ++pipelines;
-    assert(info->stageCount == 2 && info->pVertexInputState->vertexAttributeDescriptionCount == 3);
+    assert(info->stageCount == 2 && info->pVertexInputState->vertexAttributeDescriptionCount == (ui ? 4u : 3u));
     assert(info->pVertexInputState->pVertexBindingDescriptions[0].stride ==
         (ui ? sizeof(xray::render::vulkan::UiVertex) : sizeof(xray::render::vulkan::SceneVertex)));
     assert(info->pColorBlendState->pAttachments[0].blendEnable ==
@@ -60,11 +62,12 @@ VkResult VKAPI_CALL create_pipeline(VkDevice, VkPipelineCache, uint32_t,
         assert(attachment.alphaBlendOp == VK_BLEND_OP_ADD);
     }
     if (info->pDepthStencilState)
-        assert(info->pDepthStencilState->depthTestEnable == (ui ? VK_FALSE : VK_TRUE));
+        assert(info->pDepthStencilState->depthTestEnable == (ui && !world ? VK_FALSE : VK_TRUE));
+    if(world)assert(!info->pDepthStencilState->depthWriteEnable && info->pDepthStencilState->depthCompareOp==VK_COMPARE_OP_LESS_OR_EQUAL);
     assert(info->pVertexInputState->pVertexAttributeDescriptions[2].format ==
         (ui ? VK_FORMAT_R8G8B8A8_UNORM : VK_FORMAT_R32G32B32A32_SFLOAT));
     if (ui && ui_result != VK_SUCCESS) return ui_result;
-    *pipeline = handle<VkPipeline>(ui ? 12 + mode : 11);
+    *pipeline = handle<VkPipeline>(ui ? (world ? 40 : 12) + mode : 11);
     return VK_SUCCESS;
 }
 void VKAPI_CALL destroy_pipeline(VkDevice, VkPipeline, const VkAllocationCallbacks*) { ++destroyed_pipelines; }
@@ -84,7 +87,7 @@ void VKAPI_CALL draw(VkCommandBuffer, uint32_t count, uint32_t instances, uint32
 {
     assert(instances == 1);
     if (bound == handle<VkPipeline>(11)) { assert(count == 3); ++geometry_draws; }
-    else { assert(bound >= handle<VkPipeline>(12) && bound <= handle<VkPipeline>(21) && count == 6); ++ui_draws; }
+    else { assert(((bound >= handle<VkPipeline>(12) && bound <= handle<VkPipeline>(21)) || (bound>=handle<VkPipeline>(40) && bound<=handle<VkPipeline>(50))) && count == 6); ++ui_draws; }
 }
 VkResult VKAPI_CALL create_descriptor_layout(VkDevice, const VkDescriptorSetLayoutCreateInfo* info,
     const VkAllocationCallbacks*, VkDescriptorSetLayout* layout)
@@ -161,6 +164,9 @@ int main()
         assert(pass.record_ui(frame, handle<VkBuffer>(20), handle<VkBuffer>(21),
             VK_INDEX_TYPE_UINT16, 6, texture, &clipped, 0, 0, 0.f, {}, mode));
     assert(geometry_draws == 1 && ui_draws == 11 && scissor_width == 100 && descriptor_binds == 22);
+    assert(pass.record_ui(frame,handle<VkBuffer>(20),handle<VkBuffer>(21),VK_INDEX_TYPE_UINT16,
+        6,texture,nullptr,0,0,0.f,{},5,texture,true));
+    assert(bound==handle<VkPipeline>(45));
     auto wrong = frame;
     wrong.render_pass = handle<VkRenderPass>(9);
     assert(!pass.record_geometry(wrong, handle<VkBuffer>(20), handle<VkBuffer>(21),
@@ -173,9 +179,9 @@ int main()
     pass.release_ui_texture_set(texture);
     assert(texture == VK_NULL_HANDLE && descriptor_frees == 2 && descriptor_updates == 2);
     pass.destroy();
-    assert(destroyed_pipelines == 12 && destroyed_layouts == 2);
+    assert(destroyed_pipelines == 23 && destroyed_layouts == 2);
     ui_result = VK_ERROR_INITIALIZATION_FAILED;
     assert(!pass.initialize(device, render_pass, handle<VkShaderModule>(3), handle<VkShaderModule>(4),
         handle<VkShaderModule>(5), handle<VkShaderModule>(6), dispatch, error));
-    assert(destroyed_pipelines == 13 && destroyed_layouts == 4);
+    assert(destroyed_pipelines == 24 && destroyed_layouts == 4);
 }

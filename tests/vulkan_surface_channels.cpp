@@ -89,7 +89,7 @@ static void fill(Memory& memory, const Image& image, const std::array<float, 4>&
     }
     vkUnmapMemory(memory.device, image.memory);
 }
-struct Vertex { float position[3], normal[3], uv[2], lightmap_uv[2], baked[4]; uint16_t bones[4]{}; float weights[4]{1,0,0,0}; float tangent[3]{0,1,0}, bitangent[3]{-1,0,0}; };
+struct Vertex { float position[3], normal[3], uv[2], lightmap_uv[2], baked[4]; uint16_t bones[4]{}; float weights[4]{1,0,0,0}; float tangent[3]{0,1,0}, bitangent[3]{-1,0,0}; float clip_depth_w[2]{0,1}; };
 struct Push { float mvp[16]; float threshold{}, scale{}; float padding[2]{};
     float modes[4]{}, factors[4]{}, extra[4]{}, matrices[28]{}, rotation[4]{0,0,0,1}; };
 static_assert(sizeof(Push) == 256);
@@ -467,7 +467,8 @@ int main(int argc, char** argv)
             const VkVertexInputAttributeDescription ui_attributes[]{
                 {0, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, position)},
                 {1, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)},
-                {2, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(Vertex, baked)}};
+                {2, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(Vertex, baked)},
+                {3,0,VK_FORMAT_R32G32_SFLOAT,offsetof(Vertex,clip_depth_w)}};
             const bool ui = custom_vertex == ui_vs;
             const bool weather = fragment == weather_ps;
             const bool wide = ui || weather;
@@ -475,7 +476,7 @@ int main(int argc, char** argv)
             scissor.extent.width = wide ? 128 : sprite ? 2 : 1;
             viewport.height = sprite ? 2.f : 1.f; scissor.extent.height = sprite ? 2 : 1;
             pipeline_info.layout = weather ? weather_pipeline_layout : skinned ? skinned_pipeline_layout : pipeline_layout;
-            vertex_input.vertexAttributeDescriptionCount = ui ? 3 : skinned ? 7 : 5;
+            vertex_input.vertexAttributeDescriptionCount = ui ? 4 : skinned ? 7 : 5;
             vertex_input.pVertexAttributeDescriptions = ui ? ui_attributes : skinned ? skinned_attributes : attributes;
             depth.depthTestEnable=coplanar;depth.depthWriteEnable=coplanar;
             depth.depthCompareOp=xray::render::vulkan::geometry_depth_compare(false);
@@ -828,6 +829,49 @@ int main(int argc, char** argv)
         fill(memory, input[0], {.8f, .1f, .9f, 0.f});
         auto transparent_ui = execute(ui_ps, ui_push, false, ui_vs);
         near(transparent_ui[0][3], 0.f, "transparent PP atlas texels leave scene untouched");
+        // World UI/tracer path: clip-space depth must survive the UI API,
+        // even when the attachment was cleared for HUD rendering.
+        auto saved_triangle=triangle;
+        for(unsigned i=0;i<3;++i) {
+            triangle[i].position[0]=i==1?3.f:-1.f;
+            triangle[i].position[1]=i==2?-3.f:1.f;
+            triangle[i].clip_depth_w[0]=.6f;triangle[i].clip_depth_w[1]=1;
+            triangle[i].uv[0]=i==1?2.f:0.f;triangle[i].uv[1]=.5f;
+        }
+        auto write_triangle=[&]() { check(vkMapMemory(device,vertex_memory,0,VK_WHOLE_SIZE,0,&mapped));
+            std::memcpy(mapped,triangle.data(),sizeof(triangle));vkUnmapMemory(device,vertex_memory); };
+        write_triangle();fill(memory,input[0],{.8f,.1f,.9f,.5f});fill(memory,input[3],{.4f,.4f,.4f,1});
+        ui_push.mvp[3]=21; // World depth + alpha-add mode 5.
+        execute(ui_ps,ui_push,false,ui_vs);
+        for(const auto& pixel:last_ui_pixels) near(pixel[0],0.f,"world tracer behind a wall is occluded");
+        for(auto& v:triangle)v.clip_depth_w[0]=.2f;write_triangle();
+        execute(ui_ps,ui_push,false,ui_vs);
+        for(const auto& pixel:last_ui_pixels) near(pixel[0],.8f,"world tracer in front of a wall survives");
+        // A late forward occluder can be nearer than the depth snapshot.
+        // The world UI pipeline also tests the live attachment before HUD clear.
+        auto late_occlusion=execute(ui_ps,ui_push,false,ui_vs,false,false,true);
+        near(late_occlusion[0][0],0.f,"late world depth also occludes the tracer");
+        // Perspective UV differs from affine interpolation when clip W varies.
+        triangle[1].position[0]*=4;triangle[1].position[1]*=4;
+        triangle[1].clip_depth_w[0]*=4;triangle[1].clip_depth_w[1]=4;write_triangle();
+        check(vkMapMemory(device,input[0].memory,0,VK_WHOLE_SIZE,0,&mapped));
+        VkSubresourceLayout tracer_layout{};VkImageSubresource tracer_sub{VK_IMAGE_ASPECT_COLOR_BIT,0,0};
+        vkGetImageSubresourceLayout(device,input[0].image,&tracer_sub,&tracer_layout);
+        for(unsigned y=0;y<2;++y)for(unsigned x=0;x<2;++x) {
+            const float color[]{x?.8f:.2f,.1f,.1f,1};std::memcpy(static_cast<uint8_t*>(mapped)+tracer_layout.offset+y*tracer_layout.rowPitch+x*16,color,16);
+        }
+        vkUnmapMemory(device,input[0].memory);execute(ui_ps,ui_push,false,ui_vs);
+        near(last_ui_pixels[100][0],.2f,"world tracer UV uses perspective interpolation");
+        // A triangle crossing the near plane must be clipped, not flattened
+        // into an overlay or dropped as a whole.
+        for(unsigned i=0;i<3;++i) {
+            triangle[i].position[0]=i==1?3.f:-1.f;triangle[i].position[1]=i==2?-3.f:1.f;
+            triangle[i].clip_depth_w[0]=i==0?-.5f:.5f;triangle[i].clip_depth_w[1]=1;
+        }
+        write_triangle();fill(memory,input[3],{.9f,.9f,.9f,1});execute(ui_ps,ui_push,false,ui_vs);
+        unsigned visible_pixels=0;for(const auto& pixel:last_ui_pixels)if(pixel[0]>.01f)++visible_pixels;
+        if(!visible_pixels || visible_pixels>=128)throw std::runtime_error("world tracer near-plane clipping lost homogeneous depth");
+        triangle=saved_triangle;write_triangle();
         std::array<Vertex,6> sprite_vertices{};
         const unsigned order[]{0,1,2,0,2,3};
         for(unsigned i=0;i<6;++i) {

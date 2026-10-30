@@ -26,6 +26,7 @@ struct ModelGeometry
 {
     uint8_t type{};
     uint8_t skin_weights{};
+    bool depth_only{};
     std::string shader, texture;
     SurfaceMode mode{SurfaceMode::Opaque};
     std::vector<ModelVertex> vertices;

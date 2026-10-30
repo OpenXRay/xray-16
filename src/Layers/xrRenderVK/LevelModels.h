@@ -18,6 +18,8 @@ enum class SurfaceMode : uint8_t
     AlphaTest,
     Transparent
 };
+inline bool use_fast_depth_proxy(SurfaceMode mode, uint8_t tessellation)
+{ return mode == SurfaceMode::Opaque && tessellation == 0; }
 
 // Decoded static subset of level.geom and the level's OGF visual table. The
 // caller supplies decompressed chunk payloads from the engine's IReader.
@@ -57,6 +59,7 @@ struct LevelModel
 {
     uint16_t material{};
     bool lightmap_uv{};
+    bool depth_only{}; // geomX may contain POSITION0 without shading attributes
     std::vector<LevelVertex> vertices;
     std::vector<uint32_t> indices;
     std::vector<SlideWindow> windows;
@@ -113,7 +116,7 @@ bool load_game_level_models(LevelGameProfile profile, LevelBytes header, LevelBy
 // Resolve a standalone visual's GCONTAINER against level.geom, using the
 // same bounds and index validation as the level visual table.
 bool load_container_model(LevelBytes vertex_buffers, LevelBytes index_buffers, const VisualRecord &visual, LevelModel &result, std::string &error,
-                          LevelBytes tree_windows = {});
+                          LevelBytes tree_windows = {}, bool depth_only = false);
 bool parse_level_visibility(LevelBytes portals, LevelBytes sectors,
     LevelModelData& result, std::string& error);
 }

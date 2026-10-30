@@ -351,6 +351,35 @@ int main()
             result.models[0].windows.size() == 2 && result.models[0].fast->windows.size() == 2);
     }
     Bytes incompatible_fast_vb = vb;
+    Bytes positions_only;
+    u32(positions_only,1);decl(positions_only,0,2,0);
+    positions_only.insert(positions_only.end(),{0xff,0,0,0,17,0,0,0});
+    u32(positions_only,3);
+    for(unsigned vertex=0;vertex<3;++vertex) {
+        f32(positions_only,float(vertex));f32(positions_only,0);f32(positions_only,0);
+    }
+    // Shipping geomX needs POSITION0 only. Never relax the primary geometry.
+    assert(load_level_models(input(shaders),input(vb),input(progressive_ib),input(fast_visuals),
+        result,error,input(positions_only),input(progressive_ib)));
+    assert(result.models[0].fast && result.models[0].fast->depth_only);
+    assert(result.models[0].fast->vertices[2].position[0]==2);
+    assert(!load_level_models(input(shaders),input(positions_only),input(progressive_ib),
+        input(progressive_visuals),result,error));
+    assert(error.find("POSITION0/NORMAL0/TEXCOORD0 required")!=std::string::npos);
+    assert(use_fast_depth_proxy(SurfaceMode::Opaque,0));
+    assert(!use_fast_depth_proxy(SurfaceMode::AlphaTest,0));
+    assert(!use_fast_depth_proxy(SurfaceMode::Transparent,0));
+    assert(!use_fast_depth_proxy(SurfaceMode::Opaque,1));
+    // Static Fvisual also carries FASTPATH; unlike progressive meshes it
+    // has no SWI chunk in the depth proxy.
+    Bytes static_header=header;static_header[1]=0;
+    Bytes static_visual,static_fast,static_table;
+    part(static_visual,1,static_header);part(static_visual,21,progressive_container);
+    part(static_fast,21,progressive_container);part(static_visual,22,static_fast);
+    part(static_table,0,static_visual);
+    assert(load_level_models(input(shaders),input(vb),input(progressive_ib),input(static_table),
+        result,error,input(positions_only),input(progressive_ib)));
+    assert(result.models[0].fast && result.models[0].fast->windows.empty());
     incompatible_fast_vb[0] = 0xff; // The normal geometry remains usable.
     bool skipped_fast_geometry = false;
     std::string fallback_reason;

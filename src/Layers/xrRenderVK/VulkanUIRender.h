@@ -27,7 +27,8 @@ class VulkanUIRender final : public IUIRender
     void setup_states();
     void reset_frame();
     bool record(const FrameRecordingContext &frame, std::string &error,
-        bool distortion = false, VkDescriptorSet scene = VK_NULL_HANDLE);
+        bool distortion = false, VkDescriptorSet scene = VK_NULL_HANDLE,
+        VkDescriptorSet world_depth = VK_NULL_HANDLE, bool world_only = false);
     void set_distortion(bool enabled) { distortion_ = enabled; }
     bool has_distortion() const;
     void append_imgui(ImDrawData* data);
@@ -58,10 +59,12 @@ private:
         float alpha_ref{};
         int blend_mode{1};
         bool distortion{};
+        bool world_depth{};
     };
     struct FrameBuffers
     {
         BufferResource vertices, indices;
+        uint64_t revision{};
     };
     bool ensure(BufferResource& buffer, VkDeviceSize bytes, VkBufferUsageFlags usage,
         std::string& error);
@@ -79,6 +82,7 @@ private:
     std::vector<uint8_t> visible_;
     std::vector<uint32_t> indices_;
     std::vector<Batch> batches_;
+    uint64_t revision_{};
     VkDescriptorSet texture_{};
     VulkanUIShader* shader_{};
     VkRect2D scissor_{};

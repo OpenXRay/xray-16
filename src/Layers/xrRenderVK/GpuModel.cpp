@@ -22,7 +22,6 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
     const std::string texture = geometry.texture.empty() ? inherited_texture : geometry.texture;
     auto children = std::move(geometry.children);
     geometry.children.clear();
-    auto fast = std::move(geometry.fast);
     geometry.fast.reset();
     const auto upload_mesh = [&](ModelGeometry&& decoded) -> bool
     {
@@ -247,14 +246,8 @@ bool GpuModel::add_meshes(ModelGeometry&& geometry, const std::string& inherited
     {
         if (!upload_mesh(std::move(geometry)))
             return false;
-        if (fast)
-        {
-            const size_t base = meshes_.size() - 1;
-            if (!upload_mesh(std::move(*fast)))
-                return false;
-            meshes_[base].fast_index = meshes_.size() - 1;
-            meshes_.back().fast_variant = true;
-        }
+        // OGF_FASTPATH/geomX is a depth-only proxy, never a shaded distance
+        // LOD. Model shadows do not consume it yet; avoid uploading unused data.
     }
     for (auto& child : children)
         if (!add_meshes(std::move(child), texture, device, queue, pool,
@@ -326,11 +319,8 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
     for (size_t index = 0; index < meshes_.size(); ++index)
     {
         auto& base = meshes_[index];
-        if (base.fast_variant)
-            continue;
-        // The alternative OGF geometry is the low-detail path. Its own SWI
-        // is selected below; the normal mesh remains available for near LOD.
-        auto& mesh = base.fast_index != SIZE_MAX && lod < 0.33f ? meshes_[base.fast_index] : base;
+        // Distance LOD selects regular SWI; geomX is reserved for depth.
+        auto& mesh = base;
         if (phase != GeometryPhase::Hud &&
             !(phase == GeometryPhase::SecondaryOpaque ? mesh.secondary_opaque :
               phase == GeometryPhase::Transparent ?
@@ -516,13 +506,13 @@ bool GpuModel::record_animated(const FrameRecordingContext& frame, const Deferre
 bool GpuModel::has_secondary_priority() const
 {
     return std::any_of(meshes_.begin(), meshes_.end(), [](const Mesh& mesh)
-    { return !mesh.fast_variant && mesh.secondary_opaque; });
+    { return mesh.secondary_opaque; });
 }
 
 bool GpuModel::has_transparent_priority(uint8_t priority) const
 {
     return std::any_of(meshes_.begin(), meshes_.end(), [priority](const Mesh& mesh)
-    { return !mesh.fast_variant && mesh.geometry.mode == SurfaceMode::Transparent &&
+    { return mesh.geometry.mode == SurfaceMode::Transparent &&
         mesh.priority == priority; });
 }
 

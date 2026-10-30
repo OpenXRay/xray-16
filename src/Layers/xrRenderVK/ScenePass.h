@@ -22,6 +22,8 @@ struct UiVertex
     float position[2]; // framebuffer pixels, top-left origin
     float uv[2];       // reserved for the textured UI pipeline
     uint32_t color;    // normalized RGBA8
+    float depth{};    // clip-space z for world primitives
+    float clip_w{1.f};
 };
 
 struct SceneConstants
@@ -81,9 +83,9 @@ public:
         const VkRect2D* scissor = nullptr,
         VkDeviceSize vertex_offset = 0, VkDeviceSize index_offset = 0,
         float alpha_ref = 0.0f, VkExtent2D logical_extent = {}, int blend_mode = 1,
-        VkDescriptorSet distortion_scene = VK_NULL_HANDLE) const;
+        VkDescriptorSet distortion_scene = VK_NULL_HANDLE, bool world_depth = false) const;
     bool create_ui_texture_set(VkImageView view, VkSampler sampler, VkDescriptorSet& result,
-        std::string& error);
+        std::string& error, VkImageLayout image_layout = VK_IMAGE_LAYOUT_GENERAL);
     void update_ui_texture_set(VkDescriptorSet set, VkImageView view, VkSampler sampler);
     void release_ui_texture_set(VkDescriptorSet& set);
     void rebind_render_pass(VkRenderPass compatible_render_pass, VkRenderPass overlay_pass = VK_NULL_HANDLE)
@@ -99,6 +101,7 @@ private:
     VkPipelineLayout m_ui_layout = VK_NULL_HANDLE;
     VkPipeline m_scene_pipeline = VK_NULL_HANDLE;
     VkPipeline m_ui_pipelines[11]{};
+    VkPipeline m_world_ui_pipelines[11]{};
     VkDescriptorSetLayout m_ui_descriptor_layout = VK_NULL_HANDLE;
     VkDescriptorPool m_ui_descriptor_pool = VK_NULL_HANDLE;
     ScenePassDispatch m_vk{};

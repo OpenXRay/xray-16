@@ -1647,8 +1647,7 @@ void VulkanLevelRender::model_Delete(IRenderVisual*& visual, bool discard)
     R_ASSERT2(found != models_.end(), "Vulkan model deletion received an unknown visual");
     if (game_device_)
         game_device_->discard_model_draws(visual);
-    if (device_ && wait_idle_)
-        R_ASSERT2(retirement_idle(device_, wait_idle_), "Vulkan model deletion requires idle GPU frames");
+    const bool pooled = !discard && !found->second->cache_name().empty();
     std::vector<IKinematics*> doomed_skeletons;
     std::function<void(const VulkanModelVisual&)> collect_skeletons =
         [&](const VulkanModelVisual& node)
@@ -1657,14 +1656,22 @@ void VulkanLevelRender::model_Delete(IRenderVisual*& visual, bool discard)
         for (const auto& child : node.children()) collect_skeletons(*child);
     };
     collect_skeletons(*found->second);
-    wallmarks_.erase(std::remove_if(wallmarks_.begin(), wallmarks_.end(),
-        [&](const Wallmark& mark)
+    const auto attached_mark = [&](const Wallmark& mark)
     {
         return std::find(doomed_skeletons.begin(), doomed_skeletons.end(), mark.skeleton) !=
             doomed_skeletons.end();
-    }), wallmarks_.end());
-    found->second->release_pose_buffers();
-    if (!discard && !found->second->cache_name().empty())
+    };
+    // Returning an instance to its pool does not destroy GPU resources.
+    // Retain its per-frame pose buffers and descriptors; reuse waits on the
+    // normal frame-slot fence before writing them. Attached marks still need
+    // retirement because they are actually erased here.
+    const bool destroys_gpu_resources = !pooled ||
+        std::any_of(wallmarks_.begin(),wallmarks_.end(),attached_mark);
+    if (destroys_gpu_resources && device_ && wait_idle_)
+        R_ASSERT2(retirement_idle(device_, wait_idle_), "Vulkan model resource retirement requires idle GPU frames");
+    wallmarks_.erase(std::remove_if(wallmarks_.begin(),wallmarks_.end(),attached_mark),wallmarks_.end());
+    if (!pooled) found->second->release_pose_buffers();
+    if (pooled)
         model_pool_.emplace(found->second->cache_name(), std::move(found->second));
     models_.erase(found);
     visual = nullptr;
@@ -1678,6 +1685,7 @@ void VulkanLevelRender::models_Clear(bool)
         return;
     if (device_ && wait_idle_)
         R_ASSERT2(retirement_idle(device_, wait_idle_), "Vulkan model clear requires idle GPU frames");
+    for (auto& entry : model_pool_) entry.second->release_pose_buffers();
     model_pool_.clear();
     for (auto it = model_gpu_cache_.begin(); it != model_gpu_cache_.end();)
         if (it->second.expired())

@@ -3,6 +3,9 @@
 #include "src/Layers/xrRenderVK/GpuModel.h"
 #include "src/Layers/xrRenderVK/VulkanModelVisual.h"
 #include "src/Layers/xrRenderVK/VulkanVisual.h"
+#include "src/Layers/xrRenderVK/VulkanUIShader.h"
+#include "src/Layers/xrRenderVK/VulkanUIRender.h"
+#include "xrEngine/device.h"
 #include "src/xrEngine/defines.h"
 #include "vulkan_mock_device.h"
 #include <filesystem>
@@ -166,7 +169,8 @@ int main()
     DeferredPass pass;
     std::string error;
     assert(pass.initialize(device, rp, rp, handle<VkShaderModule>(5), handle<VkShaderModule>(6), handle<VkShaderModule>(7), handle<VkShaderModule>(8),
-                           handle<VkShaderModule>(9), handle<VkShaderModule>(10), handle<VkShaderModule>(11), scene_dispatch(), error));
+                           handle<VkShaderModule>(9), handle<VkShaderModule>(10), handle<VkShaderModule>(11), scene_dispatch(), error,
+                           rp,handle<VkShaderModule>(12),handle<VkShaderModule>(13),handle<VkShaderModule>(14)));
     assert(pass.create_game_pipeline("vk\\object_opaque.vs", "vk\\object_opaque.ps", handle<VkShaderModule>(5), handle<VkShaderModule>(6), SurfaceMode::Opaque,
                                      false, error));
     for (unsigned weights = 1; weights <= 4; ++weights)
@@ -357,12 +361,45 @@ int main()
         std::memcpy(blender.data() + 8, "default", 8);
         blender[172] = 1;
         chunk(records, 0, blender);
+        Bytes tracer(176,0);
+        const char screen_cls[]="S_SET   ";
+        for(size_t i=0;i<8;++i)tracer[i]=screen_cls[7-i];
+        std::memcpy(tracer.data()+8,"mod_world_effect",17);tracer[172]=4;
+        put32(tracer,0);const char base_scope[]="Base Texture";
+        tracer.insert(tracer.end(),base_scope,base_scope+sizeof(base_scope));
+        put32(tracer,7);const char blend_name[]="Blending";
+        tracer.insert(tracer.end(),blend_name,blend_name+sizeof(blend_name));
+        put32(tracer,5);put32(tracer,0);
+        put32(tracer,6);const char ztest_name[]="Z-test";
+        tracer.insert(tracer.end(),ztest_name,ztest_name+sizeof(ztest_name));put32(tracer,1);
+        chunk(records,1,tracer);
         chunk(library, 2, records);
         IReader reader(library.data(), library.size());
         assert(textures.load_blender_library(reader, error));
     }
     FrameRecordingContext frame{handle<VkCommandBuffer>(12), rp, handle<VkFramebuffer>(13), {960, 540}, 0, 0};
     float mvp[16]{};
+    {
+        VulkanUIShader tracer(textures,ui_pass);tracer.create("mod_world_effect","fixture");
+        assert(tracer.inited() && tracer.world_depth() && tracer.blend_mode()==5);
+        VulkanUIShader copied(textures,ui_pass);copied.Copy(tracer);assert(copied.world_depth());
+        VulkanUIRender world_ui;
+        world_ui.configure(device,memory,upload_dispatch().buffer,ui_pass,
+            {[&](VkDescriptorSet set){return textures.retain_ui(set,ui_pass);},
+             [&](VkDescriptorSet set){textures.release_ui(set,ui_pass);}});
+        world_ui.CreateUIGeom();Device.mFullTransform.identity();
+        world_ui.StartPrimitive(3,IUIRender::ptTriList,IUIRender::pttLIT);
+        world_ui.PushPoint(-1,1,.5f,0xffffffffu,0,0);
+        world_ui.PushPoint(3,1,.5f,0xffffffffu,1,0);
+        world_ui.PushPoint(-1,-3,.5f,0xffffffffu,0,1);
+        // Match CBulletManager: shader is selected only after vertex submission.
+        world_ui.SetShader(tracer);world_ui.FlushPrimitive();
+        const auto before=draws;
+        assert(world_ui.record(frame,error) && draws==before); // overlay excludes world effects
+        assert(!world_ui.record(frame,error,false,VK_NULL_HANDLE,VK_NULL_HANDLE,true));
+        assert(world_ui.record(frame,error,false,VK_NULL_HANDLE,tracer.descriptor(),true) && draws==before+1);
+        world_ui.DestroyUIGeom();copied.destroy();tracer.destroy();
+    }
     mvp[0] = mvp[5] = mvp[10] = mvp[15] = 1;
     assert(pass.create_game_pipeline("vk\\level_opaque.vs", "vk\\level_opaque.ps", handle<VkShaderModule>(5), handle<VkShaderModule>(6), SurfaceMode::Opaque,
                                      false, error));
@@ -403,6 +440,17 @@ int main()
         for (unsigned n : {0u, 0u, 3u, 0u, 0u, 3u})
             put32(container, n);
         chunk(visual, 21, container);
+        if(profile==LevelGameProfile::CoP) {
+            Bytes fast_vertices,fast_geometry,fast_chunks;
+            put32(fast_vertices,1);fast_vertices.insert(fast_vertices.end(),{0,0,0,0,2,0,0,0,0xff,0,0,0,17,0,0,0});
+            put32(fast_vertices,3);for(unsigned v=0;v<3;++v) {
+                putfloat(fast_vertices,.25f*(v+1));putfloat(fast_vertices,0);putfloat(fast_vertices,0);
+            }
+            chunk(fast_geometry,9,fast_vertices);chunk(fast_geometry,10,ib);
+            save(directory/"level.geomX",fast_geometry);
+            chunk(fast_chunks,21,container);chunk(visual,22,fast_chunks);
+            FS.rescan_path(FS.get_path("$level$")->m_Path,false);
+        }
         table = compressed(0, visual);
         chunk(level, 1, Bytes{14, 0, 1, 0});
         chunk(level, 2, shaders);
@@ -441,6 +489,16 @@ int main()
         }
         const auto before = draws;
         assert(gpu.record(frame, pass, mvp) && draws == before + 1);
+        if(profile==LevelGameProfile::CoP) {
+            // The shaded low LOD must keep regular UV/lightmap vertices;
+            // the shadow pass uses the position-only proxy in the same batch.
+            assert(gpu.record_visual(0,frame,pass,mvp,GeometryPhase::OpaqueAndAlphaTest,0.f,false));
+            assert(last_vertex_base==0);
+            assert(gpu.record_sun_shadow(frame,pass,mvp));
+            assert(last_vertex_base==3);
+            assert(gpu.record_hud_visual(0,frame,pass,mvp,0.f));
+            assert(last_vertex_base==0); // HUD must not sample a depth proxy either.
+        }
         if(profile==LevelGameProfile::CoP) {
             const auto set=bound_textures.back();
             assert(sampler_address.at(sampled_bindings.at(set).at(0))==VK_SAMPLER_ADDRESS_MODE_REPEAT);
@@ -564,6 +622,15 @@ int main()
                 assert(gpu->record_animated(frame, pass, mvp, *visual->skeleton(), error, GeometryPhase::Hud));
                 assert(gpu->record_animated(frame, pass, mvp, *copy->skeleton(), error, GeometryPhase::Hud));
                 assert(draws == before_hud + 2); // All 1–4 weight GPU HUD variants.
+                const auto pool_buffers=buffers.size();
+                const auto pool_frees=descriptor_frees;
+                const auto pool_destroys=buffers_destroyed;
+                visual->reset_instance_state(); // Return/reuse keeps GPU pose ownership.
+                for(unsigned slot=0;slot<FrameContext::FramesInFlight;++slot) {
+                    frame.frame_index=slot;
+                    assert(gpu->record_animated(frame,pass,mvp,*visual->skeleton(),error));
+                }
+                assert(buffers.size()==pool_buffers && descriptor_frees==pool_frees && buffers_destroyed==pool_destroys);
                 visual->release_pose_buffers();
                 assert(gpu->record_animated(frame, pass, mvp, *copy->skeleton(), error));
                 visual->reset_instance_state();

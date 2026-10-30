@@ -23,6 +23,7 @@ void VulkanUIShader::Copy(IUIShader& source)
     blend_mode_ = other->blend_mode_;
     alpha_ref_ = other->alpha_ref_;
     clamp_ = other->clamp_;
+    world_depth_ = other->world_depth_;
     video_ = other->video_;
     if (!other->sequence_.empty())
     {
@@ -63,10 +64,22 @@ void VulkanUIShader::create(LPCSTR shader, LPCSTR texture)
                 &alpha_ref_, &blend_mode_, false, true, false, false,
                 nullptr, nullptr, &material))
         {
-            Msg("! [renderer-vulkan] UI material shader='%s' texture='%s': %s",
-                shader_.c_str(), texture_.c_str(), error.c_str());
-            use_transparent_fallback();
-            return;
+            // The engine submits unlit world S_SET effects (notably tracers)
+            // through IUIRender::pttLIT. Resolve their real depth contract;
+            // accepting these as depth-free overlays would show through walls.
+            world_depth_ = textures_->surface_mode(shader_, texture_, surface, error,
+                &alpha_ref_, &blend_mode_, false, false, true, false,
+                nullptr, nullptr, &material) && material.class_name == "S_SET   " &&
+                material.pass.depth_test && !material.pass.depth_write &&
+                !material.pass.lighting && !material.pass.fog;
+            if (!world_depth_)
+            {
+                if (error.empty()) error = "world UI needs unlit, unfogged Z-test=1/Z-write=0 S_SET";
+                Msg("! [renderer-vulkan] UI material shader='%s' texture='%s': %s",
+                    shader_.c_str(), texture_.c_str(), error.c_str());
+                use_transparent_fallback();
+                return;
+            }
         }
         clamp_ = material.pass.clamp;
     }
@@ -177,6 +190,7 @@ void VulkanUIShader::destroy()
     blend_mode_ = 1;
     alpha_ref_ = 0;
     clamp_ = true;
+    world_depth_ = false;
 }
 
 bool VulkanUIShader::operator==(const IUIShader& source) const

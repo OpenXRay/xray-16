@@ -177,6 +177,7 @@ private:
     GameShaderResources shader_resources_;
     ScenePass ui_pass_;
     std::vector<VkDescriptorSet> ui_scene_sets_;
+    std::vector<VkDescriptorSet> ui_depth_sets_;
     GameTextureFactory textures_;
     std::unordered_map<std::string, VkDescriptorSet> glow_textures_;
     VulkanUIRender ui_;

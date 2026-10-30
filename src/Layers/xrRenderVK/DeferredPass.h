@@ -5,6 +5,7 @@
 #include "ScenePass.h"
 #include "ForwardLighting.h"
 #include "GeometryCommandCache.h"
+#include "ShaderPairCache.h"
 #include <string>
 #include <unordered_map>
 #include <functional>
@@ -116,7 +117,10 @@ public:
         return require_game_pipeline(vertex_name, fragment_name, mode, hud, skinned, error);
     }
     bool require_game_pipeline(const std::string &vertex_name, const std::string &fragment_name, SurfaceMode mode, bool hud, bool skinned,
-                               std::string &error) const;
+                               std::string &error) const
+    { return require_game_pipeline(vertex_name.c_str(),fragment_name.c_str(),mode,hud,skinned,error); }
+    bool require_game_pipeline(const char* vertex_name, const char* fragment_name,
+        SurfaceMode mode, bool hud, bool skinned, std::string& error) const;
     void begin_game_pipeline_reload();
     void commit_game_pipeline_reload();
     void abort_game_pipeline_reload();
@@ -213,6 +217,7 @@ private:
     void push_texture_matrices(const FrameRecordingContext& frame, VkPipelineLayout layout,
         const TextureMatrixSet* matrices, const float* normal_rows = nullptr) const;
     struct GamePipeline { VkPipeline handle{}; SurfaceMode mode{}; bool hud{}, skinned{}; };
+    mutable ShaderPairCache<GamePipeline> pipeline_lookup_cache_;
     const GamePipeline* game_pipeline(const char* vertex_name, const char* fragment_name) const;
     bool allocate(VkDescriptorSetLayout layout, VkImageView first, VkImageView second,
         VkSampler sampler, VkDescriptorSet& set, std::string& error);

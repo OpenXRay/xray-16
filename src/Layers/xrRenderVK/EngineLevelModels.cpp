@@ -249,7 +249,7 @@ bool decode_container_geometry(const VisualRecord& visual, pcstr geometry_name, 
             swi->r(swi_bytes.data(), swi_bytes.size());
         }
         loaded = load_container_model({ vb_bytes.data(), vb_bytes.size() }, { ib_bytes.data(), ib_bytes.size() }, visual, model, error,
-            {swi_bytes.data(), swi_bytes.size()});
+            {swi_bytes.data(), swi_bytes.size()}, std::strcmp(geometry_name, "level.geomX") == 0);
     }
     else
         error = std::string(geometry_name) + " has no vertex or index buffers";
@@ -267,6 +267,7 @@ bool decode_container_geometry(const VisualRecord& visual, pcstr geometry_name, 
     converted.shader = visual.shader;
     converted.texture = visual.texture;
     converted.mode = SurfaceMode::Unresolved;
+    converted.depth_only = model.depth_only;
     converted.indices = std::move(model.indices);
     converted.windows = std::move(model.windows);
     converted.vertices.reserve(model.vertices.size());
@@ -304,7 +305,7 @@ bool decode_engine_model_geometry(const VisualRecord& visual, ModelGeometry& res
         if (!source.find_chunk(OGF_GCONTAINER) || !decode_container_geometry(visual, "level.geom", decoded, error))
             return false;
     }
-    if (visual.type == 2)
+    if (visual.type == 0 || visual.type == 2)
     {
         IReader source(const_cast<uint8_t*>(visual.source.data()), visual.source.size());
         IReader* fast = source.open_chunk(OGF_FASTPATH);
@@ -313,7 +314,8 @@ bool decode_engine_model_geometry(const VisualRecord& visual, ModelGeometry& res
             const auto* fast_bytes = static_cast<const uint8_t*>(fast->pointer());
             const size_t fast_size = fast->length();
             IReader* header = source.open_chunk(OGF_HEADER);
-            if (!header || !fast->find_chunk(OGF_GCONTAINER) || !fast->find_chunk(OGF_SWIDATA))
+            if (!header || !fast->find_chunk(OGF_GCONTAINER) ||
+                (visual.type == 2 && !fast->find_chunk(OGF_SWIDATA)))
             {
                 if (header)
                     header->close();

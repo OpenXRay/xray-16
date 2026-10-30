@@ -522,11 +522,24 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         if (model.fast)
         {
             mesh.fast = std::make_unique<Mesh>();
-            if (!upload_mesh(*model.fast, *mesh.fast))
+            Mesh& fast = *mesh.fast;
+            // geomX is a depth proxy. It has no lightmap/normal/UV contract;
+            // share the regular material and bypass all shading/tessellation.
+            fast.material = mesh.material;
+            fast.material_id = mesh.material_id;
+            fast.mode = mesh.mode;
+            fast.alpha_ref = mesh.alpha_ref;
+            fast.windows = model.fast->windows;
+            if (packing.would_flush(*model.fast) && !flush_geometry()) return false;
+            if (!packing.append(*model.fast, fast.first_vertex, fast.first_index, error))
             {
                 describe_upload_failure(*model.fast, uploaded_models, "fast level.geomX");
                 return false;
             }
+            fast.index_count = static_cast<uint32_t>(model.fast->indices.size());
+            fast.vertex_bytes = model.fast->vertices.size() * sizeof(LevelVertex);
+            fast.index_bytes = model.fast->indices.size() * sizeof(uint32_t);
+            awaiting_batch.push_back(&fast);
             released_cpu_bytes += model.fast->vertices.capacity() * sizeof(LevelVertex) +
                 model.fast->indices.capacity() * sizeof(uint32_t);
             model.fast.reset();
@@ -759,11 +772,19 @@ bool GpuLevel::record_sun_shadow(const FrameRecordingContext& frame, const Defer
         if (visual.mesh >= 0)
         {
             if (size_t(visual.mesh) >= meshes_.size()) return false;
-            const Mesh& mesh = meshes_[visual.mesh];
+            const Mesh& base = meshes_[visual.mesh];
+            // Alpha-tested casters need original UVs; displaced meshes need
+            // their tessellated silhouette. Only opaque flat proxies qualify.
+            const Mesh& mesh = base.fast && use_fast_depth_proxy(base.mode,base.tessellation) ? *base.fast : base;
+            const float dx = visual.bounds[6] - Device.vCameraPosition.x;
+            const float dy = visual.bounds[7] - Device.vCameraPosition.y;
+            const float dz = visual.bounds[8] - Device.vCameraPosition.z;
+            const float lod = lod_for_distance(visual.bounds[9], dx*dx+dy*dy+dz*dz);
+            const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
             if (mesh.mode != SurfaceMode::Transparent && mesh.index_count &&
                 !pass.record_sun_shadow(frame, mesh.vertex_buffer(), mesh.index_buffer(),
-                    mesh.index_count, sun_mvp, mesh.material, mesh.mode == SurfaceMode::AlphaTest,
-                    mesh.first_index, float(mesh.alpha_ref) / 255.f, mesh.first_vertex))
+                    window.index_count, sun_mvp, mesh.material, mesh.mode == SurfaceMode::AlphaTest,
+                    mesh.first_index + window.offset, float(mesh.alpha_ref) / 255.f, mesh.first_vertex))
                 return false;
         }
         for (uint32_t child : visual.children)
@@ -1211,7 +1232,7 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
     {
         if (static_cast<size_t>(visual.mesh) >= meshes_.size()) return false;
         const Mesh& base = meshes_[visual.mesh];
-        const Mesh& mesh = base.fast && lod < 0.33f ? *base.fast : base;
+        const Mesh& mesh = base;
         const bool transparent = mesh.mode == SurfaceMode::Transparent;
         const bool selected = phase == GeometryPhase::Transparent ?
             transparent && mesh.secondary_opaque == secondary_only &&
@@ -1313,7 +1334,7 @@ bool GpuLevel::record_hud_visual(size_t index, const FrameRecordingContext& fram
     {
         if (static_cast<size_t>(visual.mesh) >= meshes_.size()) return false;
         const Mesh& base = meshes_[visual.mesh];
-        const Mesh& mesh = base.fast && lod < 0.33f ? *base.fast : base;
+        const Mesh& mesh = base;
         const SlideWindow window = select_slide_window(mesh.windows, lod, mesh.index_count);
         if (!pass.record_hud(frame, mesh.vertex_buffer(), mesh.index_buffer(),
                 window.index_count, mvp, mesh.material, mesh.first_index + window.offset,

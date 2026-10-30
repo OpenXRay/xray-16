@@ -588,11 +588,14 @@ void DeferredPass::update_surface_textures(VkDescriptorSet set,
 const DeferredPass::GamePipeline* DeferredPass::game_pipeline(const char* vertex_name, const char* fragment_name) const
 {
     if (!vertex_name || !fragment_name || !*vertex_name || !*fragment_name) return nullptr;
+    if (const auto* cached=pipeline_lookup_cache_.find(vertex_name,fragment_name)) return cached;
     std::string key(vertex_name);
     key.push_back('\0');
     key += fragment_name;
     const auto found = game_pipelines_.find(key);
-    return found == game_pipelines_.end() ? nullptr : &found->second;
+    if (found == game_pipelines_.end()) return nullptr;
+    pipeline_lookup_cache_.remember(vertex_name,fragment_name,&found->second);
+    return &found->second;
 }
 
 bool DeferredPass::has_game_pipeline(const std::string& vertex_name, const std::string& fragment_name) const
@@ -600,14 +603,14 @@ bool DeferredPass::has_game_pipeline(const std::string& vertex_name, const std::
     return game_pipeline(vertex_name.c_str(), fragment_name.c_str()) != nullptr;
 }
 
-bool DeferredPass::require_game_pipeline(const std::string& vertex_name, const std::string& fragment_name,
+bool DeferredPass::require_game_pipeline(const char* vertex_name, const char* fragment_name,
     SurfaceMode mode, bool hud, bool skinned, std::string& error) const
 {
-    const auto* pair = game_pipeline(vertex_name.c_str(), fragment_name.c_str());
+    const auto* pair = game_pipeline(vertex_name, fragment_name);
     if (!pair)
-        error = "unknown Vulkan SVS/SPS pair: " + vertex_name + " / " + fragment_name;
+        error = "unknown Vulkan SVS/SPS pair: " + std::string(vertex_name ? vertex_name : "<null>") + " / " + (fragment_name ? fragment_name : "<null>");
     else if (pair->mode != mode || pair->hud != hud || pair->skinned != skinned)
-        error = "incompatible Vulkan SVS/SPS pass parameters: " + vertex_name + " / " + fragment_name;
+        error = "incompatible Vulkan SVS/SPS pass parameters: " + std::string(vertex_name) + " / " + fragment_name;
     else
     {
         error.clear();
@@ -634,6 +637,7 @@ void DeferredPass::begin_game_pipeline_reload()
 void DeferredPass::commit_game_pipeline_reload()
 {
     if (!reloading_game_pipelines_) return;
+    pipeline_lookup_cache_.clear();
     if (device_ && vk_.destroy_pipeline)
         for (const auto& [name, pipeline] : game_pipelines_)
             if (pipeline.handle) vk_.destroy_pipeline(device_, pipeline.handle, nullptr);
@@ -1457,6 +1461,7 @@ bool DeferredPass::record_water(const FrameRecordingContext& frame, VkBuffer ver
 
 void DeferredPass::destroy()
 {
+    pipeline_lookup_cache_.clear();
     command_cache_.end();
     game_pipeline_request_ = {};
     release_forward_sets();
