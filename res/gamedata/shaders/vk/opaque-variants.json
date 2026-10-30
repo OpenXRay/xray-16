@@ -34,6 +34,8 @@
     { "source": "opaque.ps", "stage": "ps", "output": "vk/skinned_environment_opaque.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_SKINNED=1", "VK_ENV_CUBE=1"] },
     { "source": "opaque.vs", "stage": "vs", "output": "vk/object_opaque.vs.spv", "define": ["OBJECT_GEOMETRY=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/object_opaque.ps.spv", "define": ["OBJECT_GEOMETRY=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/skinned_opaque.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_SKINNED=1"] },
+    { "source": "opaque.ps", "stage": "ps", "output": "vk/skinned_cutout.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_SKINNED=1", "VK_ALPHA_TEST=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/object_detail_opaque.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_DETAIL=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/object_detail_cutout.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_DETAIL=1", "VK_ALPHA_TEST=1"] },
     { "source": "opaque.ps", "stage": "ps", "output": "vk/object_detail_blended.ps.spv", "define": ["OBJECT_GEOMETRY=1", "VK_DETAIL=1", "VK_TRANSPARENT=1"] },

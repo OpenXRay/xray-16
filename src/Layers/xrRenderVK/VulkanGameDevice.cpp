@@ -1082,7 +1082,14 @@ bool VulkanGameDevice::render(const GpuLevel& level, const float (&mvp)[16],
         Fvector origin;
         origin.mad(Device.vCameraPosition, direction, -140.f);
         sun_view.build_camera_dir(origin, direction, up);
-        sun_projection.build_projection_ortho(180.f, 180.f, 1.f, 320.f);
+        const float shadow_span = sun_shadow_span(quality_preset);
+        sun_projection.build_projection_ortho(shadow_span, shadow_span, 1.f, 320.f);
+        sun_uniform.options[2] = quality_preset <= 1 ? .08f : 0.f;
+#if defined(XR_PLATFORM_ANDROID)
+        if (Device.dwFrame % 300 == 0)
+            Msg("[renderer-vulkan] shadow.range frame=%u preset=%u span=%.1fm texel=%.4fm",
+                Device.dwFrame, quality_preset, shadow_span, shadow_span / SunShadowTargets::Size);
+#endif
         sun_vp.mul(sun_projection, sun_view);
         stabilize_shadow_projection(reinterpret_cast<float*>(&sun_vp), SunShadowTargets::Size);
         std::memcpy(sun_uniform.sun_view_projection, &sun_vp, sizeof(sun_vp));

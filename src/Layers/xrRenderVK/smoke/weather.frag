@@ -56,7 +56,12 @@ float sun_visibility(float depth, vec2 screen_uv)
             lit += visibility * w;
             total += w;
         }
-    return lit / max(total, 1e-6);
+    float visibility = lit / max(total, 1e-6);
+    // Fade the short mobile shadow range at its rim instead of exposing
+    // the square border of the orthographic map while walking.
+    float edge = min(min(uv.x, uv.y), min(1.0-uv.x, 1.0-uv.y));
+    float coverage = shadow.options.z > 0.0 ? smoothstep(0.0, shadow.options.z, edge) : 1.0;
+    return mix(1.0, visibility, coverage);
 }
 
 // R2's hmodel samples the weather environment in the world-normal direction,

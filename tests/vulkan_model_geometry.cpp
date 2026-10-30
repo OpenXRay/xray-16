@@ -39,7 +39,8 @@ VisualRecord record(unsigned links)
     {
         if (links > 1)
             for (unsigned i = 0; i < links; ++i) put16(vertices, i);
-        for (unsigned i = 0; i < 12; ++i) putfloat(vertices, i == 0 ? float(v) : 0);
+        for (unsigned i = 0; i < 12; ++i)
+            putfloat(vertices, i == 0 ? float(v) : i == 6 ? .6f : i == 10 ? -.8f : 0.f);
         if (links > 1)
             for (unsigned i = 0; i + 1 < links; ++i)
                 putfloat(vertices, links == 2 ? 0.25f : 1.0f / links);
@@ -128,6 +129,7 @@ int main()
         assert(child.skin_weights == links);
         assert(child.vertices.size() == 3 && child.indices.size() == 3);
         assert(child.vertices[2].position[0] == 2 && child.vertices[2].uv[1] == 0.75f);
+        assert(child.vertices[2].tangent[0] == .6f && child.vertices[2].bitangent[1] == -.8f);
         float total = 0;
         for (unsigned i = 0; i < links; ++i) total += child.vertices[0].weights[i];
         assert(std::abs(total - 1) < 0.0001f);
@@ -223,7 +225,7 @@ int main()
     patch.vertices[0].position[0] = 0; patch.vertices[1].position[0] = 1;
     patch.vertices[2].position[1] = 1;
     patch.vertices[0].normal[0] = .6f;
-    for (auto& v : patch.vertices) v.normal[2] = .8f;
+    for (auto& v : patch.vertices) { v.normal[2] = .8f; v.tangent[0]=1; v.bitangent[1]=1; }
     patch.vertices[1].uv[0] = 1; patch.vertices[2].uv[1] = 1;
     patch.vertices[0].bones[0] = 3; patch.vertices[1].bones[0] = 4;
     patch.vertices[2].bones[0] = 5;
@@ -231,6 +233,7 @@ int main()
     ModelGeometry pn = patch, combined = patch;
     assert(tessellate_model(pn, 1, nullptr, 1.f, error));
     assert(tessellate_model(combined, 3, &heights, 1.f, error));
+    assert(pn.vertices[3].tangent[0] == 1 && pn.vertices[3].bitangent[1] == 1);
     assert(pn.indices.size() == 24 && pn.vertices.size() == 12 &&
         select_slide_window(pn.windows, 0.f, pn.indices.size()).offset == 12 &&
         select_slide_window(pn.windows, 0.f, pn.indices.size()).index_count == 12);

@@ -52,7 +52,10 @@ bool vertex(const uint8_t* p, unsigned links, ModelVertex& out)
     {
         out.position[i] = f32(p + base + i * 4);
         out.normal[i] = f32(p + base + 12 + i * 4);
+        out.tangent[i] = f32(p + base + 24 + i * 4);
+        out.bitangent[i] = f32(p + base + 36 + i * 4);
         if (!std::isfinite(out.position[i]) || !std::isfinite(out.normal[i])) return false;
+        if (!std::isfinite(out.tangent[i]) || !std::isfinite(out.bitangent[i])) return false;
     }
     if (links == 1)
     {

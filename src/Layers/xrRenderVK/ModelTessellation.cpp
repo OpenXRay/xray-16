@@ -136,6 +136,12 @@ ModelVertex interpolate(const ModelVertex (&v)[3], const std::array<float, 3>& w
     std::copy_n(base.position, 3, out.position);
     std::copy_n(base.normal, 3, out.normal);
     std::copy_n(base.uv, 2, out.uv);
+    for (unsigned axis=0; axis<3; ++axis)
+        for (unsigned corner=0; corner<3; ++corner)
+        {
+            out.tangent[axis] += w[corner]*v[corner].tangent[axis];
+            out.bitangent[axis] += w[corner]*v[corner].bitangent[axis];
+        }
     std::array<std::pair<uint16_t, float>, 12> influences{};
     size_t count = 0;
     for (size_t corner = 0; corner < 3; ++corner)

@@ -3,6 +3,8 @@
 #include <vulkan/vulkan.h>
 #include "../src/Layers/xrRenderVK/DistortionShaders.h"
 #include "../src/Layers/xrRenderVK/ParticleSprite.h"
+#include "../src/Layers/xrRenderVK/ModelPoseConstants.h"
+#include "../src/Layers/xrRenderVK/GeometryDepth.h"
 #include "../src/Layers/xrRenderVK/SceneShaders.h"
 #include "../src/Layers/xrRenderVK/WeatherShaders.h"
 #include "../src/Layers/xrRenderVK/DeferredShaders.h"
@@ -67,7 +69,7 @@ static Image image(Memory& memory, VkFormat format, VkImageTiling tiling, VkImag
     view.image = result.image;
     view.viewType = layers == 6 ? VK_IMAGE_VIEW_TYPE_CUBE : VK_IMAGE_VIEW_TYPE_2D;
     view.format = format;
-    view.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    view.subresourceRange.aspectMask = format == VK_FORMAT_D32_SFLOAT ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
     view.subresourceRange.levelCount = levels; view.subresourceRange.layerCount = layers;
     check(vkCreateImageView(memory.device, &view, nullptr, &result.view));
     return result;
@@ -87,10 +89,10 @@ static void fill(Memory& memory, const Image& image, const std::array<float, 4>&
     }
     vkUnmapMemory(memory.device, image.memory);
 }
-struct Vertex { float position[3], normal[3], uv[2], lightmap_uv[2], baked[4]; };
+struct Vertex { float position[3], normal[3], uv[2], lightmap_uv[2], baked[4]; uint16_t bones[4]{}; float weights[4]{1,0,0,0}; float tangent[3]{0,1,0}, bitangent[3]{-1,0,0}; };
 struct Push { float mvp[16]; float threshold{}, scale{}; float padding[2]{};
-    float modes[4]{}, factors[4]{}, extra[4]{}, matrices[28]{}; };
-static_assert(sizeof(Push) == 240);
+    float modes[4]{}, factors[4]{}, extra[4]{}, matrices[28]{}, rotation[4]{0,0,0,1}; };
+static_assert(sizeof(Push) == 256);
 static void near(float actual, float expected, const char* label)
 {
     if (!std::isfinite(actual) || std::abs(actual - expected) > .015f)
@@ -169,9 +171,9 @@ int main(int argc, char** argv)
         VkDescriptorSetLayout descriptor_layout{};
         check(vkCreateDescriptorSetLayout(device, &layout_info, nullptr, &descriptor_layout));
         const VkDescriptorPoolSize pool_sizes[]{{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 80},
-            {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}};
+            {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}, {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1}};
         VkDescriptorPoolCreateInfo pool_info{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
-        pool_info.maxSets = 4; pool_info.poolSizeCount = 2; pool_info.pPoolSizes = pool_sizes;
+        pool_info.maxSets = 5; pool_info.poolSizeCount = 3; pool_info.pPoolSizes = pool_sizes;
         VkDescriptorPool pool{}; check(vkCreateDescriptorPool(device, &pool_info, nullptr, &pool));
         VkDescriptorSetAllocateInfo alloc{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
         alloc.descriptorPool = pool; alloc.descriptorSetCount = 1; alloc.pSetLayouts = &descriptor_layout;
@@ -204,7 +206,16 @@ int main(int argc, char** argv)
         pipeline_layout_info.pushConstantRangeCount = 1; pipeline_layout_info.pPushConstantRanges = &range;
         VkPipelineLayout pipeline_layout{};
         check(vkCreatePipelineLayout(device, &pipeline_layout_info, nullptr, &pipeline_layout));
-        std::array<VkAttachmentDescription, 3> attachments{};
+        const VkDescriptorSetLayoutBinding pose_binding{0,VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,1,VK_SHADER_STAGE_VERTEX_BIT,nullptr};
+        layout_info.bindingCount=1; layout_info.pBindings=&pose_binding;
+        VkDescriptorSetLayout pose_layout{}; check(vkCreateDescriptorSetLayout(device,&layout_info,nullptr,&pose_layout));
+        alloc.pSetLayouts=&pose_layout; VkDescriptorSet pose_set{}; check(vkAllocateDescriptorSets(device,&alloc,&pose_set));
+        const VkDescriptorSetLayout skinned_layouts[]{descriptor_layout,pose_layout};
+        pipeline_layout_info.pSetLayouts=skinned_layouts;
+        VkPipelineLayout skinned_pipeline_layout{}; check(vkCreatePipelineLayout(device,&pipeline_layout_info,nullptr,&skinned_pipeline_layout));
+        const Image floor_depth=image(memory,VK_FORMAT_D32_SFLOAT,VK_IMAGE_TILING_OPTIMAL,
+            VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,1,128,1,2);
+        std::array<VkAttachmentDescription, 4> attachments{};
         std::array<VkAttachmentReference, 3> references{};
         for (uint32_t i = 0; i < 3; ++i)
         {
@@ -215,10 +226,15 @@ int main(int argc, char** argv)
             attachments[i].finalLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
             references[i] = {i, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
         }
+        attachments[3].format=VK_FORMAT_D32_SFLOAT;attachments[3].samples=VK_SAMPLE_COUNT_1_BIT;
+        attachments[3].loadOp=VK_ATTACHMENT_LOAD_OP_CLEAR;attachments[3].storeOp=VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attachments[3].initialLayout=VK_IMAGE_LAYOUT_UNDEFINED;attachments[3].finalLayout=VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        const VkAttachmentReference depth_reference{3,VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
         VkSubpassDescription subpass{}; subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+        subpass.pDepthStencilAttachment=&depth_reference;
         subpass.colorAttachmentCount = 3; subpass.pColorAttachments = references.data();
         VkRenderPassCreateInfo rp_info{VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO};
-        rp_info.attachmentCount = 3; rp_info.pAttachments = attachments.data();
+        rp_info.attachmentCount = 4; rp_info.pAttachments = attachments.data();
         rp_info.subpassCount = 1; rp_info.pSubpasses = &subpass;
         VkSubpassDependency dependencies[2]{};
         dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -234,9 +250,9 @@ int main(int argc, char** argv)
         dependencies[1].dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
         rp_info.dependencyCount = 2; rp_info.pDependencies = dependencies;
         VkRenderPass render_pass{}; check(vkCreateRenderPass(device, &rp_info, nullptr, &render_pass));
-        std::array<VkImageView, 3> views{output[0].view, output[1].view, output[2].view};
+        std::array<VkImageView, 4> views{output[0].view, output[1].view, output[2].view,floor_depth.view};
         VkFramebufferCreateInfo framebuffer_info{VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO};
-        framebuffer_info.renderPass = render_pass; framebuffer_info.attachmentCount = 3;
+        framebuffer_info.renderPass = render_pass; framebuffer_info.attachmentCount = 4;
         framebuffer_info.pAttachments = views.data(); framebuffer_info.width = 128; framebuffer_info.height = 2;
         framebuffer_info.layers = 1;
         VkFramebuffer framebuffer{}; check(vkCreateFramebuffer(device, &framebuffer_info, nullptr, &framebuffer));
@@ -264,6 +280,22 @@ int main(int argc, char** argv)
         triangle[2].uv[0] = 0; triangle[2].uv[1] = 2;
         void* mapped{}; check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
         std::memcpy(mapped, triangle.data(), sizeof(triangle)); vkUnmapMemory(device, vertex_memory);
+        buffer_info.size=128; buffer_info.usage=VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+        VkBuffer pose_buffer{}; check(vkCreateBuffer(device,&buffer_info,nullptr,&pose_buffer));
+        vkGetBufferMemoryRequirements(device,pose_buffer,&required);
+        auto pose_memory=memory.allocate(required,VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        check(vkBindBufferMemory(device,pose_buffer,pose_memory,0));
+        std::array<float,32> pose_data{}; for(unsigned i=0;i<16;i+=5) pose_data[i]=1;
+        const float object_rows[]{1,0,0,-1, 0,1,0,0, 0,0,1,0};
+        auto object_data=xray::render::vulkan::model_pose_constants(object_rows,nullptr);
+        std::copy(object_data.begin(),object_data.end(),pose_data.begin()+16);
+        auto write_pose=[&]() { void* data{}; check(vkMapMemory(device,pose_memory,0,VK_WHOLE_SIZE,0,&data));
+            std::memcpy(data,pose_data.data(),sizeof(pose_data)); vkUnmapMemory(device,pose_memory); };
+        write_pose();
+        const VkDescriptorBufferInfo pose_info{pose_buffer,0,128};
+        VkWriteDescriptorSet pose_write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};pose_write.dstSet=pose_set;
+        pose_write.descriptorCount=1;pose_write.descriptorType=VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;pose_write.pBufferInfo=&pose_info;
+        vkUpdateDescriptorSets(device,1,&pose_write,0,nullptr);
         buffer_info.size = 256 * 3 * 16; buffer_info.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
         VkBuffer readback{}; check(vkCreateBuffer(device, &buffer_info, nullptr, &readback));
         vkGetBufferMemoryRequirements(device, readback, &required);
@@ -277,6 +309,11 @@ int main(int argc, char** argv)
             {2, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)},
             {5, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, lightmap_uv)},
             {6, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(Vertex, baked)}};
+        const VkVertexInputAttributeDescription skinned_attributes[]{attributes[0],attributes[1],attributes[2],
+            {3,0,VK_FORMAT_R16G16B16A16_UINT,offsetof(Vertex,bones)},
+            {4,0,VK_FORMAT_R32G32B32A32_SFLOAT,offsetof(Vertex,weights)},
+            {7,0,VK_FORMAT_R32G32B32_SFLOAT,offsetof(Vertex,tangent)},
+            {8,0,VK_FORMAT_R32G32B32_SFLOAT,offsetof(Vertex,bitangent)}};
         VkPipelineVertexInputStateCreateInfo vertex_input{VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
         vertex_input.vertexBindingDescriptionCount = 1; vertex_input.pVertexBindingDescriptions = &vertex_binding;
         vertex_input.vertexAttributeDescriptionCount = 5; vertex_input.pVertexAttributeDescriptions = attributes;
@@ -421,7 +458,7 @@ int main(int argc, char** argv)
         bool weather_initialized=false;
         bool inputs_initialized = false;
         bool cube_initialized = false;
-        auto execute = [&](VkShaderModule fragment, const Push& push, bool use_cube = false, VkShaderModule custom_vertex = VK_NULL_HANDLE, bool sprite = false) {
+        auto execute = [&](VkShaderModule fragment, const Push& push, bool use_cube = false, VkShaderModule custom_vertex = VK_NULL_HANDLE, bool sprite = false, bool skinned = false, bool coplanar = false) {
             VkPipelineShaderStageCreateInfo stages[2]{};
             for (auto& stage : stages) stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
             stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT; stages[0].module = custom_vertex ? custom_vertex : vs; stages[0].pName = "main";
@@ -437,9 +474,11 @@ int main(int argc, char** argv)
             viewport.width = wide ? 128.f : sprite ? 2.f : 1.f;
             scissor.extent.width = wide ? 128 : sprite ? 2 : 1;
             viewport.height = sprite ? 2.f : 1.f; scissor.extent.height = sprite ? 2 : 1;
-            pipeline_info.layout = weather ? weather_pipeline_layout : pipeline_layout;
-            vertex_input.vertexAttributeDescriptionCount = ui ? 3 : 5;
-            vertex_input.pVertexAttributeDescriptions = ui ? ui_attributes : attributes;
+            pipeline_info.layout = weather ? weather_pipeline_layout : skinned ? skinned_pipeline_layout : pipeline_layout;
+            vertex_input.vertexAttributeDescriptionCount = ui ? 3 : skinned ? 7 : 5;
+            vertex_input.pVertexAttributeDescriptions = ui ? ui_attributes : skinned ? skinned_attributes : attributes;
+            depth.depthTestEnable=coplanar;depth.depthWriteEnable=coplanar;
+            depth.depthCompareOp=xray::render::vulkan::geometry_depth_compare(false);
             VkPipeline pipeline{}; check(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &pipeline));
             check(vkResetCommandPool(device, commands, 0));
             VkCommandBufferBeginInfo begin{VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO}; check(vkBeginCommandBuffer(cmd, &begin));
@@ -492,15 +531,15 @@ int main(int argc, char** argv)
                     0, 0, nullptr, 0, nullptr, barriers.size(), barriers.data());
                 inputs_initialized = true;
             }
-            std::array<VkClearValue, 3> clear{};
+            std::array<VkClearValue, 4> clear{}; clear[3].depthStencil={coplanar ? 0.f : 1.f,0};
             VkRenderPassBeginInfo rp{VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
             rp.renderPass = render_pass; rp.framebuffer = framebuffer; rp.renderArea.extent = {1, 1};
             rp.renderArea.extent.width = wide ? 128 : sprite ? 2 : 1;
             rp.renderArea.extent.height = sprite ? 2 : 1;
-            rp.clearValueCount = 3; rp.pClearValues = clear.data();
+            rp.clearValueCount = 4; rp.pClearValues = clear.data();
             vkCmdBeginRenderPass(cmd, &rp, VK_SUBPASS_CONTENTS_INLINE);
             vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-            const VkDescriptorSet draw_sets[]{weather ? weather_set : set, weather ? weather_environment_set : scene_set};
+            const VkDescriptorSet draw_sets[]{weather ? weather_set : set, weather ? weather_environment_set : skinned ? pose_set : scene_set};
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_info.layout, 0, 2, draw_sets, 0, nullptr);
             VkDeviceSize offset{}; vkCmdBindVertexBuffers(cmd, 0, 1, &vertices, &offset);
             vkCmdPushConstants(cmd, pipeline_info.layout, range.stageFlags, 0, weather ? 128 : sizeof(push), &push);
@@ -536,6 +575,49 @@ int main(int argc, char** argv)
         Push push{}; for (int i = 0; i < 16; ++i) push.mvp[i] = (i % 5 == 0 ? 1.f : 0.f);
         for (int index : {0, 5, 8, 13, 16, 21, 26}) push.matrices[index] = 1.f;
         push.scale = 1; push.modes[3] = 1; push.factors[1] = 1;
+        // An authored frame rotated relative to the UV gradients must survive
+        // GPU skinning, world rotation and changes to fragment material data.
+        auto character_push=push;character_push.modes[0]=0;character_push.modes[2]=1;
+        const auto saved_normal=pixels[15];fill(memory,input[15],{.8f,.5f,.9f,1});
+        auto character_fragment=module("skinned_opaque.ps.spv");
+        for(unsigned links=1;links<=4;++links) {
+            auto character_vertex=module("skinned_"+std::to_string(links)+".vs.spv");
+            auto character=execute(character_fragment,character_push,false,character_vertex,false,true);
+            near(character[1][0],.5f,"authored character tangent X");
+            near(character[1][1],.8f,"authored character tangent Y");
+            near(character[1][2],.9f,"authored character tangent Z");
+            character_push.modes[3]=2;character_push.factors[0]=.7f;
+            auto changed=execute(character_fragment,character_push,false,character_vertex,false,true);
+            for(unsigned c=0;c<3;++c) near(changed[1][c],character[1][c],"material constants do not overwrite model transform");
+            vkDestroyShaderModule(device,character_vertex,nullptr);
+        }
+        const float rotated_rows[]{0,0,1,-1, 0,1,0,0, -1,0,0,0};
+        object_data=model_pose_constants(rotated_rows,nullptr);std::copy(object_data.begin(),object_data.end(),pose_data.begin()+16);write_pose();
+        auto character_vertex=module("skinned_1.vs.spv");
+        auto rotated=execute(character_fragment,character_push,false,character_vertex,false,true);
+        near(rotated[1][0],.9f,"character normal world rotation X");near(rotated[1][1],.8f,"character normal world rotation Y");near(rotated[1][2],.5f,"character normal world rotation Z");
+        vkDestroyShaderModule(device,character_vertex,nullptr);vkDestroyShaderModule(device,character_fragment,nullptr);
+        fill(memory,input[15],saved_normal);
+        // Forward decal at exactly the stored floor depth. LESS would reject
+        // every pixel, leaving the clear color instead of the paper texture.
+        auto paper_fragment=module("world_set_blended.ps.spv");
+        auto paper=execute(paper_fragment,push,false,VK_NULL_HANDLE,false,false,true);
+        near(paper[0][0],pixels[0][0]*triangle[0].baked[0],"coplanar paper decal survives floor depth");
+        vkDestroyShaderModule(device,paper_fragment,nullptr);
+        // Static model rotation also lives outside fragment material bytes.
+        auto object_vertex=module("object_opaque.vs.spv"),object_fragment=module("object_opaque.ps.spv");
+        auto object_push=push;const auto object_quaternion=model_rotation_quaternion(rotated_rows);
+        std::copy(object_quaternion.begin(),object_quaternion.end(),object_push.rotation);
+        object_push.matrices[2]=pack_model_hemi(.2f,.8f);
+        object_push.matrices[6]=pack_model_hemi(.4f,.6f);
+        object_push.matrices[10]=pack_model_hemi(.5f,.7f);
+        auto object_result=execute(object_fragment,object_push,false,object_vertex);
+        near(object_result[1][3],.875f+.125f*.2f,"packed hemi survives static rotation/material block");
+        near(object_result[1][0],1.f,"static model normal rotation X");near(object_result[1][2],.5f,"static model normal rotation Z");
+        object_push.modes[3]=3;object_push.factors[0]=.8f;
+        auto object_changed=execute(object_fragment,object_push,false,object_vertex);
+        for(unsigned c=0;c<3;++c) near(object_changed[1][c],object_result[1][c],"static material data cannot alter rotation");
+        vkDestroyShaderModule(device,object_vertex,nullptr);vkDestroyShaderModule(device,object_fragment,nullptr);
         auto flat_result = execute(flat, push);
         near(flat_result[0][0], pixels[0][0], "base.R");
         near(flat_result[0][1], pixels[0][1], "static albedo does not multiply packed vertex light twice");
@@ -819,6 +901,7 @@ int main(int argc, char** argv)
         vkDestroyBuffer(device, readback, nullptr); vkFreeMemory(device, readback_memory, nullptr);
         vkDestroyBuffer(device, vertices, nullptr); vkFreeMemory(device, vertex_memory, nullptr);
         vkDestroyFramebuffer(device, framebuffer, nullptr);
+        vkDestroyImageView(device,floor_depth.view,nullptr);vkDestroyImage(device,floor_depth.image,nullptr);vkFreeMemory(device,floor_depth.memory,nullptr);
         vkDestroyRenderPass(device, render_pass, nullptr);
         vkDestroyBuffer(device,weather_uniform,nullptr);vkFreeMemory(device,weather_memory,nullptr);
         for(auto target : {weather_normal,weather_cube,weather_shadow}) {
@@ -827,6 +910,8 @@ int main(int argc, char** argv)
         }
         vkDestroyPipelineLayout(device,weather_pipeline_layout,nullptr);
         vkDestroyDescriptorSetLayout(device,weather_descriptor_layout,nullptr);
+        vkDestroyBuffer(device,pose_buffer,nullptr);vkFreeMemory(device,pose_memory,nullptr);
+        vkDestroyPipelineLayout(device,skinned_pipeline_layout,nullptr);vkDestroyDescriptorSetLayout(device,pose_layout,nullptr);
         vkDestroyDescriptorPool(device, pool, nullptr);
         vkDestroyPipelineLayout(device, pipeline_layout, nullptr);
         vkDestroyDescriptorSetLayout(device, descriptor_layout, nullptr);

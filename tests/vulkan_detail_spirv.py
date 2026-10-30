@@ -69,8 +69,8 @@ def main(root):
     slots = reflect(shaders / "level_vegetation_detail_blended.ps.spv")
     assert (1, 0) in slots.values() and "lightmap" not in slots
 
-    # Camera shares the 240-byte material push range. Normal rows start at
-    # 80; material UV rows occupy the shared offsets 128, 144 and 160.
+    # Camera/material UV share a 256-byte range; static rotation is at 240.
+    # Skinned transforms/hemi live in the pose SSBO, outside material data.
     manifest = json.loads((shaders / "opaque-variants.json").read_text())
     for variant in manifest["variants"]:
         if variant["source"] not in ("opaque.vs", "skinned.vs"):
@@ -90,7 +90,8 @@ def main(root):
             cursor += count
         camera = [offset for (identifier, member), offset in offsets.items()
                   if names.get(identifier) == "Camera"]
-        assert camera == [0, 64, 80, 128, 144, 160], (path, camera)
+        expected = [0] if variant["source"] == "skinned.vs" else [0, 64, 128, 144, 160, 176, 192, 208, 224, 240]
+        assert camera == expected, (path, camera)
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@
 #include "EngineLevelModels.h"
 #include "GameTextureFactory.h"
 #include "LevelPassGraph.h"
+#include "LevelHierarchyBounds.h"
 #include "ResourceIssueCounter.h"
 #include "xrCore/_matrix.h"
 #include <array>
@@ -153,6 +154,7 @@ private:
     struct TransparentDetailDraw { uint8_t model; uint32_t first, count; };
     mutable std::array<std::vector<TransparentDetailDraw>, FrameContext::FramesInFlight> transparent_detail_draws_;
     std::vector<LevelVisual> visuals_;
+    std::vector<LevelCullSphere> cull_bounds_;
     std::vector<uint8_t> visual_phases_; // opaque bit 1, forward bit 2, secondary opaque bit 4
     std::vector<uint8_t> visual_priorities_; // ordinary transparent priority bits 1..3
     std::vector<uint32_t> roots_;

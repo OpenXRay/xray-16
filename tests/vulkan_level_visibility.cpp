@@ -1,4 +1,5 @@
 #include "src/Layers/xrRenderVK/LevelVisibility.h"
+#include "src/Layers/xrRenderVK/LevelHierarchyBounds.h"
 
 #include <cassert>
 
@@ -21,6 +22,21 @@ LevelPortal portal(uint16_t front, uint16_t back, float x)
 
 int main()
 {
+    // The exported parent sphere is deliberately wrong; the rebuilt bounds
+    // must still contain the distant child, including shared subtrees.
+    std::vector<LevelVisual> nodes(4);
+    for (auto& node : nodes) node.bounds = {0,0,0,0,0,0,0,0,0,1};
+    nodes[0].children = {1,2}; nodes[1].children = {3};
+    nodes[2].bounds[6] = -10; nodes[3].bounds[6] = 20;
+    auto bounds = level_hierarchy_bounds(nodes);
+    assert(bounds[0][0]-bounds[0][3] <= -11 && bounds[0][0]+bounds[0][3] >= 21);
+    assert(bounds[1][0]+bounds[1][3] >= 21);
+    nodes[3].children = {0};
+    bounds = level_hierarchy_bounds(nodes);
+    assert(bounds[0][3] < 0 && bounds[1][3] < 0); // cycle fails open
+    nodes[3].children.clear(); nodes[3].bounds[9] = 0;
+    bounds = level_hierarchy_bounds(nodes);
+    assert(bounds[0][3] < 0 && bounds[1][3] < 0); // unknown bounds fail open
     Fmatrix view_projection;
     view_projection.identity();
     Fvector camera;

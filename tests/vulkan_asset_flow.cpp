@@ -171,7 +171,7 @@ int main()
                                      false, error));
     for (unsigned weights = 1; weights <= 4; ++weights)
     {
-        assert(pass.create_game_pipeline("vk\\skinned_" + std::to_string(weights) + ".vs", "vk\\object_opaque.ps", handle<VkShaderModule>(5),
+        assert(pass.create_game_pipeline("vk\\skinned_" + std::to_string(weights) + ".vs", "vk\\skinned_opaque.ps", handle<VkShaderModule>(5),
                                          handle<VkShaderModule>(6), SurfaceMode::Opaque, false, error, true));
         assert(pass.create_game_pipeline("vk\\hud_skinned_" + std::to_string(weights) + ".vs", "vk\\hud_blended.ps", handle<VkShaderModule>(5),
                                          handle<VkShaderModule>(6), SurfaceMode::Opaque, true, error, true));

@@ -1,5 +1,6 @@
 #include "xrEngine/stdafx.h"
 #include "GpuModel.h"
+#include "ModelPoseConstants.h"
 #include "ModelTessellation.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrCore/Animation/Bone.hpp"
@@ -385,7 +386,7 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
             auto& per_instance = mesh.poses[instance];
             auto& pose_buffer = per_instance.buffers[frame.frame_index];
             auto& descriptor = per_instance.descriptors[frame.frame_index];
-            const size_t pose_bytes = bones * 16 * sizeof(float);
+            const size_t pose_bytes = (bones + 1) * 16 * sizeof(float);
             if (!pose_buffer.handle())
                 if (!pose_buffer.initialize(device_, pose_bytes, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -397,7 +398,10 @@ bool GpuModel::record(const FrameRecordingContext& frame, const DeferredPass& pa
             }
             if (!descriptor && !pass_->pose_descriptor(pose_buffer.handle(), pose_buffer.size(), descriptor, error))
                 return false;
-            if (!pose_buffer.write(0, pose, pose_bytes, error)) return false;
+            const size_t bone_bytes = bones * 16 * sizeof(float);
+            const auto object_constants = model_pose_constants(normal_rows, pass.model_hemi_negative());
+            if (!pose_buffer.write(0, pose, bone_bytes, error) ||
+                !pose_buffer.write(bone_bytes, object_constants.data(), sizeof(object_constants), error)) return false;
             RenderPassGraph hud_graph;
             if (hud && !build_render_pass_graph({RenderConsumer::Model, mesh.geometry.mode, true,
                     true, mesh.environment, mesh.tree_surface, mesh.geometry.skin_weights,

@@ -2,11 +2,22 @@
 #include "src/Layers/xrRenderVK/ShadowStability.h"
 #include "src/Layers/xrRenderVK/TextureQuality.h"
 #include "src/Layers/xrRenderVK/LevelLightmap.h"
+#include "src/Layers/xrRenderVK/ModelPoseConstants.h"
 #include <cassert>
 #include <array>
 #include <cmath>
 using namespace xray::render::vulkan;
 int main() {
+    const float rotation_rows[]{0,0,1,.2f, 0,1,0,.4f, -1,0,0,.6f};
+    const auto q=model_rotation_quaternion(rotation_rows);
+    assert(std::abs(q[1]-.70710678f)<1e-5f && std::abs(q[3]-.70710678f)<1e-5f);
+    for (float pos : {0.f,.2f,.9f,1.f}) for (float neg : {0.f,.3f,.8f,1.f}) {
+        const float packed=pack_model_hemi(pos,neg);
+        assert(std::abs(std::floor(packed)/1023.f-pos)<.001f);
+        assert(std::abs((packed-std::floor(packed))*1024.f/1023.f-neg)<.001f);
+    }
+    assert(sun_shadow_span(0) == 64.f && sun_shadow_span(1) == 96.f);
+    assert(sun_shadow_span(2) == 180.f && sun_shadow_span(4) == 180.f);
     assert(select_level_lightmap("base, color_lmap, hemi_lmap") == "hemi_lmap");
     assert(select_level_lightmap("base, color_lmap, hemi_lmap",true) == "color_lmap");
     assert(select_level_lightmap("base, legacy_lmap") == "legacy_lmap");

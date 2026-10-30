@@ -3,6 +3,8 @@
 #include "SunShadowTargets.h"
 #include "ShaderMaterialLibrary.h"
 #include "ModelGeometry.h"
+#include "ModelPoseConstants.h"
+#include "GeometryDepth.h"
 #include "xrEngine/device.h"
 #if defined(XR_PLATFORM_ANDROID)
 #include "xrEngine/x_ray.h"
@@ -47,12 +49,16 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
         {5, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(LevelVertex, lightmap_uv)},
         {6, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(LevelVertex, baked)}
     };
+    const VkVertexInputAttributeDescription skinned_attributes[]{attributes[0], attributes[1],
+        attributes[2], attributes[3], attributes[4],
+        {7, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(ModelVertex, tangent)},
+        {8, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(ModelVertex, bitangent)}};
     const VkVertexInputAttributeDescription static_attributes[]{attributes[0], attributes[1], attributes[2], attributes[5], attributes[6]};
     VkPipelineVertexInputStateCreateInfo inputs{VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
     inputs.vertexBindingDescriptionCount = geometry_input ? 1 : 0;
     inputs.pVertexBindingDescriptions = geometry_input ? &binding : nullptr;
-    inputs.vertexAttributeDescriptionCount = geometry_input ? 5 : 0;
-    inputs.pVertexAttributeDescriptions = geometry_input ? (skinned ? attributes : static_attributes) : nullptr;
+    inputs.vertexAttributeDescriptionCount = geometry_input ? (skinned ? 7 : 5) : 0;
+    inputs.pVertexAttributeDescriptions = geometry_input ? (skinned ? skinned_attributes : static_attributes) : nullptr;
     VkPipelineInputAssemblyStateCreateInfo assembly{VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO};
     assembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     VkPipelineViewportStateCreateInfo viewport{VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO};
@@ -81,7 +87,9 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout,
         water_depth_write) ? VK_TRUE : VK_FALSE;
     // Decal polygons lie on top of the level surface. Strict LESS rejects
     // coplanar pixels and makes papers/wallmarks blink as the view moves.
-    depth.depthCompareOp = wallmark || legacy_multiply ? VK_COMPARE_OP_LESS_OR_EQUAL : VK_COMPARE_OP_LESS;
+    // R_Backend uses LESSEQUAL for ordinary geometry, including alpha decals.
+    // Equality must survive the forward pass that loads the floor's depth.
+    depth.depthCompareOp = geometry_depth_compare(shadow);
     VkPipelineColorBlendAttachmentState attachments[3]{};
     for (auto& attachment : attachments)
     {
@@ -397,7 +405,7 @@ bool DeferredPass::initialize(VkDevice device, VkRenderPass geometry_pass, VkRen
     {
         // Material UV transforms occupy bytes 128..239 in the fragment stage.
         const VkPushConstantRange camera{VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-            0, sizeof(float) * 60};
+            0, sizeof(float) * 64};
         const VkPushConstantRange light{VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(DeferredLight)};
         VkPipelineLayoutCreateInfo layout{VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
         layout.pushConstantRangeCount = 1;
@@ -554,7 +562,7 @@ void DeferredPass::push_surface(const FrameRecordingContext& frame,
     const auto found = surface_parameters_.find(material);
     const SurfaceParameters empty{};
     const auto& parameters = found == surface_parameters_.end() ? empty : found->second;
-    command_cache_.push(vk_, frame.command_buffer, layout, VK_SHADER_STAGE_FRAGMENT_BIT,
+    command_cache_.push(vk_, frame.command_buffer, layout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         offset, sizeof(parameters), &parameters);
 }
 
@@ -766,7 +774,7 @@ void DeferredPass::release_pose_descriptor(VkDescriptorSet& set)
 }
 
 void DeferredPass::push_texture_matrices(const FrameRecordingContext& frame,
-    VkPipelineLayout layout, const TextureMatrixSet* matrices) const
+    VkPipelineLayout layout, const TextureMatrixSet* matrices, const float* normal_rows) const
 {
     // Seven float4 rows: base UV, detail UV, environment UV/direction.
     float rows[28]{};
@@ -820,13 +828,16 @@ void DeferredPass::push_texture_matrices(const FrameRecordingContext& frame,
         }
     // UV matrix rows use x, y and w (the coordinate's z is always zero).
     // Preserve the transform, including its translation in w, and carry
-    // model hemi faces in the unused z components of base U/V and detail U.
-    rows[2] = model_hemi_negative_[0];
-    rows[6] = model_hemi_negative_[1];
-    rows[10] = model_hemi_negative_[2];
+    // packed model hemi pairs in the unused z components of base U/V and detail U.
+    for (unsigned axis=0;axis<3;++axis)
+        rows[axis*4+2] = pack_model_hemi(normal_rows ? normal_rows[axis*4+3] : -1.f,
+            model_hemi_negative_[axis]);
     command_cache_.push(vk_, frame.command_buffer, layout,
         VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         128, sizeof(rows), rows);
+    const auto rotation=model_rotation_quaternion(normal_rows);
+    command_cache_.push(vk_, frame.command_buffer, layout,
+        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,240,sizeof(rotation),rotation.data());
 }
 
 bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer vertices, VkBuffer indices,
@@ -851,22 +862,19 @@ bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer v
     const VkDescriptorSet sets[]{material_set, pose_set};
     vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
         skinned_layout_, 0, 2, sets, 0, nullptr);
-    command_cache_.push(vk_, frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+    command_cache_.push(vk_, frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         0, sizeof(mvp), mvp);
-    if (normal_rows)
-        command_cache_.push(vk_, frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_VERTEX_BIT,
-            80, sizeof(float) * 12, normal_rows);
     const bool opaque_environment = mode == SurfaceMode::Opaque && fragment_name &&
         std::strstr(fragment_name, "skinned_environment_opaque.ps");
     push_surface(frame, skinned_layout_, material_set, opaque_environment ? 96 : 80);
     if (opaque_environment)
     {
         const float origin[4]{};
-        command_cache_.push(vk_, frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+        command_cache_.push(vk_, frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
             64, sizeof(origin), environment_camera ? environment_camera : origin);
     }
     else
-        command_cache_.push(vk_, frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+        command_cache_.push(vk_, frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
             68, sizeof(detail_scale), &detail_scale);
     if (mode == SurfaceMode::AlphaTest || (fragment_name &&
             (std::strstr(fragment_name, "world_set_blended.ps") ||
@@ -879,7 +887,7 @@ bool DeferredPass::record_skinned(const FrameRecordingContext& frame, VkBuffer v
              std::strstr(fragment_name, "model_set_blend_4r.ps") ||
              std::strstr(fragment_name, "model_set_alpha_add.ps") ||
              std::strstr(fragment_name, "glow_alpha_add.ps"))))
-        command_cache_.push(vk_, frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+        command_cache_.push(vk_, frame.command_buffer, skinned_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
     if (mode == SurfaceMode::Transparent && !hud)
     {
@@ -1182,34 +1190,31 @@ bool DeferredPass::record_geometry(const FrameRecordingContext& frame, VkBuffer 
         !frame.extent.width || !frame.extent.height || !vertices || !indices ||
         !index_count || !material_set) return false;
     command_cache_.bind(vk_, frame, pipeline, geometry_layout_, vertices, indices, material_set);
-    command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+    command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         0, sizeof(mvp), mvp);
-    if (normal_rows)
-        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
-            80, sizeof(float) * 12, normal_rows);
     const bool environment_variant = fragment_name &&
         (std::strstr(fragment_name, "level_environment.ps") ||
             std::strstr(fragment_name, "object_environment_opaque.ps") ||
             std::strstr(fragment_name, "level_laemb_base.ps"));
     push_surface(frame, geometry_layout_, material_set, environment_variant ? 96 : 80);
     if (mode == SurfaceMode::AlphaTest)
-        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
     if (!environment_variant)
-        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp) + sizeof(alpha_ref), sizeof(terrain_scale), &terrain_scale);
     if (fragment_name && (std::strstr(fragment_name, "level_environment.ps") ||
             std::strstr(fragment_name, "object_environment_opaque.ps") ||
             std::strstr(fragment_name, "level_laemb_base.ps")))
     {
         const float zero_camera[4]{};
-        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
             64, sizeof(zero_camera), environment_camera ? environment_camera : zero_camera);
         if (environment_factor)
-            command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+            command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 80, sizeof(float) * 4, environment_factor);
     }
-    push_texture_matrices(frame, geometry_layout_, matrices);
+    push_texture_matrices(frame, geometry_layout_, matrices, normal_rows);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, vertex_base, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;
@@ -1224,10 +1229,10 @@ bool DeferredPass::record_sun_shadow(const FrameRecordingContext& frame, VkBuffe
         (frame.render_pass != shadow_pass_ && frame.render_pass != local_shadow_pass_) ||
         !vertices || !indices || !material || !index_count) return false;
     command_cache_.bind(vk_, frame, pipeline, geometry_layout_, vertices, indices, material);
-    command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+    command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         0, sizeof(mvp), mvp);
     if (alpha_test)
-        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, vertex_base, 0);
     ++draw_calls_; triangles_ += index_count / 3;
@@ -1267,13 +1272,10 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
         (frame.image_index >= forward_sets_.size() || !forward_sets_[frame.image_index]))
         return reject("missing forward lighting descriptor");
     command_cache_.bind(vk_, frame, pipeline, geometry_layout_, vertices, indices, material_set);
-    command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+    command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         0, sizeof(mvp), mvp);
-    if (normal_rows)
-        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
-            80, sizeof(float) * 12, normal_rows);
     push_surface(frame, geometry_layout_, material_set);
-    command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+    command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         68, sizeof(detail_scale), &detail_scale);
     if (fragment_name && ((std::strstr(fragment_name, "particle_") &&
             std::strstr(fragment_name, "_set.ps") &&
@@ -1289,7 +1291,7 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
             std::strstr(fragment_name, "model_set_alpha_add.ps") ||
             std::strstr(fragment_name, "level_fog.ps") ||
             std::strstr(fragment_name, "glow_alpha_add.ps")))
-        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
     if (vertex_name || fragment_name)
     {
@@ -1299,7 +1301,7 @@ bool DeferredPass::record_transparent(const FrameRecordingContext& frame, VkBuff
             vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                 geometry_layout_, 2, 1, &forward_weather_, 0, nullptr);
     }
-    push_texture_matrices(frame, geometry_layout_, matrices);
+    push_texture_matrices(frame, geometry_layout_, matrices, normal_rows);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, vertex_base, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;
@@ -1328,11 +1330,8 @@ bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer verti
     vk_.cmd_bind_index_buffer(frame.command_buffer, indices, 0, VK_INDEX_TYPE_UINT32);
     vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
         geometry_layout_, 0, 1, &material_set, 0, nullptr);
-    command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
+    command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
         0, sizeof(mvp), mvp);
-    if (normal_rows)
-        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT,
-            80, sizeof(float) * 12, normal_rows);
     if (fragment_name && ((std::strstr(fragment_name, "particle_") &&
             std::strstr(fragment_name, "_set.ps") &&
             !std::strstr(fragment_name, "particle_screen_set.ps")) ||
@@ -1345,9 +1344,9 @@ bool DeferredPass::record_hud(const FrameRecordingContext& frame, VkBuffer verti
             std::strstr(fragment_name, "glow_alpha_add.ps") ||
             std::strstr(fragment_name, "hud_particle_screen_blended.ps") ||
             std::strstr(fragment_name, "hud_particle_screen_alpha_add.ps")))
-        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_FRAGMENT_BIT,
+        command_cache_.push(vk_, frame.command_buffer, geometry_layout_, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
             sizeof(mvp), sizeof(alpha_ref), &alpha_ref);
-    push_texture_matrices(frame, geometry_layout_, matrices);
+    push_texture_matrices(frame, geometry_layout_, matrices, normal_rows);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, first_index, vertex_base, 0);
     ++draw_calls_; triangles_ += index_count / 3;
     return true;

@@ -86,6 +86,10 @@ struct Fragment
 #endif
     [[vk::location(4)]] float3 world_position : TEXCOORD4;
     [[vk::location(5)]] float hemi : TEXCOORD5;
+#if defined(VK_SKINNED)
+    [[vk::location(6)]] float3 tangent : TEXCOORD6;
+    [[vk::location(7)]] float3 bitangent : TEXCOORD7;
+#endif
 };
 
 
@@ -132,6 +136,19 @@ float3 surface_normal(float3 geometric, float3 position, float2 uv, float3 tange
 float3 unpack_bump(float4 main_map, float4 auxiliary)
 {
     return normalize(main_map.wzy + auxiliary.xyz - 1.0);
+}
+
+float3 model_surface_normal(Fragment fragment, float2 uv, float3 tangent_normal)
+{
+    float3 geometric = normalize(fragment.normal);
+#if defined(VK_SKINNED)
+    // Match the desktop model shader's skinned, authored tangent frame.
+    if (dot(fragment.tangent, fragment.tangent) > 1e-12 &&
+        dot(fragment.bitangent, fragment.bitangent) > 1e-12)
+        return normalize(fragment.tangent * tangent_normal.x +
+            fragment.bitangent * tangent_normal.y + fragment.normal * tangent_normal.z);
+#endif
+    return surface_normal(geometric, fragment.world_position, uv, tangent_normal);
 }
 
 #if defined(VK_TRANSPARENT)
@@ -279,7 +296,7 @@ float4 main(Fragment fragment) : SV_Target0
                 detail_bump_aux.Sample(diffuse_sampler, detail_uv)) - float3(0.0, 0.0, 1.0));
             gloss = max(gloss, detail_map.x * detail_map.x);
         }
-        normal = surface_normal(normal, fragment.world_position, base_uv, tangent_normal);
+        normal = model_surface_normal(fragment, base_uv, tangent_normal);
     }
     float hemisphere = saturate(fragment.hemi);
 #if defined(VK_LIGHTMAP)
@@ -500,8 +517,7 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
 #endif
     output.surface.r = saturate(gloss);
     if (surface_modes.x >= 2.0 || surface_modes.y > 0.5 || surface_modes.z > 0.5 || surface_factors.w > 0.0)
-        fragment.normal = surface_normal(normalize(fragment.normal), fragment.world_position,
-            base_uv, mapped_normal);
+        fragment.normal = model_surface_normal(fragment, base_uv, mapped_normal);
 #if defined(VK_LIGHTMAP)
     float4 indirect = lightmap.Sample(diffuse_sampler, fragment.lightmap_uv);
     output.albedo.a = indirect.g;

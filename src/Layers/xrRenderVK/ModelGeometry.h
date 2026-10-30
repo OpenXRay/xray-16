@@ -16,6 +16,10 @@ struct ModelVertex
     float uv[2]{};
     uint16_t bones[4]{};
     float weights[4]{1, 0, 0, 0};
+    // Authored OGF basis: UV derivatives cannot reproduce smoothed/mirrored
+    // tangent frames at character seams.
+    float tangent[3]{};
+    float bitangent[3]{};
 };
 
 struct ModelGeometry

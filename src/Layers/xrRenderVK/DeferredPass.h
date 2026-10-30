@@ -70,6 +70,7 @@ bool create_gbuffer_render_pass(VkDevice device, VkFormat albedo_format,
 class DeferredPass
 {
 public:
+    const float* model_hemi_negative() const { return model_hemi_negative_; }
     ~DeferredPass() { destroy(); }
     DeferredPass(const DeferredPass&) = delete;
     DeferredPass& operator=(const DeferredPass&) = delete;
@@ -210,7 +211,7 @@ public:
 private:
     mutable GeometryCommandCache command_cache_;
     void push_texture_matrices(const FrameRecordingContext& frame, VkPipelineLayout layout,
-        const TextureMatrixSet* matrices) const;
+        const TextureMatrixSet* matrices, const float* normal_rows = nullptr) const;
     struct GamePipeline { VkPipeline handle{}; SurfaceMode mode{}; bool hud{}, skinned{}; };
     const GamePipeline* game_pipeline(const char* vertex_name, const char* fragment_name) const;
     bool allocate(VkDescriptorSetLayout layout, VkImageView first, VkImageView second,

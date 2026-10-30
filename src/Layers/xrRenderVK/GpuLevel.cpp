@@ -68,11 +68,6 @@ bool visible_sphere(const float (&mvp)[16], float x, float y, float z, float rad
         !outside(cz, mvp[2], mvp[6], mvp[10]) &&
         !outside(cw - cz, mvp[3] - mvp[2], mvp[7] - mvp[6], mvp[11] - mvp[10]);
 }
-bool visible_sphere(const float (&mvp)[16], const LevelVisual& visual)
-{
-    return visible_sphere(mvp, visual.bounds[6], visual.bounds[7],
-        visual.bounds[8], visual.bounds[9]);
-}
 
 std::string lightmap_texture(const std::string& textures, const MaterialDefinition& definition)
 {
@@ -670,6 +665,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
     details_ = std::move(prepared.details_);
     detail_meshes_ = std::move(prepared.detail_meshes_);
     visuals_ = std::move(prepared.visuals_);
+    cull_bounds_ = level_hierarchy_bounds(visuals_);
     visual_phases_.assign(visuals_.size(), 0);
     visual_priorities_.assign(visuals_.size(), 0);
     std::vector<uint8_t> phase_state(visuals_.size(), 0);
@@ -751,34 +747,15 @@ bool GpuLevel::record_sun_shadow(const FrameRecordingContext& frame, const Defer
     const float (&sun_mvp)[16]) const
 {
     auto command_batch = pass.geometry_batch();
-    Fmatrix transform;
-    std::memcpy(&transform, sun_mvp, sizeof(transform));
-    const auto visible = [&](const LevelVisual& visual)
-    {
-        const float radius = visual.bounds[9];
-        if (!std::isfinite(radius) || radius <= 0.f) return true;
-        Fvector4 world, clip;
-        world.set(visual.bounds[6], visual.bounds[7], visual.bounds[8], 1.f);
-        transform.transform(clip, world);
-        const auto extent = [radius](float x, float y, float z)
-        { return radius * std::sqrt(x * x + y * y + z * z); };
-        return clip.x + clip.w >= -extent(transform._11 + transform._14,
-                transform._21 + transform._24, transform._31 + transform._34) &&
-            clip.w - clip.x >= -extent(transform._14 - transform._11,
-                transform._24 - transform._21, transform._34 - transform._31) &&
-            clip.y + clip.w >= -extent(transform._12 + transform._14,
-                transform._22 + transform._24, transform._32 + transform._34) &&
-            clip.w - clip.y >= -extent(transform._14 - transform._12,
-                transform._24 - transform._22, transform._34 - transform._32) &&
-            clip.z >= -extent(transform._13, transform._23, transform._33) &&
-            clip.w - clip.z >= -extent(transform._14 - transform._13,
-                transform._24 - transform._23, transform._34 - transform._33);
-    };
     const auto draw = [&](const auto& self, uint32_t index) -> bool
     {
         if (index >= visuals_.size()) return false;
         const LevelVisual& visual = visuals_[index];
-        if (!visible(visual)) return true;
+        if (index < cull_bounds_.size())
+        {
+            const auto& sphere = cull_bounds_[index];
+            if (!visible_sphere(sun_mvp, sphere[0], sphere[1], sphere[2], sphere[3])) return true;
+        }
         if (visual.mesh >= 0)
         {
             if (size_t(visual.mesh) >= meshes_.size()) return false;
@@ -1148,9 +1125,10 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext& frame,
     if (phase == GeometryPhase::Transparent && !secondary_only && priority_filter >= 0 &&
         !has_transparent_priority(index, static_cast<uint8_t>(priority_filter))) return true;
     const LevelVisual& visual = visuals_[index];
-    // Hierarchy bounds in older level archives are not guaranteed to enclose
-    // every child. Cull leaf meshes, but always descend into child visuals.
-    if (cull_static && visual.children.empty() && !visible_sphere(mvp, visual))
+    // Rebuilt bounds enclose every descendant. Reject an offscreen branch
+    // once instead of walking its leaves again for each material priority.
+    const auto& sphere = cull_bounds_[index];
+    if (cull_static && !visible_sphere(mvp, sphere[0], sphere[1], sphere[2], sphere[3]))
     {
         static std::atomic<uint64_t> culled{0};
         const uint64_t count = ++culled;
@@ -1428,6 +1406,7 @@ void GpuLevel::destroy()
     for (auto& draws : transparent_detail_draws_) draws.clear();
     detail_signatures_.fill(0);
     visuals_.clear();
+    cull_bounds_.clear();
     visual_phases_.clear();
     visual_priorities_.clear();
     roots_.clear();

@@ -1,13 +1,16 @@
 // Level and object geometry share the Vulkan G-buffer vertex layout.
 [[vk::push_constant]] cbuffer Camera {
     float4x4 mvp;
-    float alpha_threshold;
-    float4 normal_rows[3];
-    // These rows alias the material UV push constants at bytes 128, 144, 160.
-    // Their z components do not participate in matrix_uv(float4(uv, 0, 1)).
+    float4 material_padding[4]; // bytes 64..127 belong to fragment material data
     float4 base_matrix_u;
     float4 base_matrix_v;
     float4 detail_matrix_u;
+    float4 detail_matrix_v;
+    float4 environment_matrix_u;
+    float4 environment_matrix_v;
+    float4 environment_matrix_z;
+    float4 object_rotation; // bytes 240..255 never alias material data
+
 };
 
 struct Vertex
@@ -34,6 +37,12 @@ struct Fragment
 #endif
 };
 
+float3 rotate_object(float3 value)
+{
+    return value + 2.0 * cross(object_rotation.xyz,
+        cross(object_rotation.xyz, value) + object_rotation.w * value);
+}
+
 Fragment main(Vertex vertex)
 {
     Fragment fragment;
@@ -49,16 +58,16 @@ Fragment main(Vertex vertex)
 #if defined(LEVEL_GEOMETRY)
     fragment.normal = vertex.normal;
 #else
-    fragment.normal = normalize(float3(dot(normal_rows[0].xyz, vertex.normal),
-        dot(normal_rows[1].xyz, vertex.normal), dot(normal_rows[2].xyz, vertex.normal)));
+    fragment.normal = normalize(rotate_object(vertex.normal));
 #endif
     fragment.hemi = saturate(0.5 + 0.5 * normalize(fragment.normal).y);
 #if !defined(LEVEL_GEOMETRY)
-    if (normal_rows[0].w >= 0.0)
+    if (base_matrix_u.z >= 0.0)
     {
         float3 world_normal = normalize(fragment.normal);
-        float3 positive = float3(normal_rows[0].w, normal_rows[1].w, normal_rows[2].w);
-        float3 negative = float3(base_matrix_u.z, base_matrix_v.z, detail_matrix_u.z);
+        float3 packed = float3(base_matrix_u.z, base_matrix_v.z, detail_matrix_u.z);
+        float3 positive = floor(packed) / 1023.0;
+        float3 negative = frac(packed) * (1024.0 / 1023.0);
         fragment.hemi = saturate(dot(lerp(positive, negative,
             float3(world_normal.x < 0.0, world_normal.y < 0.0, world_normal.z < 0.0)),
             abs(world_normal)));
@@ -67,8 +76,7 @@ Fragment main(Vertex vertex)
     fragment.uv = vertex.uv;
     fragment.world_position = vertex.position;
 #if !defined(LEVEL_GEOMETRY)
-    fragment.world_position = float3(dot(normal_rows[0].xyz, vertex.position),
-        dot(normal_rows[1].xyz, vertex.position), dot(normal_rows[2].xyz, vertex.position));
+    fragment.world_position = rotate_object(vertex.position);
 #endif
 #if defined(LEVEL_GEOMETRY)
     fragment.lightmap_uv = vertex.lightmap_uv;

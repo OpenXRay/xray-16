@@ -226,6 +226,8 @@ inline bool build_render_pass_graph(const RenderPassSelection& input,
         node.fragment = input.hud ? input.animated ? "vk\\hud_blended.ps" : std::string{} :
             input.animated && input.environment ? "vk\\skinned_environment.ps" :
             input.animated && input.mode == SurfaceMode::Transparent ? "vk\\skinned_blended.ps" :
+            input.animated && input.mode == SurfaceMode::AlphaTest ? "vk\\skinned_cutout.ps" :
+            input.animated ? "vk\\skinned_opaque.ps" :
                 std::string("vk\\") + family + ".ps";
         if (input.detail && !input.hud && !input.environment)
         {

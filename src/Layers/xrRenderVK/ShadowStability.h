@@ -2,6 +2,12 @@
 #include <cmath>
 #include <cstdint>
 namespace xray::render::vulkan {
+inline float sun_shadow_span(uint32_t quality)
+{
+    // Spend the fixed 1024 texels on nearby receivers on mobile presets.
+    // Default and higher keep the original long-range coverage.
+    return quality == 0 ? 64.f : quality == 1 ? 96.f : 180.f;
+}
 inline void stabilize_shadow_projection(float* matrix, uint32_t size)
 {
     if(!matrix || !size) return;

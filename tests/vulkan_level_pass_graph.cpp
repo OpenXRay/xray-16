@@ -232,7 +232,7 @@ int main()
     assert(build_render_pass_graph({RenderConsumer::Model, SurfaceMode::AlphaTest,
         false, true, false, false, 2}, common, error));
     assert(common.passes[0].vertex == "vk\\skinned_2.vs");
-    assert(common.passes[0].fragment == "vk\\object_cutout.ps");
+    assert(common.passes[0].fragment == "vk\\skinned_cutout.ps");
     assert(build_render_pass_graph({RenderConsumer::Model, SurfaceMode::Opaque,
         true, true, false, false, 4}, common, error));
     assert(common.passes[0].target == LevelPassTarget::Hud);

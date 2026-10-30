@@ -141,7 +141,12 @@ class GameShaderVariantsTest(unittest.TestCase):
                 self.assertIn(5, locations)
             offsets = {args[3] for op, args in vertex
                        if op == 72 and len(args) >= 4 and args[2] == 35}
-            self.assertIn(128, offsets)
+            if vertex_name.startswith("skinned"):
+                self.assertEqual(offsets, {0})  # model/hemi data live in the pose SSBO
+                self.assertIn(68, {op for op, _ in vertex})  # OpArrayLength finds the trailer
+            else:
+                self.assertIn(128, offsets)
+                self.assertIn(240, offsets)  # quaternion cannot overlap fragment parameters
 
     def test_opaque_model_environment_uses_cube_and_surface_attachment(self):
         for name in ("object_environment_opaque", "skinned_environment_opaque"):

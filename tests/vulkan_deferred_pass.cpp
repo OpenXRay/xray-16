@@ -64,7 +64,7 @@ VkResult VKAPI_PTR create_layout(VkDevice, const VkPipelineLayoutCreateInfo* inf
     if (range.stageFlags & VK_SHADER_STAGE_VERTEX_BIT)
     {
         assert(range.stageFlags == (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT));
-        assert(range.size == sizeof(float) * 60);
+        assert(range.size == sizeof(float) * 64);
         *output = info->setLayoutCount == 4 ?
             (skinned_layout = handle<VkPipelineLayout>(44)) :
             (geometry_layout = handle<VkPipelineLayout>(41));
@@ -278,7 +278,7 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
         assert(attributes[4].location == 6 && attributes[4].offset == offsetof(LevelVertex, baked));
         assert(info->pColorBlendState->attachmentCount == 3);
         assert(info->pDepthStencilState->depthTestEnable == VK_TRUE);
-        assert(info->pDepthStencilState->depthCompareOp == VK_COMPARE_OP_LESS);
+        assert(info->pDepthStencilState->depthCompareOp == VK_COMPARE_OP_LESS_OR_EQUAL);
         assert(info->pDepthStencilState->depthWriteEnable == VK_TRUE);
         assert(info->pColorBlendState->pAttachments[0].blendEnable == VK_FALSE);
     }
@@ -289,7 +289,7 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
         assert(info->pColorBlendState->attachmentCount == 1);
         assert(info->pDepthStencilState->depthTestEnable == VK_TRUE);
         assert(info->pDepthStencilState->depthWriteEnable == (pipeline_count == 3 ? VK_TRUE : VK_FALSE));
-        assert(info->pDepthStencilState->depthCompareOp == VK_COMPARE_OP_LESS);
+        assert(info->pDepthStencilState->depthCompareOp == VK_COMPARE_OP_LESS_OR_EQUAL);
         assert(info->pColorBlendState->pAttachments[0].blendEnable == VK_TRUE);
     }
     else if (pipeline_count < 6)
@@ -302,7 +302,7 @@ VkResult VKAPI_PTR create_pipeline(VkDevice, VkPipelineCache, uint32_t count,
     else
     {
         const bool skinned = pipeline_count == 8 || (pipeline_count >= 13 && pipeline_count <= 16);
-        assert(info->pVertexInputState->vertexAttributeDescriptionCount == 5u);
+        assert(info->pVertexInputState->vertexAttributeDescriptionCount == (skinned ? 7u : 5u));
         if (skinned)
         {
             assert(info->layout == skinned_layout);
@@ -345,6 +345,7 @@ void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShader
         return;
     }
     assert(layout == geometry_layout || layout == skinned_layout);
+    if (offset == 240) { assert(size == 16 && stage == (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)); return; }
     if (offset == 128)
     {
         assert(stage == (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT));
@@ -354,8 +355,9 @@ void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShader
             rows[13] == 1.f && rows[16] == 1.f && rows[21] == 1.f && rows[26] == 1.f);
         return;
     }
-    if (stage == VK_SHADER_STAGE_FRAGMENT_BIT)
+    if (offset != 0)
     {
+        assert(stage == (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT));
         if (offset == 96)
         {
             assert(size == sizeof(SurfaceParameters) &&
@@ -404,7 +406,7 @@ void VKAPI_PTR push_constants(VkCommandBuffer, VkPipelineLayout layout, VkShader
         }
         return;
     }
-    assert(stage == VK_SHADER_STAGE_VERTEX_BIT && offset == 0 && size == sizeof(expected_mvp));
+    assert(stage == (VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT) && offset == 0 && size == sizeof(expected_mvp));
     assert(std::memcmp(data, expected_mvp, sizeof(expected_mvp)) == 0);
 }
 void VKAPI_PTR draw_indexed(VkCommandBuffer, uint32_t count, uint32_t instances,
