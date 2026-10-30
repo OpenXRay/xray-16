@@ -531,6 +531,7 @@ void VulkanGameDevice::record_level_visuals(const FrameRecordingContext& frame, 
 {
     auto& owner = *static_cast<VulkanGameDevice*>(user);
     PassCpuSample timing{"opaque-level", owner.deferred_, owner.deferred_.draw_calls()};
+    auto command_batch = owner.deferred_.geometry_batch();
     for (const auto& draw : owner.level_draws_)
     {
         if (draw.hud) continue;
@@ -570,6 +571,7 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
             if (level.hud || !owner.current_level_->has_secondary_priority(level.index)) continue;
             float mvp[16];
             std::copy(level.mvp.begin(), level.mvp.end(), mvp);
+            auto command_batch = owner.deferred_.geometry_batch();
             if (!owner.current_level_->record_visual(level.index, frame, owner.deferred_,
                     mvp, GeometryPhase::Transparent, level.lod, level.instance == nullptr, true))
             {
@@ -703,6 +705,7 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext& frame, vo
         {
             const LevelDraw& level = owner.level_draws_[draw.index];
             std::copy(level.mvp.begin(), level.mvp.end(), mvp);
+            auto command_batch = owner.deferred_.geometry_batch();
             if (!owner.current_level_->record_visual(level.index, frame,
                     owner.deferred_, mvp, GeometryPhase::Transparent, level.lod,
                     level.instance == nullptr, false, draw.priority))

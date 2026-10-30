@@ -105,7 +105,7 @@ bool VulkanParticleEffect::initialize(VkDevice device, const VkPhysicalDeviceMem
     }
     priority_ = definition.priority;
     matrices_ = definition.matrices;
-    screen_set_ = definition.class_name == "S_SET   ";
+    screen_set_ = particle_uses_screen_program(def_->shader, definition.class_name);
     // This game's Lua special pass overrides its serialized S_SET additive
     // state (gl/particles_xdistort.s). Keep its offset map out of color ADD.
     distortion_ = def_->shader == "particles\\xdistort";

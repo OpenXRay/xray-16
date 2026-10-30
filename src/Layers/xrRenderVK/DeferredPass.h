@@ -4,6 +4,7 @@
 #include "LevelModels.h"
 #include "ScenePass.h"
 #include "ForwardLighting.h"
+#include "GeometryCommandCache.h"
 #include <string>
 #include <unordered_map>
 #include <functional>
@@ -73,6 +74,7 @@ public:
     DeferredPass(const DeferredPass&) = delete;
     DeferredPass& operator=(const DeferredPass&) = delete;
     DeferredPass() = default;
+    GeometryCommandCache::Batch geometry_batch() const { return GeometryCommandCache::Batch(command_cache_); }
 
     bool initialize(VkDevice device, VkRenderPass geometry_pass, VkRenderPass light_pass,
         VkShaderModule geometry_vertex, VkShaderModule geometry_fragment,
@@ -206,6 +208,7 @@ public:
     uint32_t triangles() const { return triangles_; }
 
 private:
+    mutable GeometryCommandCache command_cache_;
     void push_texture_matrices(const FrameRecordingContext& frame, VkPipelineLayout layout,
         const TextureMatrixSet* matrices) const;
     struct GamePipeline { VkPipeline handle{}; SurfaceMode mode{}; bool hud{}, skinned{}; };

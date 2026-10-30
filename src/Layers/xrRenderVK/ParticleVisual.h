@@ -16,6 +16,12 @@ namespace PAPI { struct Particle; }
 
 namespace xray::render::vulkan
 {
+// particles_xadd.s replaces the serialized S_SET program with particle.ps.
+inline bool particle_uses_screen_program(const std::string& shader, const std::string& cls)
+{
+    return cls == "S_SET   " && shader != "particles\\xadd";
+}
+
 inline bool particle_records_in_phase(bool hud, bool screen_set, int blend_mode,
     GeometryPhase phase)
 {

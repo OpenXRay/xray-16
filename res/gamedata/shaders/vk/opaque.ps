@@ -298,8 +298,8 @@ float4 main(Fragment fragment) : SV_Target0
         float3 env_normal = normalize(normal);
         float blend = saturate(viewport.z);
         float3 diffuse_env = lerp(
-            weather_environment_a.Sample(diffuse_sampler, env_normal).rgb,
-            weather_environment_b.Sample(diffuse_sampler, env_normal).rgb, blend);
+            weather_environment_a.SampleLevel(diffuse_sampler, env_normal, 0.0).rgb,
+            weather_environment_b.SampleLevel(diffuse_sampler, env_normal, 0.0).rgb, blend);
         float3 tinted = diffuse_env * hemi_color.rgb * 4.0;
         float material = saturate((surface_modes.w + surface_factors.x) / 3.0);
         illumination += tinted * tinted * environment_diffuse_factor(hemisphere, material) -
@@ -311,8 +311,8 @@ float4 main(Fragment fragment) : SV_Target0
             float angle = 0.5 + 0.5 * dot(reflection, incident);
             reflection.y = reflection.y * 2.0 - 1.0;
             float3 spec_env = lerp(
-                weather_environment_a.Sample(diffuse_sampler, reflection).rgb,
-                weather_environment_b.Sample(diffuse_sampler, reflection).rgb, blend);
+                weather_environment_a.SampleLevel(diffuse_sampler, reflection, 0.0).rgb,
+                weather_environment_b.SampleLevel(diffuse_sampler, reflection, 0.0).rgb, blend);
             tinted = spec_env * hemi_color.rgb * 4.0;
             environment_specular = tinted * tinted *
                 environment_specular_factor(hemisphere, angle, material) * gloss;

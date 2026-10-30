@@ -1,5 +1,6 @@
 #include "xrEngine/stdafx.h"
 #include "src/Layers/xrRenderVK/ParticleVisual.h"
+#include "src/Layers/xrRenderVK/LevelPassGraph.h"
 
 #include <cassert>
 
@@ -19,6 +20,16 @@ int main()
                     GeometryPhase::Transparent);
                 assert(deferred != forward && deferred == (!hud && !screen_set && mode == 0));
             }
+    assert(!particle_uses_screen_program("particles\\xadd", "S_SET   "));
+    assert(particle_uses_screen_program("effects\\screen_add", "S_SET   "));
+    assert(!particle_uses_screen_program("particles\\add", "PARTICLE"));
+    RenderPassGraph graph;
+    std::string error;
+    RenderPassSelection xadd{RenderConsumer::Particle, SurfaceMode::Transparent};
+    xadd.blend_mode = 2;
+    xadd.particle_screen_set = particle_uses_screen_program("particles\\xadd", "S_SET   ");
+    assert(build_render_pass_graph(xadd, graph, error));
+    assert(graph.passes[0].fragment == "vk\\particle_world_additive.ps");
     Core.Initialize("vulkan_particle_visual_test", nullptr, false);
     auto catalog = std::make_shared<ParticleCatalog>();
     auto& def = catalog->effects.emplace_back();

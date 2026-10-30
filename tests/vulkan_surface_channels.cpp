@@ -3,6 +3,8 @@
 #include <vulkan/vulkan.h>
 #include "../src/Layers/xrRenderVK/DistortionShaders.h"
 #include "../src/Layers/xrRenderVK/SceneShaders.h"
+#include "../src/Layers/xrRenderVK/WeatherShaders.h"
+#include "../src/Layers/xrRenderVK/DeferredShaders.h"
 #include <array>
 #include <algorithm>
 #include <cassert>
@@ -44,12 +46,12 @@ struct Memory
 };
 struct Image { VkImage image{}; VkImageView view{}; VkDeviceMemory memory{}; };
 static Image image(Memory& memory, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
-    VkMemoryPropertyFlags flags, uint32_t layers = 1, uint32_t width = 1)
+    VkMemoryPropertyFlags flags, uint32_t layers = 1, uint32_t width = 1, uint32_t levels = 1)
 {
     Image result;
     VkImageCreateInfo info{VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
     info.imageType = VK_IMAGE_TYPE_2D; info.format = format;
-    info.extent = {width, 1, 1}; info.mipLevels = 1; info.arrayLayers = layers;
+    info.extent = {width, layers == 6 ? width : 1, 1}; info.mipLevels = levels; info.arrayLayers = layers;
     if (layers == 6) info.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
     info.samples = VK_SAMPLE_COUNT_1_BIT; info.tiling = tiling; info.usage = usage;
     info.initialLayout = tiling == VK_IMAGE_TILING_LINEAR ?
@@ -64,7 +66,7 @@ static Image image(Memory& memory, VkFormat format, VkImageTiling tiling, VkImag
     view.viewType = layers == 6 ? VK_IMAGE_VIEW_TYPE_CUBE : VK_IMAGE_VIEW_TYPE_2D;
     view.format = format;
     view.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    view.subresourceRange.levelCount = 1; view.subresourceRange.layerCount = layers;
+    view.subresourceRange.levelCount = levels; view.subresourceRange.layerCount = layers;
     check(vkCreateImageView(memory.device, &view, nullptr, &result.view));
     return result;
 }
@@ -96,7 +98,7 @@ int main(int argc, char** argv)
 {
     try
     {
-        if (argc < 2 || argc > 3) throw std::runtime_error("usage: vulkan_surface_channels <vk shader directory> [menu-preview.ppm]");
+        if (argc < 2 || argc > 4) throw std::runtime_error("usage: vulkan_surface_channels <vk shader directory> [menu-preview.ppm] [weather-preview.ppm]");
         VkInstance instance{}; VkInstanceCreateInfo instance_info{VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
         check(vkCreateInstance(&instance_info, nullptr, &instance));
         uint32_t count{}; check(vkEnumeratePhysicalDevices(instance, &count, nullptr));
@@ -163,9 +165,10 @@ int main(int argc, char** argv)
         layout_info.bindingCount = bindings.size(); layout_info.pBindings = bindings.data();
         VkDescriptorSetLayout descriptor_layout{};
         check(vkCreateDescriptorSetLayout(device, &layout_info, nullptr, &descriptor_layout));
-        VkDescriptorPoolSize pool_size{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 40};
+        const VkDescriptorPoolSize pool_sizes[]{{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 80},
+            {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1}};
         VkDescriptorPoolCreateInfo pool_info{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
-        pool_info.maxSets = 2; pool_info.poolSizeCount = 1; pool_info.pPoolSizes = &pool_size;
+        pool_info.maxSets = 4; pool_info.poolSizeCount = 2; pool_info.pPoolSizes = pool_sizes;
         VkDescriptorPool pool{}; check(vkCreateDescriptorPool(device, &pool_info, nullptr, &pool));
         VkDescriptorSetAllocateInfo alloc{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO};
         alloc.descriptorPool = pool; alloc.descriptorSetCount = 1; alloc.pSetLayouts = &descriptor_layout;
@@ -328,6 +331,80 @@ int main(int argc, char** argv)
         const auto ui_vs = embedded(scene_shaders::UiVertex, sizeof(scene_shaders::UiVertex));
         const auto ui_ps = embedded(scene_shaders::UiFragment, sizeof(scene_shaders::UiFragment));
         std::array<std::array<float, 4>, 128> last_ui_pixels{};
+        const auto weather_ps = embedded(weather_shaders::Fragment, sizeof(weather_shaders::Fragment));
+        const auto weather_vs = embedded(deferred_shaders::LightVertex, sizeof(deferred_shaders::LightVertex));
+        const Image weather_normal = image(memory, format, VK_IMAGE_TILING_LINEAR,
+            VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 1, 128);
+        const Image weather_cube = image(memory, format, VK_IMAGE_TILING_LINEAR,
+            VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 6, 64, 7);
+        // Deliberately different mip contents expose implicit-LOD selection.
+        check(vkMapMemory(device, weather_cube.memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        for (unsigned face = 0; face < 6; ++face)
+            for (unsigned mip = 0; mip < 7; ++mip)
+            {
+                VkImageSubresource sub{VK_IMAGE_ASPECT_COLOR_BIT, mip, face};
+                VkSubresourceLayout layout{};
+                vkGetImageSubresourceLayout(device, weather_cube.image, &sub, &layout);
+                const float rgba[]{mip ? 0.f : .8f, mip ? 0.f : .6f, mip ? 0.f : .4f, 1.f};
+                for (unsigned y = 0; y < (64u >> mip); ++y)
+                    for (unsigned x = 0; x < (64u >> mip); ++x)
+                        std::memcpy(static_cast<uint8_t*>(mapped)+layout.offset+y*layout.rowPitch+x*16,rgba,16);
+            }
+        vkUnmapMemory(device, weather_cube.memory);
+        check(vkMapMemory(device, weather_normal.memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        VkImageSubresource normal_sub{VK_IMAGE_ASPECT_COLOR_BIT,0,0}; VkSubresourceLayout normal_layout{};
+        vkGetImageSubresourceLayout(device,weather_normal.image,&normal_sub,&normal_layout);
+        for(unsigned x=0;x<128;++x)
+        {
+            const float rgba[]{x%2 ? .9f : .1f,.8f,.5f,.75f};
+            std::memcpy(static_cast<uint8_t*>(mapped)+normal_layout.offset+x*16,rgba,16);
+        }
+        vkUnmapMemory(device, weather_normal.memory);
+        VkBuffer weather_uniform{}; buffer_info.size=176; buffer_info.usage=VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+        check(vkCreateBuffer(device,&buffer_info,nullptr,&weather_uniform));
+        vkGetBufferMemoryRequirements(device,weather_uniform,&required);
+        auto weather_memory=memory.allocate(required,VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT|VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        check(vkBindBufferMemory(device,weather_uniform,weather_memory,0));
+        float constants[44]{};
+        for(unsigned i=0;i<16;++i) constants[i]=constants[16+i]=i%5==0?1.f:0.f;
+        constants[36]=constants[37]=constants[38]=.04f;
+        constants[40]=.5f;constants[41]=.45f;constants[42]=.4f;
+        check(vkMapMemory(device,weather_memory,0,VK_WHOLE_SIZE,0,&mapped));
+        std::memcpy(mapped,constants,sizeof(constants));vkUnmapMemory(device,weather_memory);
+        auto weather_bindings=bindings;
+        weather_bindings[4].descriptorType=VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        layout_info.pBindings=weather_bindings.data();layout_info.bindingCount=6;
+        VkDescriptorSetLayout weather_descriptor_layout{};
+        check(vkCreateDescriptorSetLayout(device,&layout_info,nullptr,&weather_descriptor_layout));
+        alloc.pSetLayouts=&weather_descriptor_layout;
+        VkDescriptorSet weather_set{};check(vkAllocateDescriptorSets(device,&alloc,&weather_set));
+        alloc.pSetLayouts=&descriptor_layout;
+        VkDescriptorSet weather_environment_set{};check(vkAllocateDescriptorSets(device,&alloc,&weather_environment_set));
+        VkDescriptorImageInfo weather_images[]{
+            {sampler,input[0].view,VK_IMAGE_LAYOUT_GENERAL},
+            {sampler,weather_normal.view,VK_IMAGE_LAYOUT_GENERAL},
+            {sampler,input[19].view,VK_IMAGE_LAYOUT_GENERAL},
+            {sampler,input[19].view,VK_IMAGE_LAYOUT_GENERAL},
+            {},{sampler,input[2].view,VK_IMAGE_LAYOUT_GENERAL}};
+        VkDescriptorBufferInfo uniform_info{weather_uniform,0,176};
+        for(unsigned i=0;i<6;++i)
+        {
+            VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+            write.dstSet=weather_set;write.dstBinding=i;write.descriptorCount=1;
+            write.descriptorType=i==4?VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            write.pImageInfo=&weather_images[i];if(i==4)write.pBufferInfo=&uniform_info;
+            vkUpdateDescriptorSets(device,1,&write,0,nullptr);
+            VkDescriptorImageInfo cube_info{sampler,weather_cube.view,VK_IMAGE_LAYOUT_GENERAL};
+            write.dstSet=weather_environment_set;write.descriptorType=VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            write.pImageInfo=i==2||i==3?&weather_images[0]:&cube_info;write.pBufferInfo=nullptr;
+            vkUpdateDescriptorSets(device,1,&write,0,nullptr);
+        }
+        const VkDescriptorSetLayout weather_layouts[]{weather_descriptor_layout,descriptor_layout};
+        const VkPushConstantRange weather_range{VK_SHADER_STAGE_VERTEX_BIT|VK_SHADER_STAGE_FRAGMENT_BIT,0,128};
+        pipeline_layout_info.pSetLayouts=weather_layouts;pipeline_layout_info.pPushConstantRanges=&weather_range;
+        VkPipelineLayout weather_pipeline_layout{};
+        check(vkCreatePipelineLayout(device,&pipeline_layout_info,nullptr,&weather_pipeline_layout));
+        bool weather_initialized=false;
         bool inputs_initialized = false;
         bool cube_initialized = false;
         auto execute = [&](VkShaderModule fragment, const Push& push, bool use_cube = false, VkShaderModule custom_vertex = VK_NULL_HANDLE) {
@@ -341,13 +418,31 @@ int main(int argc, char** argv)
                 {1, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv)},
                 {2, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(Vertex, baked)}};
             const bool ui = custom_vertex == ui_vs;
-            viewport.width = ui ? 128.f : 1.f;
-            scissor.extent.width = ui ? 128 : 1;
+            const bool weather = fragment == weather_ps;
+            const bool wide = ui || weather;
+            viewport.width = wide ? 128.f : 1.f;
+            scissor.extent.width = wide ? 128 : 1;
+            pipeline_info.layout = weather ? weather_pipeline_layout : pipeline_layout;
             vertex_input.vertexAttributeDescriptionCount = ui ? 3 : 5;
             vertex_input.pVertexAttributeDescriptions = ui ? ui_attributes : attributes;
             VkPipeline pipeline{}; check(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &pipeline));
             check(vkResetCommandPool(device, commands, 0));
             VkCommandBufferBeginInfo begin{VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO}; check(vkBeginCommandBuffer(cmd, &begin));
+            if (weather && !weather_initialized)
+            {
+                VkImageMemoryBarrier barriers[2]{};
+                for(unsigned i=0;i<2;++i) {
+                    auto& b=barriers[i];b.sType=VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+                    b.srcAccessMask=VK_ACCESS_HOST_WRITE_BIT;b.dstAccessMask=VK_ACCESS_SHADER_READ_BIT;
+                    b.oldLayout=VK_IMAGE_LAYOUT_PREINITIALIZED;b.newLayout=VK_IMAGE_LAYOUT_GENERAL;
+                    b.image=i?weather_cube.image:weather_normal.image;
+                    b.subresourceRange={VK_IMAGE_ASPECT_COLOR_BIT,0,i?7u:1u,0,i?6u:1u};
+                    b.srcQueueFamilyIndex=b.dstQueueFamilyIndex=VK_QUEUE_FAMILY_IGNORED;
+                }
+                vkCmdPipelineBarrier(cmd,VK_PIPELINE_STAGE_HOST_BIT,VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                    0,0,nullptr,0,nullptr,2,barriers);
+                weather_initialized=true;
+            }
             if (use_cube && !cube_initialized)
             {
                 VkImageMemoryBarrier barrier{VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
@@ -385,14 +480,14 @@ int main(int argc, char** argv)
             std::array<VkClearValue, 3> clear{};
             VkRenderPassBeginInfo rp{VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
             rp.renderPass = render_pass; rp.framebuffer = framebuffer; rp.renderArea.extent = {1, 1};
-            rp.renderArea.extent.width = ui ? 128 : 1;
+            rp.renderArea.extent.width = wide ? 128 : 1;
             rp.clearValueCount = 3; rp.pClearValues = clear.data();
             vkCmdBeginRenderPass(cmd, &rp, VK_SUBPASS_CONTENTS_INLINE);
             vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-            const VkDescriptorSet draw_sets[]{set, scene_set};
-            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 2, draw_sets, 0, nullptr);
+            const VkDescriptorSet draw_sets[]{weather ? weather_set : set, weather ? weather_environment_set : scene_set};
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_info.layout, 0, 2, draw_sets, 0, nullptr);
             VkDeviceSize offset{}; vkCmdBindVertexBuffers(cmd, 0, 1, &vertices, &offset);
-            vkCmdPushConstants(cmd, pipeline_layout, range.stageFlags, 0, sizeof(push), &push);
+            vkCmdPushConstants(cmd, pipeline_info.layout, range.stageFlags, 0, weather ? 128 : sizeof(push), &push);
             vkCmdDraw(cmd, 3, 1, 0, 0); vkCmdEndRenderPass(cmd);
             std::array<VkBufferImageCopy, 3> copies{};
             for (uint32_t i = 0; i < 3; ++i)
@@ -400,7 +495,7 @@ int main(int argc, char** argv)
                 copies[i].bufferOffset = i * 128 * 16;
                 copies[i].imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
                 copies[i].imageSubresource.layerCount = 1;
-                copies[i].imageExtent = {ui ? 128u : 1u, 1, 1};
+                copies[i].imageExtent = {wide ? 128u : 1u, 1, 1};
             }
             for (uint32_t i = 0; i < 3; ++i)
                 vkCmdCopyImageToBuffer(cmd, output[i].image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
@@ -417,7 +512,7 @@ int main(int argc, char** argv)
             void* data{}; check(vkMapMemory(device, readback_memory, 0, VK_WHOLE_SIZE, 0, &data));
             for (unsigned i = 0; i < 3; ++i)
                 std::memcpy(result[i].data(), static_cast<uint8_t*>(data) + i * 128 * 16, 16);
-            if (ui) std::memcpy(last_ui_pixels.data(), data, sizeof(last_ui_pixels));
+            if (wide) std::memcpy(last_ui_pixels.data(), data, sizeof(last_ui_pixels));
             vkUnmapMemory(device, readback_memory);
             vkDestroyPipeline(device, pipeline, nullptr); return result;
         };
@@ -607,7 +702,7 @@ int main(int argc, char** argv)
         execute(ui_ps, ui_push, false, ui_vs);
         for (unsigned x = 0; x < 128; ++x)
             near(last_ui_pixels[x][0], float(std::min(x + 2, 127u)) / 127.f, "menu displacement uses alpha weight and clamps edges");
-        if (argc == 3)
+        if (argc >= 3)
         {
             std::ofstream preview(argv[2], std::ios::binary);
             preview << "P6\n128 96\n255\n";
@@ -624,15 +719,57 @@ int main(int argc, char** argv)
         fill(memory, input[0], {.8f, .1f, .9f, 0.f});
         auto transparent_ui = execute(ui_ps, ui_push, false, ui_vs);
         near(transparent_ui[0][3], 0.f, "transparent PP atlas texels leave scene untouched");
+        // Run the actual weather combine. Rapidly varying normals must not
+        // select dark lower cube mips: the original hmodel explicitly uses LOD 0.
+        sampler_info.maxLod=6; // The original sampler used maxLod=0; use an unrestricted sampler below.
+        VkSampler environment_sampler{}; check(vkCreateSampler(device,&sampler_info,nullptr,&environment_sampler));
+        for(unsigned binding : {0u,1u,4u,5u}) {
+            VkDescriptorImageInfo info{environment_sampler,weather_cube.view,VK_IMAGE_LAYOUT_GENERAL};
+            VkWriteDescriptorSet write{VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET};
+            write.dstSet=weather_environment_set;write.dstBinding=binding;write.descriptorCount=1;
+            write.descriptorType=VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;write.pImageInfo=&info;
+            vkUpdateDescriptorSets(device,1,&write,0,nullptr);
+        }
+        fill(memory,input[0],{.25f,.4f,.6f,1.f});
+        fill(memory,input[2],{0.f,1.f/3.f,0.f,0.f});
+        fill(memory,input[19],{.5f,0.f,0.f,0.f});
+        Push weather_push{};
+        float* w=reinterpret_cast<float*>(&weather_push);
+        w[2]=1000.f;w[13]=-1.f;w[20]=w[21]=w[22]=1.f;
+        // packHalf2x16(0,100) and (1000,1000).
+        const uint32_t near_bits=0x56400000u,far_bits=0x63d063d0u;
+        std::memcpy(w+7,&near_bits,4);std::memcpy(w+11,&far_bits,4);
+        execute(weather_ps,weather_push,false,weather_vs);
+        if (argc == 4)
+        {
+            std::ofstream preview(argv[3],std::ios::binary);
+            preview << "P6\n128 32\n255\n";
+            for(unsigned y=0;y<32;++y) for(const auto& pixel:last_ui_pixels)
+                for(unsigned c=0;c<3;++c) preview.put(static_cast<char>(std::clamp(pixel[c],0.f,1.f)*255.f+.5f));
+            if(!preview) throw std::runtime_error("cannot save weather GPU readback");
+        }
+        const std::array<float,3> expected_lighting{.25f*(.04f+1.6f*1.6f),
+            .4f*(.04f+1.08f*1.08f),.6f*(.04f+.64f*.64f)};
+        for(unsigned x=0;x<128;++x)
+            for(unsigned channel=0;channel<3;++channel)
+                near(last_ui_pixels[x][channel],expected_lighting[channel],"weather diffuse reads cube mip zero across rapidly changing normals");
+        vkDestroySampler(device,environment_sampler,nullptr);
         std::cout << "surface channel readback: base/lightmap sun+hemi/material/bump/aux/normal/detail/terrain/emission/environment2D/cube/particle OK\n";
         check(vkDeviceWaitIdle(device));
-        for (auto module_handle : {vs, terrain, detail, flat, laemb, reflection, deferred_particle, additive_particle, additive_world_set, distort_vs, distort_ps, ui_vs, ui_ps})
+        for (auto module_handle : {vs, terrain, detail, flat, laemb, reflection, deferred_particle, additive_particle, additive_world_set, distort_vs, distort_ps, ui_vs, ui_ps, weather_vs, weather_ps})
             vkDestroyShaderModule(device, module_handle, nullptr);
         vkDestroyCommandPool(device, commands, nullptr);
         vkDestroyBuffer(device, readback, nullptr); vkFreeMemory(device, readback_memory, nullptr);
         vkDestroyBuffer(device, vertices, nullptr); vkFreeMemory(device, vertex_memory, nullptr);
         vkDestroyFramebuffer(device, framebuffer, nullptr);
         vkDestroyRenderPass(device, render_pass, nullptr);
+        vkDestroyBuffer(device,weather_uniform,nullptr);vkFreeMemory(device,weather_memory,nullptr);
+        for(auto target : {weather_normal,weather_cube}) {
+            vkDestroyImageView(device,target.view,nullptr);vkDestroyImage(device,target.image,nullptr);
+            vkFreeMemory(device,target.memory,nullptr);
+        }
+        vkDestroyPipelineLayout(device,weather_pipeline_layout,nullptr);
+        vkDestroyDescriptorSetLayout(device,weather_descriptor_layout,nullptr);
         vkDestroyDescriptorPool(device, pool, nullptr);
         vkDestroyPipelineLayout(device, pipeline_layout, nullptr);
         vkDestroyDescriptorSetLayout(device, descriptor_layout, nullptr);
