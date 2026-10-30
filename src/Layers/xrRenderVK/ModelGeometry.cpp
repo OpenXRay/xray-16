@@ -44,7 +44,7 @@ bool find_chunk(const std::vector<uint8_t>& source, uint32_t wanted, LevelBytes&
     return false;
 }
 
-bool vertex(const uint8_t* p, unsigned links, ModelVertex& out)
+bool vertex(const uint8_t* p, unsigned links, ModelVertex& out, std::string& error)
 {
     // Serialized layouts from xrCore/Animation/Bone.hpp, packed to 2 bytes.
     const size_t base = links == 1 ? 0 : links * 2;
@@ -54,14 +54,30 @@ bool vertex(const uint8_t* p, unsigned links, ModelVertex& out)
         out.normal[i] = f32(p + base + 12 + i * 4);
         out.tangent[i] = f32(p + base + 24 + i * 4);
         out.bitangent[i] = f32(p + base + 36 + i * 4);
-        if (!std::isfinite(out.position[i]) || !std::isfinite(out.normal[i])) return false;
-        if (!std::isfinite(out.tangent[i]) || !std::isfinite(out.bitangent[i])) return false;
+        if (!std::isfinite(out.position[i]) || !std::isfinite(out.normal[i]))
+        {
+            error = "non-finite position/normal axis=" + std::to_string(i);
+            return false;
+        }
     }
+    // Some shipped meshes have undefined tangents on degenerate UV faces.
+    // They are optional shading attributes, not invalid positions or weights.
+    // Clear the complete frame so the existing shader derivative fallback is
+    // selected, and never upload NaN/Inf to skinning or interpolation.
+    float tangent_length = 0, bitangent_length = 0;
+    for (unsigned i = 0; i < 3; ++i)
+    {
+        tangent_length += out.tangent[i] * out.tangent[i];
+        bitangent_length += out.bitangent[i] * out.bitangent[i];
+    }
+    if (!std::isfinite(tangent_length) || !std::isfinite(bitangent_length) ||
+        tangent_length <= 1e-12f || bitangent_length <= 1e-12f)
+        for (unsigned i = 0; i < 3; ++i) out.tangent[i] = out.bitangent[i] = 0.f;
     if (links == 1)
     {
         out.uv[0] = f32(p + 48); out.uv[1] = f32(p + 52);
         const uint32_t bone = u32(p + 56);
-        if (bone > UINT16_MAX) return false;
+        if (bone > UINT16_MAX) { error = "bone ID exceeds uint16: " + std::to_string(bone); return false; }
         out.bones[0] = static_cast<uint16_t>(bone);
     }
     else
@@ -86,10 +102,16 @@ bool vertex(const uint8_t* p, unsigned links, ModelVertex& out)
         const size_t uv_offset = weight_offset + (links - 1) * 4;
         out.uv[0] = f32(p + uv_offset); out.uv[1] = f32(p + uv_offset + 4);
     }
-    if (!std::isfinite(out.uv[0]) || !std::isfinite(out.uv[1])) return false;
+    if (!std::isfinite(out.uv[0]) || !std::isfinite(out.uv[1]))
+    { error = "non-finite texture coordinates"; return false; }
     for (unsigned i = 0; i < links; ++i)
         if (!std::isfinite(out.weights[i]) || out.weights[i] < -0.0001f ||
-            out.weights[i] > 1.0001f) return false;
+            out.weights[i] > 1.0001f)
+        {
+            error = "invalid skin weight influence=" + std::to_string(i) +
+                " value=" + std::to_string(out.weights[i]);
+            return false;
+        }
     return true;
 }
 
@@ -162,9 +184,10 @@ bool mesh(const VisualRecord& source, ModelGeometry& out, std::string& error)
                     return false;
                 }
         }
-        else if (!vertex(vertices.data + 8 + i * stride, links, out.vertices[i]))
+        else if (!vertex(vertices.data + 8 + i * stride, links, out.vertices[i], error))
         {
-            error = "OGF skinned vertex contains invalid weights or coordinates";
+            error = "OGF skinned vertex=" + std::to_string(i) + " format=" +
+                std::to_string(format) + " / " + error;
             return false;
         }
     out.indices.reserve(index_count);

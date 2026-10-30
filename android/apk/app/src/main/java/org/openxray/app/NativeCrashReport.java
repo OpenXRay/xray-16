@@ -42,8 +42,8 @@ final class NativeCrashReport {
         ApplicationExitInfo exit = latestEngineExit(context);
         if (exit == null) return;
 
-        File detailsFile = session[3];
-        File tombstoneFile = session[4];
+        File detailsFile = session[2];
+        File tombstoneFile = session[3];
         boolean nativeCrash = exit.getReason() == ApplicationExitInfo.REASON_CRASH_NATIVE;
         if (detailsFile.isFile() && (!nativeCrash || tombstoneFile.isFile())) return;
 

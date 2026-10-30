@@ -592,6 +592,23 @@ int main(int argc, char** argv)
             for(unsigned c=0;c<3;++c) near(changed[1][c],character[1][c],"material constants do not overwrite model transform");
             vkDestroyShaderModule(device,character_vertex,nullptr);
         }
+        // A decoder-sanitized optional frame must select finite UV-derivative
+        // normal mapping in the production skinned shaders, for every skin mode.
+        const auto authored_triangle=triangle;
+        for(auto& v:triangle) for(unsigned axis=0;axis<3;++axis) v.tangent[axis]=v.bitangent[axis]=0;
+        check(vkMapMemory(device,vertex_memory,0,VK_WHOLE_SIZE,0,&mapped));
+        std::memcpy(mapped,triangle.data(),sizeof(triangle));vkUnmapMemory(device,vertex_memory);
+        for(unsigned links=1;links<=4;++links) {
+            auto vertex=module("skinned_"+std::to_string(links)+".vs.spv");
+            auto fallback=execute(character_fragment,character_push,false,vertex,false,true);
+            near(fallback[1][0],.8f,"missing authored basis uses UV tangent X");
+            near(fallback[1][1],.5f,"missing authored basis uses UV tangent Y");
+            near(fallback[1][2],.9f,"missing authored basis preserves normal Z");
+            vkDestroyShaderModule(device,vertex,nullptr);
+        }
+        triangle=authored_triangle;
+        check(vkMapMemory(device,vertex_memory,0,VK_WHOLE_SIZE,0,&mapped));
+        std::memcpy(mapped,triangle.data(),sizeof(triangle));vkUnmapMemory(device,vertex_memory);
         const float rotated_rows[]{0,0,1,-1, 0,1,0,0, -1,0,0,0};
         object_data=model_pose_constants(rotated_rows,nullptr);std::copy(object_data.begin(),object_data.end(),pose_data.begin()+16);write_pose();
         auto character_vertex=module("skinned_1.vs.spv");

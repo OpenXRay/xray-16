@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstring>
+#include <limits>
 
 using namespace xray::render::vulkan;
 namespace
@@ -145,6 +146,42 @@ int main()
         assert(skinned.size() == 3);
         if (links == 2) assert(std::abs(skinned[0].position[0] - 0.25f) < 0.0001f);
         assert(!skin_model_mesh(child, &pose[0][0], 1, skinned, error));
+        // Optional exporter tangent data must not prevent a detector/NPC mesh
+        // from loading. Keep geometry, UVs and skin weights strictly validated.
+        const size_t base = links == 1 ? 0 : links * 2;
+        auto changed = [&](size_t field, float value) {
+            auto copy = record(links);
+            uint32_t bits; std::memcpy(&bits,&value,sizeof(bits));
+            auto& bytes=copy.embedded_children[0].source;
+            const size_t at=16+base+field;
+            for(unsigned i=0;i<4;++i) bytes[at+i]=uint8_t(bits>>(i*8));
+            return copy;
+        };
+        for(auto field : {24u,36u})
+            for(float value : {std::numeric_limits<float>::quiet_NaN(),
+                    std::numeric_limits<float>::infinity(),std::numeric_limits<float>::max()}) {
+                ModelGeometry sanitized;
+                assert(decode_model_geometry(changed(field,value),sanitized,error));
+                const auto& vertex=sanitized.children[0].vertices[0];
+                for(unsigned axis=0;axis<3;++axis)
+                    assert(vertex.tangent[axis]==0 && vertex.bitangent[axis]==0);
+                assert(vertex.uv[0]==.5f && vertex.uv[1]==.75f);
+                assert(skin_model_mesh(sanitized.children[0],&pose[0][0],4,skinned,error));
+            }
+        for(auto field : {0u,12u}) {
+            ModelGeometry rejected;
+            assert(!decode_model_geometry(changed(field,std::numeric_limits<float>::quiet_NaN()),rejected,error));
+            assert(error.find("vertex=0 format=")!=std::string::npos &&
+                error.find("non-finite position/normal")!=std::string::npos);
+        }
+        const size_t uv=48+(links==1?0:(links-1)*4);
+        ModelGeometry rejected;
+        assert(!decode_model_geometry(changed(uv,std::numeric_limits<float>::infinity()),rejected,error));
+        assert(error.find("non-finite texture coordinates")!=std::string::npos);
+        if(links>1) {
+            assert(!decode_model_geometry(changed(48,2.f),rejected,error));
+            assert(error.find("invalid skin weight influence=")!=std::string::npos);
+        }
         visual.embedded_children[0].source.pop_back();
         assert(!decode_model_geometry(visual, geometry, error));
     }
