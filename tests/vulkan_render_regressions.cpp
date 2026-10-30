@@ -1,4 +1,5 @@
 #include "src/Layers/xrRenderVK/ParticleSprite.h"
+#include "src/Layers/xrRenderVK/LevelModels.h"
 #include "src/Layers/xrRenderVK/ShadowStability.h"
 #include "src/Layers/xrRenderVK/TextureQuality.h"
 #include "src/Layers/xrRenderVK/LevelLightmap.h"
@@ -10,6 +11,10 @@
 #include <cmath>
 using namespace xray::render::vulkan;
 int main() {
+    LevelModel decal;decal.vertices.resize(1);
+    decal.vertices[0].position[0]=12;decal.vertices[0].normal[1]=1;decal.vertices[0].uv[0]=.3f;
+    offset_level_wallmark(decal);
+    assert(decal.vertices[0].position[0]==12 && std::abs(decal.vertices[0].position[1]-.007f)<1e-7f && decal.vertices[0].uv[0]==.3f);
     quality_preset=4;detail_radius=80;ambient_scale=.1f;hemisphere_scale=.2f;
     apply_vulkan_launch_settings("-cop -android-mobile-preset Minimum -vk-detail-distance 0 -vk-ambient-scale 1 -vk-hemi-scale 1");
     assert(quality_preset==0 && detail_radius==0 && ambient_scale==1 && hemisphere_scale==1);

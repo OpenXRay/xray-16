@@ -66,6 +66,16 @@ struct LevelModel
     std::shared_ptr<LevelModel> fast;
 };
 
+inline void offset_level_wallmark(LevelModel& model)
+{
+    // shared/wmark.h: NORMAL_SHIFT, in world-space metres. Keep this in the
+    // uploaded decal geometry so coplanar precision does not depend only on
+    // the hardware's depth-bias units. UVs and baked channels stay unchanged.
+    for (auto& vertex : model.vertices)
+        for (unsigned axis=0;axis<3;++axis)
+            vertex.position[axis] += vertex.normal[axis] * .007f;
+}
+
 // The index of a visual in the level OGF table is stable. Hierarchies keep
 // their child references instead of duplicating every child as a scene draw.
 struct LevelVisual

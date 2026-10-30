@@ -223,6 +223,7 @@ bool GpuLevel::load(IReader& level, VkDevice device, VkQueue queue, VkCommandPoo
         mesh.shader = material.shader;
         const auto tessellate = [&]() -> bool
         {
+            if (mesh.wallmark_multiply) offset_level_wallmark(model);
             if (!mesh.tessellation) return true;
             const HeightField* height = nullptr;
             if (mesh.tessellation & 2)

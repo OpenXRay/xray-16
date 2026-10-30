@@ -458,7 +458,7 @@ int main(int argc, char** argv)
         bool weather_initialized=false;
         bool inputs_initialized = false;
         bool cube_initialized = false;
-        auto execute = [&](VkShaderModule fragment, const Push& push, bool use_cube = false, VkShaderModule custom_vertex = VK_NULL_HANDLE, bool sprite = false, bool skinned = false, bool coplanar = false) {
+        auto execute = [&](VkShaderModule fragment, const Push& push, bool use_cube = false, VkShaderModule custom_vertex = VK_NULL_HANDLE, bool sprite = false, bool skinned = false, bool coplanar = false, bool multiply_decal = false) {
             VkPipelineShaderStageCreateInfo stages[2]{};
             for (auto& stage : stages) stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
             stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT; stages[0].module = custom_vertex ? custom_vertex : vs; stages[0].pName = "main";
@@ -480,6 +480,10 @@ int main(int argc, char** argv)
             vertex_input.pVertexAttributeDescriptions = ui ? ui_attributes : skinned ? skinned_attributes : attributes;
             depth.depthTestEnable=coplanar;depth.depthWriteEnable=coplanar;
             depth.depthCompareOp=xray::render::vulkan::geometry_depth_compare(false);
+            color_blends[0].blendEnable=multiply_decal;
+            color_blends[0].colorWriteMask=multiply_decal?7:15;
+            color_blends[0].srcColorBlendFactor=VK_BLEND_FACTOR_DST_COLOR;
+            color_blends[0].dstColorBlendFactor=VK_BLEND_FACTOR_SRC_COLOR;
             VkPipeline pipeline{}; check(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &pipeline));
             check(vkResetCommandPool(device, commands, 0));
             VkCommandBufferBeginInfo begin{VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO}; check(vkBeginCommandBuffer(cmd, &begin));
@@ -533,6 +537,7 @@ int main(int argc, char** argv)
                 inputs_initialized = true;
             }
             std::array<VkClearValue, 4> clear{}; clear[3].depthStencil={coplanar ? 0.f : 1.f,0};
+            if(multiply_decal) clear[0].color={{.2f,.3f,.4f,1.f}};
             VkRenderPassBeginInfo rp{VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
             rp.renderPass = render_pass; rp.framebuffer = framebuffer; rp.renderArea.extent = {1, 1};
             rp.renderArea.extent.width = wide ? 128 : sprite ? 2 : 1;
@@ -636,6 +641,26 @@ int main(int argc, char** argv)
         auto object_changed=execute(object_fragment,object_push,false,object_vertex);
         for(unsigned c=0;c<3;++c) near(object_changed[1][c],object_result[1][c],"static material data cannot alter rotation");
         vkDestroyShaderModule(device,object_vertex,nullptr);vkDestroyShaderModule(device,object_fragment,nullptr);
+        // GL level wallmarks sample their texture without baked vertex color.
+        // A neutral 0.5 border must stay neutral even with black COLOR0 and
+        // alpha=1; otherwise multiply-2x draws a dark rectangle around fire.
+        const auto before_decal=triangle;const auto before_decal_texture=pixels[0];
+        fill(memory,input[0],{.5f,.5f,.5f,1});
+        for(auto& v:triangle) { v.baked[0]=v.baked[1]=v.baked[2]=0;v.baked[3]=1; }
+        check(vkMapMemory(device,vertex_memory,0,VK_WHOLE_SIZE,0,&mapped));
+        std::memcpy(mapped,triangle.data(),sizeof(triangle));vkUnmapMemory(device,vertex_memory);
+        auto decal_shader=module("wallmark_multiply_2x.ps.spv");
+        const auto decal=execute(decal_shader,push);
+        for(unsigned c=0;c<3;++c) near(decal[0][c],.5f,"level decal neutral border ignores baked COLOR0");
+        const auto neutral_floor=execute(decal_shader,push,false,VK_NULL_HANDLE,false,false,false,true);
+        for(unsigned c=0;c<3;++c) near(neutral_floor[0][c],.2f+float(c)*.1f,"multiply decal border leaves lit floor unchanged");
+        fill(memory,input[0],{.2f,.2f,.2f,1});
+        const auto burned_floor=execute(decal_shader,push,false,VK_NULL_HANDLE,false,false,false,true);
+        for(unsigned c=0;c<3;++c) near(burned_floor[0][c],(.2f+float(c)*.1f)*.4f,"burn mark detail survives without a rectangular border");
+        vkDestroyShaderModule(device,decal_shader,nullptr);
+        triangle=before_decal;fill(memory,input[0],before_decal_texture);
+        check(vkMapMemory(device,vertex_memory,0,VK_WHOLE_SIZE,0,&mapped));
+        std::memcpy(mapped,triangle.data(),sizeof(triangle));vkUnmapMemory(device,vertex_memory);
         auto flat_result = execute(flat, push);
         near(flat_result[0][0], pixels[0][0], "base.R");
         near(flat_result[0][1], pixels[0][1], "static albedo does not multiply packed vertex light twice");

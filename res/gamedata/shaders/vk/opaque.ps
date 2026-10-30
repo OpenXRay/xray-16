@@ -226,12 +226,10 @@ float4 main(Fragment fragment) : SV_Target0
 #endif
 #if defined(VK_UNLIT)
 #if defined(VK_WALLMARK_MULT)
-    // The legacy wallmark blender uses stub_default_ma: vertex alpha
-    // interpolates toward vertex color before destination-color blending.
-#if defined(LEVEL_GEOMETRY)
-    texel.rgb = lerp(texel.rgb, fragment.baked.rgb, fragment.baked.a);
-    texel.a *= fragment.baked.a;
-#endif
+    // GL's level effects_wallmarkmult uses wmark/simple, which samples the
+    // decal without vertex color. COLOR in level vertices is baked lighting,
+    // not the screen-space stub_default_ma fade: mixing it darkens the whole
+    // quad, including the neutral 0.5 border of a multiply-2x decal.
     return texel;
 #elif defined(VK_GLOW)
     float4 color = texel;

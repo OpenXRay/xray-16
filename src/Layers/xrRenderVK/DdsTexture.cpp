@@ -19,6 +19,34 @@ uint32_t read32(const std::uint8_t* bytes, size_t offset)
         (uint32_t(bytes[offset + 2]) << 16) | (uint32_t(bytes[offset + 3]) << 24);
 }
 
+// Decode each compressed block once, directly into the final upload payload.
+// gli::convert fetches/decompresses the same block separately for every texel
+// and builds an additional complete RGBA texture before we copy it again.
+void expand_bc(const uint8_t* source, uint8_t* target, size_t width, size_t height, VkFormat format)
+{
+    const bool bc1=format>=VK_FORMAT_BC1_RGB_UNORM_BLOCK && format<=VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
+    const bool rgb=format==VK_FORMAT_BC1_RGB_UNORM_BLOCK || format==VK_FORMAT_BC1_RGB_SRGB_BLOCK;
+    const bool bc2=format==VK_FORMAT_BC2_UNORM_BLOCK || format==VK_FORMAT_BC2_SRGB_BLOCK;
+    const size_t block_size=bc1?8:16, columns=(width+3)/4;
+    for(size_t y=0;y<height;y+=4) for(size_t x=0;x<width;x+=4)
+    {
+        const uint8_t* data=source+((y/4)*columns+x/4)*block_size;
+        gli::detail::texel_block4x4 pixels;
+        if(bc1) { gli::detail::dxt1_block block;std::memcpy(&block,data,sizeof(block));pixels=gli::detail::decompress_dxt1_block(block); }
+        else if(bc2) { gli::detail::dxt3_block block;std::memcpy(&block,data,sizeof(block));pixels=gli::detail::decompress_dxt3_block(block); }
+        else { gli::detail::dxt5_block block;std::memcpy(&block,data,sizeof(block));pixels=gli::detail::decompress_dxt5_block(block); }
+        for(size_t row=0;row<std::min(size_t(4),height-y);++row)
+            for(size_t col=0;col<std::min(size_t(4),width-x);++col)
+            {
+                // sRGB DDS already contains encoded bytes. Preserve them and
+                // let the Vulkan sRGB image perform the only decode at sampling.
+                auto packed=gli::compScale<uint8_t>(pixels.Texel[row][col]);
+                if(rgb) packed.a=255;
+                std::memcpy(target+((y+row)*width+x+col)*4,&packed[0],4);
+            }
+    }
+}
+
 VkFormat vk_format(gli::format format)
 {
     switch (format)
@@ -254,18 +282,11 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
     const uint32_t output_width = std::max(1u, width >> first_mip);
     const uint32_t output_height = std::max(1u, height >> first_mip);
 
-    if (!bc_supported && compressed(format))
+    const VkFormat source_format=format;
+    const bool expand=!bc_supported && compressed(format);
+    if (expand)
     {
         const bool srgb = gli::is_srgb(loaded.format());
-        const auto decodedFormat = srgb ? gli::FORMAT_RGBA8_SRGB_PACK8 : gli::FORMAT_RGBA8_UNORM_PACK8;
-        loaded = cube ? gli::texture(gli::convert(gli::texture_cube(loaded), decodedFormat)) :
-            gli::texture(gli::convert(gli::texture2d(loaded), decodedFormat));
-        if (loaded.empty() || loaded.layers() != 1 || loaded.faces() != faces ||
-            loaded.levels() != output_mips)
-        {
-            error = "DDS decompression did not produce all faces and mips";
-            return false;
-        }
         format = srgb ? VK_FORMAT_R8G8B8A8_SRGB : VK_FORMAT_R8G8B8A8_UNORM;
     }
 
@@ -278,12 +299,24 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
     // Copy each mip into one allocation. Repeated vector growth temporarily
     // keeps both the old and new buffers resident on 32-bit Android.
     const size_t alignment_bytes = size_t(faces) * output_mips * 3u;
-    if (loaded.size() > decoded.pixels.max_size() - alignment_bytes)
+    size_t payload_bytes=loaded.size();
+    if(expand)
+    {
+        payload_bytes=0;
+        for(uint32_t level=0;level<output_mips;++level)
+        {
+            const size_t layer_bytes=size_t(std::max(1u,output_width>>level))*std::max(1u,output_height>>level)*4;
+            if(layer_bytes>(decoded.pixels.max_size()-payload_bytes-alignment_bytes)/faces)
+            { error="DDS decoded payload is too large";return false; }
+            payload_bytes+=layer_bytes*faces;
+        }
+    }
+    if (payload_bytes > decoded.pixels.max_size() - alignment_bytes)
     {
         error = "DDS decoded payload is too large";
         return false;
     }
-    decoded.pixels.reserve(loaded.size() + alignment_bytes);
+    decoded.pixels.reserve(payload_bytes + alignment_bytes);
     decoded.copies.reserve(size_t(faces) * output_mips);
     for (uint32_t face = 0; face < faces; ++face)
     for (uint32_t level = 0; level < output_mips; ++level)
@@ -297,7 +330,7 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
         decoded.copies.push_back(copy);
         const size_t bytes = loaded.size(level);
         const size_t w = copy.imageExtent.width, h = copy.imageExtent.height;
-        const size_t expected_mip = compressed(format) ?
+        const size_t expected_mip = compressed(source_format) ?
             ((w + 3) / 4) * ((h + 3) / 4) * block_bytes : w * h * 4;
         const auto extent = loaded.extent(level);
         if (!bytes || bytes != expected_mip || extent.x != w || extent.y != h)
@@ -313,7 +346,12 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
                 " level=" + std::to_string(level);
             return false;
         }
-        decoded.pixels.insert(decoded.pixels.end(), src, src + bytes);
+        if(expand)
+        {
+            decoded.pixels.resize(offset+w*h*4);
+            expand_bc(src,decoded.pixels.data()+offset,w,h,source_format);
+        }
+        else decoded.pixels.insert(decoded.pixels.end(), src, src + bytes);
     }
     result = std::move(decoded);
     error.clear();

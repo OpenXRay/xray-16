@@ -1,8 +1,10 @@
 #include "src/Layers/xrRenderVK/DdsTexture.h"
 #include <gli/texture.hpp>
 #include <gli/save_dds.hpp>
+#include <gli/convert.hpp>
 #include <cassert>
 #include <cstring>
+#include <cstdio>
 #include <vector>
 using namespace xray::render::vulkan;
 namespace
@@ -33,6 +35,41 @@ std::vector<char> legacy_dds(uint32_t flags, uint32_t bits, uint32_t red,
 }
 int main()
 {
+    // Compare complete BC fallback payloads against the independent texel
+    // conversion path, including small/partial blocks, faces and mip tails.
+    for(unsigned dimension : {7u,8u})
+    for(bool cube : {false,true})
+    for(auto unorm : {gli::FORMAT_RGBA_DXT1_UNORM_BLOCK8,
+            gli::FORMAT_RGBA_DXT3_UNORM_BLOCK16,gli::FORMAT_RGBA_DXT5_UNORM_BLOCK16})
+    for(bool srgb : {false,true})
+    {
+        const auto format=gli::format(int(unorm)+(srgb?1:0));
+        gli::texture input(cube?gli::TARGET_CUBE:gli::TARGET_2D,format,{int(dimension),int(dimension),1},1,cube?6:1,3);
+        auto* bytes=static_cast<uint8_t*>(input.data());uint32_t random=357;
+        for(size_t i=0;i<input.size();++i) { random=random*1664525+1013904223;bytes[i]=uint8_t(random>>24); }
+        std::vector<char> file;assert(gli::save_dds(input,file));
+        DdsTexture decoded;std::string error;
+        if(!decode_dds(file.data(),file.size(),false,decoded,error))
+        { std::fprintf(stderr,"BC fixture cube=%d format=%d bytes=%zu: %s\n",cube,int(format),file.size(),error.c_str());assert(false); }
+        // Compressed sRGB blocks hold the same encoded bytes as UNORM.
+        // Decode palettes without adding another sRGB encoding operation.
+        for(const auto& copy:decoded.copies) {
+            const auto level=copy.imageSubresource.mipLevel,face=copy.imageSubresource.baseArrayLayer;
+            // GLI's per-texel path rounds block strides down for NPOT. Use
+            // an equivalent padded source to compare every visible texel.
+            const size_t w=copy.imageExtent.width,h=copy.imageExtent.height;
+            const size_t pw=(w+3)/4*4,ph=(h+3)/4*4;
+            gli::texture padded(gli::TARGET_2D,unorm,{int(pw),int(ph),1},1,1,1);
+            assert(padded.size()==input.size(level));
+            std::memcpy(padded.data(),input.data(0,face,level),input.size(level));
+            const auto reference=gli::convert(gli::texture2d(padded),gli::FORMAT_RGBA8_UNORM_PACK8);
+            const auto* expected=static_cast<const uint8_t*>(reference.data());
+            const auto* actual=decoded.pixels.data()+copy.bufferOffset;
+            for(size_t y=0;y<h;++y) for(size_t x=0;x<w;++x) for(size_t c=0;c<4;++c)
+                assert(actual[(y*w+x)*4+c]==expected[(y*pw+x)*4+c]);
+            assert(decoded.format==(srgb?VK_FORMAT_R8G8B8A8_SRGB:VK_FORMAT_R8G8B8A8_UNORM));
+        }
+    }
     for (bool cube : {false, true})
     for (auto format : {gli::FORMAT_RGBA8_UNORM_PACK8, gli::FORMAT_RGBA8_SRGB_PACK8,
         gli::FORMAT_BGRA8_UNORM_PACK8, gli::FORMAT_RGBA_DXT5_UNORM_BLOCK16,
