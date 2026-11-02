@@ -18,6 +18,24 @@ inline ParticleSpriteBasis particle_path_basis(std::array<float,3> direction,
     }
     return {right,direction};
 }
+// Face alignment uses the direction as a surface normal, including at rest.
+// A path billboard instead uses it as its vertical edge.
+inline ParticleSpriteBasis particle_face_basis(std::array<float, 3> direction)
+{
+    const float length =
+        std::sqrt(direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2]);
+    if (!std::isfinite(length) || length < 1e-6f)
+        direction = {0, 1, 0};
+    else
+        for (float &value : direction)
+            value /= length;
+    const auto basis = particle_path_basis(direction, std::abs(direction[1]) > .99f ? std::array<float, 3>{0, 0, 1}
+                                                                                    : std::array<float, 3>{0, 1, 0});
+    const std::array<float, 3> r{-basis.right[0], -basis.right[1], -basis.right[2]};
+    return {r,
+            {direction[1] * r[2] - direction[2] * r[1], direction[2] * r[0] - direction[0] * r[2],
+             direction[0] * r[1] - direction[1] * r[0]}};
+}
 inline ParticleSpriteCorner particle_sprite_corner(unsigned corner, float sx, float sy, float angle)
 {
     const float x = corner == 0 || corner == 3 ? -sx : sx;

@@ -40,6 +40,13 @@ float visibility(vec3 world, vec3 delta)
     vec4 receiver_clip = light.shadow_matrices[face] * vec4(receiver, 1.0);
     if (receiver_clip.w <= 0.0) return 1.0;
     float reference_depth = receiver_clip.z / receiver_clip.w;
+    // Correct each PCF tap to the receiver plane. A single centre depth
+    // self-shadows sloped faces when the light texel covers several pixels.
+    vec3 dx = dFdx(projected), dy = dFdy(projected);
+    vec2 ux = dx.xy * .5, uy = dy.xy * .5;
+    float determinant = ux.x * uy.y - ux.y * uy.x;
+    vec2 gradient = abs(determinant) > 1e-12 ?
+        vec2(uy.y * dx.z - ux.y * dy.z, ux.x * dy.z - uy.x * dx.z) / determinant : vec2(0);
     float layer = light.shadow_params.x + float(face);
     ivec2 size = textureSize(shadow_array, 0).xy;
     vec2 grid = uv * vec2(size) - 0.5;
@@ -52,7 +59,8 @@ float visibility(vec3 world, vec3 delta)
             vec2 weight = max(vec2(1.5) - abs(vec2(x,y) - fraction), vec2(0.0));
             float w = weight.x * weight.y;
             ivec2 pixel = clamp(center + ivec2(x,y), ivec2(0), size - 1);
-            lit += (reference_depth <=
+            float tap_depth = reference_depth + clamp(dot(gradient, (vec2(pixel) + .5) / vec2(size) - uv), -.01, .01);
+            lit += (tap_depth <=
                 texelFetch(shadow_array, ivec3(pixel, int(layer)), 0).r ? 1.0 : 0.0) * w;
             total += w;
         }

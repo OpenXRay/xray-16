@@ -122,6 +122,7 @@ class GpuLevel
         uint8_t priority{1};
         int alpha_ref{128};
         bool wallmark_multiply{};
+        bool wallmark_blend{};
         bool glow_alpha_add{};
         bool fog{};
         bool lightmapped{};

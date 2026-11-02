@@ -202,6 +202,15 @@ int main()
     b[12] += .002f;
     stabilize_shadow_projection(b.data(), 1024);
     assert(std::abs(b[12] - a[12] - 2.f / 1024.f) < 1e-6f);
+    for (const auto &direction : {std::array<float, 3>{0, 1, 0}, std::array<float, 3>{0, 0, 0}})
+    {
+        const auto plane = particle_face_basis(direction);
+        for (unsigned corner = 0; corner < 4; ++corner)
+        {
+            const auto vertex = particle_sprite_corner(corner, 2, 3, .7f);
+            assert(std::abs(plane.right[1] * vertex.right + plane.up[1] * vertex.up) < 1e-6f);
+        }
+    }
     const std::string minimum = "-cop -android-mobile-preset Minimum -renderer-vulkan";
     for (const char *name : {"ui\\ui_actor_menu", "UI\\ui_font", "intro\\intro_zaton_1", "map\\zaton", "lmap#1",
                              "sky\\sky_1_cube", "wpn\\wpn_crosshair"})

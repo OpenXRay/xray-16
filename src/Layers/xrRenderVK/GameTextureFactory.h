@@ -49,7 +49,7 @@ class GameTextureFactory
                     const TextureUploadDispatch &dispatch, PFN_vkCreateSampler create_sampler,
                     PFN_vkDestroySampler destroy_sampler, PFN_vkDeviceWaitIdle wait_idle, std::string &error);
     bool material(const std::string &texture_list, DeferredPass &pass, VkDescriptorSet &result, std::string &error,
-                  bool clamp = false);
+                  bool clamp = false, bool preserve_resolution = false);
     bool lightmapped_material(const std::string &diffuse, const std::string &lightmap, DeferredPass &pass,
                               VkDescriptorSet &result, std::string &error);
     void release_lightmapped_material(VkDescriptorSet set, DeferredPass &pass);
@@ -66,6 +66,7 @@ class GameTextureFactory
     void release_terrain_material(VkDescriptorSet set, DeferredPass &pass);
     float terrain_detail_scale(const std::string &diffuse) const;
     bool texture_detail_metadata(const std::string &diffuse, DetailMetadata &detail, std::string &error) const;
+    void invalidate_metadata() { detail_metadata_cache_.clear(); }
     bool height_field(const std::string &bump_aux, const HeightField *&result, std::string &error);
     static bool decode_detail_metadata(const uint8_t *params, size_t params_size, const uint8_t *extension,
                                        size_t extension_size, DetailMetadata &detail, std::string &error)
@@ -139,9 +140,17 @@ class GameTextureFactory
     bool retirement_safe_{};
     bool retirement_idle() const;
     std::unordered_map<std::string, HeightField> height_fields_;
+    struct CachedMetadata
+    {
+        DetailMetadata value;
+        uint32_t age{};
+        int bytes{};
+    };
+    mutable std::unordered_map<std::string, CachedMetadata> detail_metadata_cache_;
     struct Asset
     {
         UploadedTexture texture;
+        std::string source_path;
         VkDescriptorSet material_set{};
         VkDescriptorSet clamp_material_set{};
         VkDescriptorSet ui_set{};
@@ -178,7 +187,7 @@ class GameTextureFactory
         DeferredPass *pass{};
         size_t refs{};
     };
-    bool load(const std::string &name, Asset *&asset, std::string &error);
+    bool load(const std::string &name, Asset *&asset, std::string &error, bool preserve_resolution = false);
     void evict_if_unused(const std::string &name);
     VkDevice device_{};
     VkQueue queue_{};

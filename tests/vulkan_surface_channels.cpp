@@ -1083,8 +1083,7 @@ int main(int argc, char **argv)
                 near(changed[1][c], character[1][c], "material constants do not overwrite model transform");
             vkDestroyShaderModule(device, character_vertex, nullptr);
         }
-        // A decoder-sanitized optional frame must select finite UV-derivative
-        // normal mapping in the production skinned shaders, for every skin mode.
+        // Singular UV frames keep a geometric normal in every skin mode.
         const auto authored_triangle = triangle;
         for (auto &v : triangle)
             for (unsigned axis = 0; axis < 3; ++axis)
@@ -1096,9 +1095,19 @@ int main(int argc, char **argv)
         {
             auto vertex = module("skinned_" + std::to_string(links) + ".vs.spv");
             auto fallback = execute(character_fragment, character_push, false, vertex, false, true);
-            near(fallback[1][0], .8f, "missing authored basis uses UV tangent X");
-            near(fallback[1][1], .5f, "missing authored basis uses UV tangent Y");
-            near(fallback[1][2], .9f, "missing authored basis preserves normal Z");
+            near(fallback[1][0], .5f, "missing frame geometric X");
+            near(fallback[1][1], .5f, "missing frame geometric Y");
+            near(fallback[1][2], 1.f, "missing frame geometric Z");
+            for (float angle : {-.4f, .2f, .5f})
+            {
+                auto camera = character_push;
+                camera.mvp[0] = camera.mvp[5] = std::cos(angle);
+                camera.mvp[1] = std::sin(angle);
+                camera.mvp[4] = -std::sin(angle);
+                auto turned = execute(character_fragment, camera, false, vertex, false, true);
+                for (unsigned axis = 0; axis < 3; ++axis)
+                    near(turned[1][axis], fallback[1][axis], "singular model normal is camera independent");
+            }
             vkDestroyShaderModule(device, vertex, nullptr);
         }
         for (auto &v : triangle)
@@ -1114,8 +1123,8 @@ int main(int argc, char **argv)
         {
             auto vertex = module("skinned_" + std::to_string(links) + ".vs.spv");
             auto fallback = execute(character_fragment, character_push, false, vertex, false, true);
-            near(fallback[1][0], .8f, "finite collapsed tangent frame falls back to UV basis");
-            near(fallback[1][2], .9f, "collapsed tangent frame keeps finite normal");
+            near(fallback[1][0], .5f, "collapsed frame keeps geometric X");
+            near(fallback[1][2], 1.f, "collapsed frame keeps geometric Z");
             vkDestroyShaderModule(device, vertex, nullptr);
         }
         triangle = authored_triangle;
@@ -1140,13 +1149,25 @@ int main(int argc, char **argv)
         auto paper = execute(paper_fragment, push, false, VK_NULL_HANDLE, false, false, true);
         near(paper[0][0], pixels[0][0] * triangle[0].baked[0], "coplanar paper decal survives floor depth");
         vkDestroyShaderModule(device, paper_fragment, nullptr);
-        auto cutout_paper = module("level_cutout.ps.spv");
-        auto paper_push = push;
-        paper_push.mvp[14] = std::nextafter(.5f, 1.f);
-        const auto cutout_result =
-            execute(cutout_paper, paper_push, false, VK_NULL_HANDLE, false, false, true, false, true);
-        near(cutout_result[0][0], pixels[0][0], "cutout paper survives one ULP of floor-depth error");
-        vkDestroyShaderModule(device, cutout_paper, nullptr);
+        // Wallmark Lua uses simple.ps: zero baked COLOR must not erase alpha.
+        const auto paper_vertices = triangle;
+        for (auto &v : triangle)
+            std::fill_n(v.baked, 4, 0.f);
+        check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        std::memcpy(mapped, triangle.data(), sizeof(triangle));
+        vkUnmapMemory(device, vertex_memory);
+        auto generic_paper = module("world_set_blended.ps.spv");
+        auto hidden_paper = execute(generic_paper, push, false, VK_NULL_HANDLE, false, false, true);
+        near(hidden_paper[0][0], 0.f, "old generic SET erases the zero-COLOR decal");
+        vkDestroyShaderModule(device, generic_paper, nullptr);
+        auto simple_paper = module("wallmark_blended.ps.spv");
+        auto visible_paper = execute(simple_paper, push, false, VK_NULL_HANDLE, false, false, true);
+        near(visible_paper[0][0], pixels[0][0], "wallmark ignores zero baked RGB and alpha");
+        vkDestroyShaderModule(device, simple_paper, nullptr);
+        triangle = paper_vertices;
+        check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        std::memcpy(mapped, triangle.data(), sizeof(triangle));
+        vkUnmapMemory(device, vertex_memory);
         // Static model rotation also lives outside fragment material bytes.
         auto object_vertex = module("object_opaque.vs.spv"), object_fragment = module("object_opaque.ps.spv");
         auto object_push = push;

@@ -165,7 +165,15 @@ float3 model_surface_normal(Fragment fragment, float2 uv, float3 tangent_normal)
         return finite_normal(tangent * tangent_normal.x + bitangent * tangent_normal.y +
             geometric * tangent_normal.z, geometric);
     }
+#if defined(OBJECT_GEOMETRY)
+    // Missing UV frames have no defined normal-map orientation. Rebuilding
+    // them from screen derivatives makes degenerate faces change with the
+    // camera. CPU mesh preparation repairs usable UVs; keep the geometric
+    // normal on the remaining singular faces.
+    return geometric;
+#else
     return surface_normal(geometric, fragment.world_position, uv, tangent_normal);
+#endif
 }
 
 #if defined(VK_TRANSPARENT)
@@ -242,7 +250,10 @@ float4 main(Fragment fragment) : SV_Target0
             detail_uv).rgb;
 #endif
 #if defined(VK_UNLIT)
-#if defined(VK_WALLMARK_MULT)
+#if defined(VK_WALLMARK_BLEND)
+    clip(texel.a - terrain_alpha_threshold);
+    return texel;
+#elif defined(VK_WALLMARK_MULT)
     // GL's level effects_wallmarkmult uses wmark/simple, which samples the
     // decal without vertex color. COLOR in level vertices is baked lighting,
     // not the screen-space stub_default_ma fade: mixing it darkens the whole
@@ -412,6 +423,10 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
     float2 detail_uv = matrix_uv(fragment.uv, detail_matrix_u, detail_matrix_v) * terrain_scale;
 #endif
     output.albedo = diffuse.Sample(diffuse_sampler, base_uv);
+#if defined(VK_ALPHA_TEST)
+    // Reject empty foliage/LOD texels before any normal/detail fetches.
+    clip(output.albedo.a - terrain_alpha_threshold);
+#endif
 #if defined(VK_PARTICLE_DEFERRED)
     output.albedo *= fragment.baked;
     clip(output.albedo.a - terrain_alpha_threshold);
@@ -520,13 +535,6 @@ GBuffer main(Fragment fragment, bool front_face : SV_IsFrontFace)
 #endif
     // Preserve the baked green channel for diagnostics. CoP's default
     // dynamic-sun path does not apply it to sunlight; alpha stores hemi.
-#if defined(VK_ALPHA_TEST)
-#if defined(VK_DETAIL)
-    clip(output.albedo.a - terrain_alpha_threshold);
-#else
-    clip(output.albedo.a - terrain_alpha_threshold);
-#endif
-#endif
 #if defined(VK_DOUBLE_SIDED)
     if (!front_face) fragment.normal = -fragment.normal;
 #endif

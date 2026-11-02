@@ -563,7 +563,9 @@ bool GpuModel::record_shadow(const FrameRecordingContext &frame, const DeferredP
                     error = "shadow pose grew after allocation";
                     return false;
                 }
-                if (!buffer.write(0, pose.data(), bytes, error))
+                // Shadow vertices read bones only. Do not overwrite the final object/ROS
+                // matrix used by G-buffer and forward commands sharing this frame slot.
+                if (!buffer.write(0, pose.data(), bytes - 16 * sizeof(float), error))
                     return false;
                 state.shadow_frames[frame.frame_index] = Device.dwFrame;
                 descriptor = state.descriptors[frame.frame_index];

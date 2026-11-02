@@ -94,7 +94,7 @@ bool GameTextureFactory::initialize(VkDevice device, VkQueue queue, VkCommandPoo
     return true;
 }
 
-bool GameTextureFactory::load(const std::string &name, Asset *&asset, std::string &error)
+bool GameTextureFactory::load(const std::string &name, Asset *&asset, std::string &error, bool preserve_resolution)
 {
     asset = nullptr;
     if (!device_ || !sampler_ || name.empty())
@@ -122,7 +122,7 @@ bool GameTextureFactory::load(const std::string &name, Asset *&asset, std::strin
     }
     // A new level may have a different $level$ texture with the same name.
     // Cache by the resolved VFS path, not the material's local texture name.
-    const std::string key(path);
+    const std::string key = std::string(path) + (preserve_resolution ? "|atlas-native" : "");
     auto existing = assets_.find(key);
     if (existing != assets_.end())
     {
@@ -140,7 +140,9 @@ bool GameTextureFactory::load(const std::string &name, Asset *&asset, std::strin
     UploadedTexture texture;
     VkExtent3D extent{};
     bool cube = false;
-    const uint32_t maximum_dimension = world_texture_limit(normalized, quality_preset);
+    // An atlas limit applies to the entire sheet, not one tree facet. Keep
+    // authored LOD texel density while still selecting mip levels on the GPU.
+    const uint32_t maximum_dimension = preserve_resolution ? 0 : world_texture_limit(normalized, quality_preset);
     const bool uploaded =
         upload_engine_texture(device_, queue_, pool_, memory_, dispatch_, reader->pointer(), reader->length(),
                               bc_supported_, texture, pending_, states_, error, &extent, &cube, maximum_dimension);
@@ -158,6 +160,7 @@ bool GameTextureFactory::load(const std::string &name, Asset *&asset, std::strin
     }
     auto inserted = assets_.emplace(key, Asset{}).first;
     inserted->second.texture = texture;
+    inserted->second.source_path = path;
     inserted->second.extent = {extent.width, extent.height};
     inserted->second.cube = cube;
     inserted->second.maximum_dimension = maximum_dimension;
@@ -168,7 +171,7 @@ bool GameTextureFactory::load(const std::string &name, Asset *&asset, std::strin
 }
 
 bool GameTextureFactory::material(const std::string &texture_list, DeferredPass &pass, VkDescriptorSet &result,
-                                  std::string &error, bool clamp)
+                                  std::string &error, bool clamp, bool preserve_resolution)
 {
     result = VK_NULL_HANDLE;
     const size_t comma = texture_list.find(',');
@@ -179,7 +182,7 @@ bool GameTextureFactory::material(const std::string &texture_list, DeferredPass 
     if (first != std::string::npos)
         diffuse.erase(0, first);
     Asset *asset;
-    if (!load(diffuse, asset, error))
+    if (!load(diffuse, asset, error, preserve_resolution))
         return false;
     if (asset->cube)
     {
@@ -639,6 +642,15 @@ bool GameTextureFactory::texture_detail_metadata(const std::string &diffuse, Det
         error.clear();
         return true;
     } // Metadata is optional for implicit detail.
+    const uint32_t age = FS.get_file_age(path);
+    const int bytes = FS.file_length(path);
+    if (const auto found = detail_metadata_cache_.find(path); found != detail_metadata_cache_.end() &&
+        found->second.age == age && found->second.bytes == bytes)
+    {
+        detail = found->second.value;
+        error.clear();
+        return true;
+    }
     IReader *reader = FS.r_open(path);
     if (!reader)
     {
@@ -675,6 +687,7 @@ bool GameTextureFactory::texture_detail_metadata(const std::string &diffuse, Det
         error = std::string(path) + " / " + error;
         return false;
     }
+    detail_metadata_cache_.insert_or_assign(path, CachedMetadata{detail, age, bytes});
     error.clear();
     return true;
 }
@@ -1022,6 +1035,7 @@ void GameTextureFactory::destroy()
             destroy_sampler_(device_, lightmap_sampler_, nullptr);
     }
     assets_.clear();
+    detail_metadata_cache_.clear();
     lightmapped_.clear();
     terrain_.clear();
     height_fields_.clear();
@@ -1103,7 +1117,7 @@ bool GameTextureFactory::reload_assets(std::string &error, const std::function<v
     {
         if (path[0] == '#')
             continue;
-        IReader *source = FS.r_open(path.c_str());
+        IReader *source = FS.r_open(asset.source_path.c_str());
         if (!source)
         {
             error = "cannot reopen texture during asset reload: " + path;

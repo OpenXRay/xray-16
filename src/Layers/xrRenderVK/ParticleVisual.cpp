@@ -266,12 +266,19 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
             !indices.initialize(device_, capacity * 6 * sizeof(uint32_t), VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                 memory_, dispatch_, error)) return false;
+        std::vector<uint32_t> quad_indices(capacity * 6);
+        constexpr uint32_t corners[]{0, 1, 2, 0, 2, 3};
+        for (size_t particle = 0; particle < capacity; ++particle)
+            for (size_t corner = 0; corner < 6; ++corner)
+                quad_indices[particle * 6 + corner] = uint32_t(particle * 4) + corners[corner];
+        if (!indices.write(0, quad_indices.data(), quad_indices.size() * sizeof(uint32_t), error))
+            return false;
         buffers.vertices = std::move(vertices);
         buffers.indices = std::move(indices);
         buffers.capacity = capacity;
     }
-    std::vector<LevelVertex> vertices(count * 4);
-    std::vector<uint32_t> indices(count * 6);
+    auto &vertices = buffers.scratch;
+    vertices.resize(count * 4);
     for (u32 i = 0; i < count; ++i)
     {
         const auto& p = particles[i];
@@ -290,13 +297,17 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
                 Fmatrix basis;basis.setXYZ(def_->align_rotation[0],def_->align_rotation[1],def_->align_rotation[2]);
                 basis.mulA_43(transform_);sprite_right=basis.i;sprite_up=basis.k;
             }
-            else if(speed>=EPS_S && (def_->flags & (1u<<21)))
+            else if (def_->flags & (1u << 21))
             {
-                Fmatrix basis;basis.identity();basis.k.div(velocity,speed);basis.j.set(0,1,0);
-                if(std::abs(basis.j.dotproduct(basis.k))>.99f) basis.j.set(0,0,1);
-                basis.i.crossproduct(basis.j,basis.k).normalize_safe();
-                basis.j.crossproduct(basis.k,basis.i).normalize_safe();
-                basis.mulA_43(transform_);sprite_right=basis.i;sprite_up=basis.j;
+                Fvector direction;
+                if (speed >= EPS_S)
+                    direction.div(velocity, speed);
+                else
+                    direction.setHP(-def_->align_rotation[1], -def_->align_rotation[0]);
+                transform_.transform_dir(direction);
+                const auto basis = particle_face_basis({direction.x, direction.y, direction.z});
+                sprite_right.set(basis.right[0], basis.right[1], basis.right[2]);
+                sprite_up.set(basis.up[0], basis.up[1], basis.up[2]);
             }
             else
             {
@@ -334,12 +345,9 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
             v.baked[2] = float(p.color & 255) / 255.f;
             v.baked[3] = float((p.color >> 24) & 255) / 255.f;
         }
-        for (u32 j = 0; j < 6; ++j)
-            indices[i * 6 + j] = i * 4 + (j == 0 || j == 3 ? 0 :
-                j == 1 ? 1 : j == 2 || j == 4 ? 2 : 3);
     }
-    if (!buffers.vertices.write(0, vertices.data(), vertices.size() * sizeof(LevelVertex), error) ||
-        !buffers.indices.write(0, indices.data(), indices.size() * sizeof(uint32_t), error)) return false;
+    if (!buffers.vertices.write(0, vertices.data(), vertices.size() * sizeof(LevelVertex), error))
+        return false;
     if (distortion_)
         return pass.record_distortion(frame, buffers.vertices.handle(), buffers.indices.handle(),
             count * 6, mvp, material_);
@@ -555,6 +563,8 @@ void VulkanParticleGroup::on_particle(size_t index, bool birth, PAPI::Particle& 
     Fvector velocity;
     velocity.sub(particle.pos, particle.posB);
     velocity.div(step_seconds);
+    if (transform_parent_)
+        parent_.transform_dir(velocity);
     pending_.push_back({name, position, velocity});
 }
 
@@ -582,8 +592,9 @@ void VulkanParticleGroup::spawn(const std::string& name, const Fvector& position
         effect = child.get();
         triggered_.push_back({name, std::move(child)});
     }
-    Fmatrix parent;
-    parent.identity();
+    // Child actions inherit the emitter frame, as in ParticleGroup::StartFreeChild.
+    // Translation alone loses the surface orientation of water impact emitters.
+    Fmatrix parent = transform_parent_ ? parent_ : Fidentity;
     parent.c.set(position);
     effect->SetHudMode(hud_);
     effect->UpdateParent(parent, velocity, FALSE);

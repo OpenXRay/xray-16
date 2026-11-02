@@ -49,7 +49,13 @@ struct TextureMatrixSet
 };
 struct MaterialDefinition
 {
-    enum class Role { Standard, Water };
+    enum class Role
+    {
+        Standard,
+        Water,
+        WallmarkBlend,
+        Lod
+    };
     uint32_t id{};
     std::string shader, class_name;
     uint16_t version{};

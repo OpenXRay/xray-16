@@ -665,7 +665,7 @@ int main()
     assert(library.resolve("mod\\cutout", mode, error, &alpha_ref) && alpha_ref == 200);
     int wallmark_blend = -1;
     assert(library.resolve("effects\\wallmarkblend", mode, error, nullptr, &wallmark_blend,
-        false, false, true) && mode == SurfaceMode::Transparent && wallmark_blend == 6);
+        false, false, true) && mode == SurfaceMode::Transparent && wallmark_blend == 1);
     assert(library.resolve("hud\\opaque", mode, error) && mode == SurfaceMode::Opaque);
     assert(library.resolve("hud\\alpha", mode, error) && mode == SurfaceMode::Transparent);
     assert(!library.resolve("effects\\additive", mode, error) &&
@@ -765,6 +765,11 @@ int main()
         assert(library.resolve(name, mode, error, &alpha_ref, &blend_mode, false, true));
         assert(blend_mode >= 0 && blend_mode <= 9);
     }
+    MaterialDefinition paper_definition;
+    assert(library.resolve("effects\\wallmarkblend", mode, error, &alpha_ref, &blend_mode, false, false, true, false,
+                           nullptr, nullptr, &paper_definition));
+    assert(paper_definition.role == MaterialDefinition::Role::WallmarkBlend && paper_definition.priority == 1 &&
+           mode == SurfaceMode::Transparent && blend_mode == 1);
     assert(!library.resolve("effects\\wallmarkblend", mode, error, nullptr, nullptr,
         false, true) && error.find("Z-test") != std::string::npos);
     assert(!library.resolve("trees\\leaf", mode, error, nullptr, nullptr, false, true) &&
@@ -878,11 +883,9 @@ int main()
     assert(library.resolve("water\\ordinary_overlay", mode, error, nullptr, nullptr,
         false, true, false, false, nullptr, nullptr, &ordinary_definition) &&
         ordinary_definition.role == MaterialDefinition::Role::Standard);
-    assert(!library.resolve("details\\lod", mode, error, nullptr, nullptr, false, false, false) &&
-        error.find("Fog") != std::string::npos);
-    assert(library.resolve("details\\lod", mode, error, nullptr, &blend_mode,
-        false, false, true, false, &flags) && mode == SurfaceMode::Transparent &&
-        blend_mode == 1 && (flags & 16u));
+    assert(!library.resolve("details\\lod", mode, error, nullptr, nullptr, false, false, false) && !error.empty());
+    assert(library.resolve("details\\lod", mode, error, nullptr, &blend_mode, false, false, true, false, &flags) &&
+           mode == SurfaceMode::AlphaTest && blend_mode == -1 && flags == 0);
     assert(!library.resolve("effects\\glow", mode, error) &&
         error.find("blending=5") != std::string::npos);
     assert(library.resolve("effects\\glow", mode, error, nullptr, &blend_mode,

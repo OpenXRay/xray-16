@@ -325,6 +325,13 @@ int main()
         save(directory / (distinct_names[role] + ".dds"), Bytes(dds.begin(), dds.end()));
     }
     FS.rescan_path(FS.get_path("$level$")->m_Path, false);
+    {
+        VkDescriptorSet atlas{};
+        assert(textures.material("fixture", pass, atlas, error, false, true));
+        assert(atlas != wrap_set);
+        assert(textures.reload_assets(error));
+        textures.release_material(atlas, pass);
+    }
     const size_t before_surface = textures.resident_count();
     VkDescriptorSet roles_a{}, roles_again{}, changed_parameter{}, changed_slot{};
     assert(textures.surface_material(distinct_names, surface_parameters, pass, roles_a, error));

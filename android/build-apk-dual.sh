@@ -69,6 +69,12 @@ if ! command -v "$glslc_bin" >/dev/null 2>&1; then
     echo "glslc is required to compile the embedded Vulkan shaders" >&2
     exit 2
 fi
+# Build external and embedded gameplay modules from the same source before
+# compiling native code; otherwise the embedded cutout fallback lags a build.
+python3 "$repo_dir/tools/compile_vulkan_shader.py" --compiler glslc --dxc "$glslc_bin" \
+    --manifest "$repo_dir/res/gamedata/shaders/vk/opaque-variants.json" \
+    --output-dir "$repo_dir/res/gamedata/shaders"
+python3 "$repo_dir/tools/embed_vulkan_game_shader.py"
 for generator in \
     embed_vulkan_deferred_shaders.py \
     embed_vulkan_scene_shaders.py \
@@ -158,9 +164,11 @@ remove_path "$asset_root"
 mkdir -p "$asset_root/gamedata"
 cp "$repo_dir/res/fsgame.ltx" "$asset_root/fsgame.ltx"
 glslc_bin=${GLSLC_BIN:-glslc}
-python3 "$repo_dir/tools/compile_vulkan_shader.py" --compiler glslc --dxc "$glslc_bin" \
-    --manifest "$repo_dir/res/gamedata/shaders/vk/opaque-variants.json" \
-    --output-dir "$repo_dir/res/gamedata/shaders"
+if [ "${XRAY_ANDROID_SKIP_NATIVE_BUILD:-OFF}" = ON ]; then
+    python3 "$repo_dir/tools/compile_vulkan_shader.py" --compiler glslc --dxc "$glslc_bin" \
+        --manifest "$repo_dir/res/gamedata/shaders/vk/opaque-variants.json" \
+        --output-dir "$repo_dir/res/gamedata/shaders"
+fi
 cp -R "$repo_dir/res/gamedata/." "$asset_root/gamedata/"
 # Compiler scratch files and an accidentally nested output directory are not
 # engine assets, including after an interrupted local shader build.

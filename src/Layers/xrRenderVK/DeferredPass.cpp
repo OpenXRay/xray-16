@@ -141,8 +141,7 @@ bool make_pipeline(VkDevice device, VkRenderPass pass, VkPipelineLayout layout, 
     // Depth precision on shallow terrain slopes otherwise produces long,
     // repeating self-shadow bands. Apply bias while writing shadow depth,
     // in addition to the small receiver bias used by the lighting shader.
-    const auto bias = geometry_depth_bias(
-        shadow, wallmark, (gbuffer && cutout && !instanced) || (transparent && geometry_input && !water_depth_write));
+    const auto bias = geometry_depth_bias(shadow, wallmark, transparent && geometry_input && !water_depth_write);
     raster.depthBiasEnable = bias.enabled;
     raster.depthBiasConstantFactor = bias.constant;
     raster.depthBiasSlopeFactor = bias.slope;

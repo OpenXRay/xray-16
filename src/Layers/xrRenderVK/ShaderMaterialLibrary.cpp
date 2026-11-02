@@ -348,6 +348,26 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
         if (cls == "S_SET   " && blending == 0 && strict_sorting &&
             (screen_flags & 14u) == 14u)
             definition.role = MaterialDefinition::Role::Water;
+        // These shipped Lua programs override the serialized S_SET blender.
+        // Match program names, never texture or object names.
+        if (cls == "S_SET   " && name == "effects\\wallmarkblend")
+        {
+            definition.role = MaterialDefinition::Role::WallmarkBlend;
+            definition.priority = 1;
+            definition.mode = SurfaceMode::Transparent;
+            definition.blending = 1;
+            definition.alpha_ref = 0;
+            definition.screen_flags = 2;
+            definition.pass = {true, false, false, false, false, false};
+        }
+        if (cls == "S_SET   " && name == "details\\lod")
+        {
+            definition.role = MaterialDefinition::Role::Lod;
+            definition.mode = SurfaceMode::AlphaTest;
+            definition.alpha_ref = 96;
+            definition.pass.depth_write = true;
+            definition.pass.fog = false;
+        }
         if (cls == "LmEbB   " || cls == "MODELEbB" || cls == "LaEmB   ")
         {
             for (const BlenderProperty& property : definition.properties)
@@ -557,7 +577,9 @@ bool ShaderMaterialLibrary::load(IReader& file, std::string& error)
             id, name.c_str(), cls.c_str(), version,
             mode == SurfaceMode::Transparent ? "transparent" : mode == SurfaceMode::AlphaTest ? "cutout" : "opaque",
             definition.priority, alpha_ref, blending, definition.screen_flags,
-            definition.role == MaterialDefinition::Role::Water ? "water" : "standard",
+            definition.role == MaterialDefinition::Role::Water ? "water" :
+            definition.role == MaterialDefinition::Role::WallmarkBlend ? "wallmark-blend" :
+            definition.role == MaterialDefinition::Role::Lod ? "lod" : "standard",
             terrain.enabled ? 1 : 0, definition.detail_texture.c_str(),
             definition.environment_texture.c_str(), definition.environment_transform.c_str(),
             definition.environment_constant.c_str(), definition.tessellation,
@@ -586,6 +608,22 @@ bool ShaderMaterialLibrary::resolve(const std::string& shader, SurfaceMode& mode
     if (!material.pipeline_supported)
     { error = "unsupported " + context + (material.unsupported_reason.empty() ? "" :
         " property='" + material.unsupported_reason + "'"); return false; }
+    if (material.role == MaterialDefinition::Role::Lod && level_pipeline && !model_pipeline)
+    {
+        mode = SurfaceMode::AlphaTest;
+        if (alpha_ref)
+            *alpha_ref = 96;
+        if (blend_mode)
+            *blend_mode = -1;
+        if (material_flags)
+            *material_flags = 0;
+        if (terrain)
+            *terrain = material.terrain;
+        if (definition)
+            *definition = material;
+        error.clear();
+        return true;
+    }
     if (material.priority != 1 &&
         !(level_pipeline && !model_pipeline && material.priority >= 2 &&
           material.priority <= 3 &&

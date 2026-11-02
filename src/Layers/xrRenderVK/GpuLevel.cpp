@@ -118,6 +118,7 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
         error = "Vulkan level requires a device and command pool";
         return false;
     }
+    textures.invalidate_metadata();
     LevelModelData models;
     if (!load_engine_level_models(level, models, error))
         return false;
@@ -231,8 +232,9 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
         const auto &material = models.materials[model.material];
         mesh.material_id = model.material;
         mesh.shader = material.shader;
-        const auto tessellate = [&]() -> bool {
-            if (mesh.wallmark_multiply)
+        const auto tessellate = [&]() -> bool
+        {
+            if (mesh.wallmark_multiply || mesh.wallmark_blend)
                 offset_level_wallmark(model);
             if (!mesh.tessellation)
             {
@@ -280,6 +282,7 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
             mesh.priority = source.priority;
             mesh.alpha_ref = source.alpha_ref;
             mesh.wallmark_multiply = source.wallmark_multiply;
+            mesh.wallmark_blend = source.wallmark_blend;
             mesh.glow_alpha_add = source.glow_alpha_add;
             mesh.fog = source.fog;
             mesh.lightmapped = source.lightmapped;
@@ -394,6 +397,7 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
             return false;
         }
         mesh.wallmark_multiply = blend_mode == 6;
+        mesh.wallmark_blend = definition.role == MaterialDefinition::Role::WallmarkBlend;
         mesh.glow_alpha_add = blend_mode == 5;
         mesh.fog = definition.class_name == "S_SET   " && definition.pass.fog;
         mesh.laemb = definition.class_name == "LaEmB   ";
@@ -417,16 +421,22 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
                                (!metadata.external_normal_texture.empty() || metadata.normal ? NormalRole : 0u);
         if (mesh.secondary_opaque)
             mesh.pass_graph = secondary_opaque_level_graph(roles, mesh.lightmapped);
-        else if (!build_render_pass_graph(
-                     LevelPassSelection{mode, mesh.lightmapped, mesh.terrain, mesh.single_detail, mesh.environment,
-                                        mesh.laemb, mesh.wallmark_multiply, mesh.glow_alpha_add, mesh.fog, roles,
-                                        definition.class_name == "S_SET   " ? blend_mode : -1, definition.object_lod},
-                     mesh.pass_graph, error))
+        else if (!build_render_pass_graph(LevelPassSelection{mode, mesh.lightmapped, mesh.terrain, mesh.single_detail,
+                                                             mesh.environment, mesh.laemb, mesh.wallmark_multiply,
+                                                             mesh.glow_alpha_add, mesh.fog, roles,
+                                                             definition.class_name == "S_SET   " &&
+                                                                     definition.role != MaterialDefinition::Role::Lod
+                                                                 ? blend_mode
+                                                                 : -1,
+                                                             definition.object_lod},
+                                          mesh.pass_graph, error))
         {
             error =
                 "level / material id=" + std::to_string(model.material) + " shader='" + material.shader + "': " + error;
             return false;
         }
+        if (mesh.wallmark_blend)
+            mesh.pass_graph.passes[0].fragment = "vk\\wallmark_blended.ps";
         for (uint8_t index = 0; index < mesh.pass_graph.count; ++index)
         {
             const auto &node = mesh.pass_graph.passes[index];
@@ -441,9 +451,9 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
             mesh.terrain_scale = metadata.scale;
         if (mesh.single_detail)
             mesh.terrain_scale = metadata.scale;
-        const bool surface_roles = metadata.bump_mode >= 2 || metadata.normal ||
-                                   !metadata.external_normal_texture.empty() || metadata.material != 1 ||
-                                   metadata.material_weight != 0.f || mesh.terrain;
+        const bool surface_roles = definition.role != MaterialDefinition::Role::Lod &&
+            (metadata.bump_mode >= 2 || metadata.normal || !metadata.external_normal_texture.empty() ||
+             metadata.material != 1 || metadata.material_weight != 0.f || mesh.terrain);
         mesh.surface = surface_roles;
         bool surface_ready = false;
         if (surface_roles)
@@ -516,7 +526,8 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
             : mesh.environment   ? textures.environment_material(diffuse, lightmap, definition.environment_texture,
                                                                  !mesh.laemb, pass, mesh.material, error)
             : lightmap.empty()   ? textures.material(material.textures, pass, mesh.material, error,
-                                                     definition.class_name == "S_SET   " && definition.pass.clamp)
+                                                     definition.class_name == "S_SET   " && definition.pass.clamp,
+                                                     definition.role == MaterialDefinition::Role::Lod)
                                  : textures.lightmapped_material(diffuse, lightmap, pass, mesh.material, error);
         if (!material_ready)
         {

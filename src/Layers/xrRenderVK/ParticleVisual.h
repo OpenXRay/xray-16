@@ -94,6 +94,7 @@ private:
     {
         BufferResource vertices, indices;
         size_t capacity{};
+        std::vector<LevelVertex> scratch;
     };
     std::array<Buffers, FrameContext::FramesInFlight> buffers_;
 };

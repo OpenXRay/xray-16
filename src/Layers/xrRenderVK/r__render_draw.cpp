@@ -493,6 +493,7 @@ void VulkanGameDevice::record_models(const FrameRecordingContext &frame, void *u
 {
     auto &owner = *static_cast<VulkanGameDevice *>(user);
     PassCpuSample timing{"opaque-models", owner.deferred_, owner.deferred_.draw_calls()};
+    auto command_batch = owner.deferred_.geometry_batch();
     for (auto &draw : owner.model_draws_)
     {
         if (draw.hud)
