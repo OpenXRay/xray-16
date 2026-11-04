@@ -236,6 +236,7 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
         {
             if (mesh.wallmark_multiply || mesh.wallmark_blend)
                 offset_level_wallmark(model);
+            if (model.lod_pairs) return true;
             if (!mesh.tessellation)
             {
                 prepare_tangent_basis(model.vertices, model.indices);
@@ -563,6 +564,8 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
                        models.materials[model.material].textures + "'";
         error = context + " / GPU preparation: " + error;
     };
+    if (!pass.request_game_pipeline("vk\\level_lod.vs", "vk\\level_lod.ps", SurfaceMode::AlphaTest, false, false, error))
+        return false;
     for (LevelModel &model : models.models)
     {
         if (uploaded_models % 64 == 0)
@@ -1250,7 +1253,13 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext &frame, c
         Fvector direction;
         direction.set(visual.bounds[6] - Device.vCameraPosition.x, visual.bounds[7] - Device.vCameraPosition.y,
                       visual.bounds[8] - Device.vCameraPosition.z);
-        const auto facet = select_lod_facet(visual.lod_normals, {direction.x, direction.y, direction.z});
+        auto views = select_lod_views(visual.lod_normals, {direction.x, direction.y, direction.z});
+        if (views.first > views.second)
+        {
+            std::swap(views.first, views.second);
+            views.weight = 1.f - views.weight;
+        }
+        const auto facet = views.first;
         const int32_t mesh_index = visual.lod_facets[facet];
         if (mesh_index < 0 || size_t(mesh_index) >= meshes_.size())
             return false;
@@ -1260,9 +1269,8 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext &frame, c
             (transparent && (mesh.secondary_opaque != secondary_only ||
                              (!secondary_only && priority_filter >= 0 && mesh.priority != priority_filter))))
             return true;
-        const auto &first = mesh.pass_graph.passes[0];
-        const char *vertex = first.vertex_for_visual(false, visual.type);
-        const char *fragment = first.fragment.c_str();
+        const char *vertex = "vk\\level_lod.vs";
+        const char *fragment = "vk\\level_lod.ps";
         std::string shader_error;
         const bool named = pass.require_game_pipeline(vertex, fragment, mesh.mode, false, false, shader_error);
         if (!named)
@@ -1282,36 +1290,9 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext &frame, c
         }
 #endif
         const char *failure = nullptr;
-        const float camera[4]{Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, 0.f};
-        float factor[4]{1.f, 1.f, 1.f, 1.f};
-        if (mesh.environment_constant)
-            for (unsigned channel = 0; channel < 4; ++channel)
-            {
-                WaveForm waveform = mesh.constant_waveforms[channel];
-                factor[channel] = waveform.Calculate(Device.fTimeGlobal);
-            }
-        const bool recorded =
-            mesh.water && transparent
-                ? pass.record_water(frame, mesh.vertex_buffer(), mesh.index_buffer(), mesh.index_count, mvp,
-                                    mesh.material, mesh.first_index, Device.fTimeGlobal, mesh.glass ? -.35f : .72f,
-                                    mesh.first_vertex)
-            : transparent
-                ? pass.record_transparent(frame, mesh.vertex_buffer(), mesh.index_buffer(), mesh.index_count, mvp,
-                                          mesh.material, mesh.first_index, named ? vertex : nullptr,
-                                          named ? fragment : nullptr, &failure, float(mesh.alpha_ref) / 255.f, nullptr,
-                                          mesh.terrain_scale, mesh.first_vertex, &mesh.matrices)
-                : pass.record_geometry(frame, mesh.vertex_buffer(), mesh.index_buffer(), mesh.index_count, mvp,
-                                       mesh.material, mesh.mode, mesh.first_index, named ? vertex : nullptr,
-                                       named ? fragment : nullptr, float(mesh.alpha_ref) / 255.f, nullptr,
-                                       mesh.terrain_scale, mesh.environment ? camera : nullptr,
-                                       mesh.laemb ? factor : nullptr, mesh.first_vertex, &mesh.matrices);
-        const bool completed =
-            recorded &&
-            (mesh.pass_graph.count < 2 ||
-             pass.record_geometry(frame, mesh.vertex_buffer(), mesh.index_buffer(), mesh.index_count, mvp,
-                                  mesh.material, mesh.mode, mesh.first_index, mesh.pass_graph.passes[1].vertex.c_str(),
-                                  mesh.pass_graph.passes[1].fragment.c_str(), 128.f / 255.f, nullptr, 1.f, nullptr,
-                                  nullptr, mesh.first_vertex));
+        const bool completed = pass.record_geometry(frame, mesh.vertex_buffer(), mesh.index_buffer(), 6, mvp,
+            mesh.material, SurfaceMode::AlphaTest, mesh.first_index + (views.second - views.first) * 6,
+            vertex, fragment, 96.f/255.f, nullptr, views.weight, nullptr, nullptr, mesh.first_vertex);
         if (!completed)
             report_visual_record_failure(index, mesh_index, phase, mesh.water, mesh.index_count, lod, failure);
         return completed;
@@ -1414,19 +1395,6 @@ bool GpuLevel::record_hud_visual(size_t index, const FrameRecordingContext &fram
     if (index >= visuals_.size())
         return false;
     const LevelVisual &visual = visuals_[index];
-    if (visual.type == 6 && lod < .33f)
-    {
-        Fvector direction;
-        direction.set(visual.bounds[6] - Device.vCameraPosition.x, visual.bounds[7] - Device.vCameraPosition.y,
-                      visual.bounds[8] - Device.vCameraPosition.z);
-        const auto facet = select_lod_facet(visual.lod_normals, {direction.x, direction.y, direction.z});
-        const int32_t mesh_index = visual.lod_facets[facet];
-        if (mesh_index < 0 || size_t(mesh_index) >= meshes_.size())
-            return false;
-        const Mesh &mesh = meshes_[mesh_index];
-        return pass.record_hud(frame, mesh.vertex_buffer(), mesh.index_buffer(), mesh.index_count, mvp, mesh.material,
-                               mesh.first_index, nullptr, nullptr, 0.f, nullptr, mesh.first_vertex, &mesh.matrices);
-    }
     if (visual.mesh >= 0)
     {
         if (static_cast<size_t>(visual.mesh) >= meshes_.size())

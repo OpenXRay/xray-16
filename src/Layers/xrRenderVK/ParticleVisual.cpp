@@ -279,6 +279,7 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     }
     auto &vertices = buffers.scratch;
     vertices.resize(count * 4);
+    const bool water_ring = particle_is_surface_ring(def_->name, distortion_);
     for (u32 i = 0; i < count; ++i)
     {
         const auto& p = particles[i];
@@ -290,7 +291,14 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
         const float speed=velocity.magnitude();
         if(def_->flags & (1u<<18))
         { sx+=speed*def_->velocity_scale[0];sy+=speed*def_->velocity_scale[1]; }
-        if(def_->flags & (1u<<15))
+        // These authored refraction rings describe the water surface;
+        // their emission velocity belongs to the impact, not the sprite plane.
+        if (water_ring)
+        {
+            sprite_right.set(1.f, 0.f, 0.f);
+            sprite_up.set(0.f, 0.f, 1.f);
+        }
+        else if(def_->flags & (1u<<15))
         {
             if(speed<EPS_S && (def_->flags & (1u<<20)))
             {

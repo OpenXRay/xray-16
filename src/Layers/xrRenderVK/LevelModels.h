@@ -61,6 +61,7 @@ struct LevelVertex
 struct LevelModel
 {
     uint16_t material{};
+    bool lod_pairs{};
     bool lightmap_uv{};
     bool depth_only{}; // geomX may contain POSITION0 without shading attributes
     std::vector<LevelVertex> vertices;

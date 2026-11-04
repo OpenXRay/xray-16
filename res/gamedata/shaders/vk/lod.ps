@@ -1,0 +1,28 @@
+[[vk::binding(0,0)]] Texture2D<float4> atlas;
+[[vk::binding(0,0)]] SamplerState atlas_sampler;
+[[vk::push_constant]] cbuffer Material {
+    float4x4 mvp;
+    float alpha_ref;
+    float blend;
+};
+struct Fragment {
+    float4 position : SV_Position;
+    [[vk::location(0)]] float3 normal : TEXCOORD0;
+    [[vk::location(1)]] float2 uv0 : TEXCOORD1;
+    [[vk::location(2)]] float2 uv1 : TEXCOORD2;
+    [[vk::location(3)]] float hemi : TEXCOORD3;
+};
+struct GBuffer {
+    float4 albedo : SV_Target0;
+    float4 normal : SV_Target1;
+    float4 surface : SV_Target2;
+};
+GBuffer main(Fragment f) {
+    GBuffer o;
+    o.albedo=lerp(atlas.Sample(atlas_sampler,f.uv1),atlas.Sample(atlas_sampler,f.uv0),blend);
+    clip(o.albedo.a-alpha_ref);
+    o.albedo.a=1;
+    o.normal=float4(normalize(f.normal)*.5+.5,.875+.125*saturate(f.hemi));
+    o.surface=float4(0,1.f/3.f,0,0);
+    return o;
+}

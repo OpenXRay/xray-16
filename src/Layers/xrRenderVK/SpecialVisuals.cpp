@@ -22,7 +22,7 @@ float real(const uint8_t *p)
 }
 } // namespace
 
-bool decode_lod_facets(LevelBytes bytes, uint16_t material, LodFacets &result, std::string &error)
+bool decode_lod_facets(LevelBytes bytes, uint16_t material, LodFacets &result, std::string &error, bool paired)
 {
     constexpr size_t vertex_size = 28;
     if (!bytes.data || bytes.size != 8 * 4 * vertex_size)
@@ -89,9 +89,54 @@ bool decode_lod_facets(LevelBytes bytes, uint16_t material, LodFacets &result, s
         for (auto &vertex : mesh.vertices)
             std::copy(normal.begin(), normal.end(), vertex.normal);
     }
+    // Keep both baked views in one vertex stream. The vertex shader morphs
+    // the four corners and the fragment shader blends the two atlas samples.
+    if (paired)
+    {
+        const auto source = parsed.meshes;
+        for (size_t a = 0; a < 8; ++a)
+        {
+            auto &mesh = parsed.meshes[a];
+            mesh.lod_pairs = true;
+            mesh.vertices.clear(); mesh.indices.clear();
+            for (size_t b = a; b < 8; ++b)
+            {
+                for (unsigned v = 0; v < 4; ++v)
+                {
+                    auto vertex = source[a].vertices[v];
+                    std::copy_n(source[b].vertices[v].position, 3, vertex.normal);
+                    std::copy_n(source[b].vertices[v].uv, 2, vertex.lightmap_uv);
+                    for (unsigned axis = 0; axis < 3; ++axis)
+                    {
+                        vertex.tangent[axis] = int8_t(std::round(parsed.normals[a][axis] * 127.f));
+                        vertex.bitangent[axis] = int8_t(std::round(parsed.normals[b][axis] * 127.f));
+                    }
+                    const auto *ra = bytes.data + (a * 4 + v) * vertex_size;
+                    const auto *rb = bytes.data + (b * 4 + v) * vertex_size;
+                    vertex.baked[0] = ra[23] / 255.f;
+                    vertex.baked[1] = rb[23] / 255.f;
+                    mesh.vertices.push_back(vertex);
+                }
+                for (uint32_t v : {3u, 0u, 2u, 1u, 2u, 0u})
+                    mesh.indices.push_back(uint32_t((b-a) * 4) + v);
+            }
+        }
+    }
     result = std::move(parsed);
     error.clear();
     return true;
+}
+
+LodSelection select_lod_views(const std::array<std::array<float,3>,8>& normals,
+    const std::array<float,3>& direction)
+{
+    std::array<std::pair<float,uint8_t>,8> ranked;
+    for (uint8_t i=0;i<8;++i)
+        ranked[i] = {normals[i][0]*direction[0]+normals[i][1]*direction[1]+normals[i][2]*direction[2],i};
+    std::sort(ranked.begin(),ranked.end(),[](const auto& a,const auto& b){return a.first>b.first;});
+    const float span=ranked[0].first-ranked[2].first;
+    const float weight=span>1e-8f ? 1.f-.5f*(ranked[1].first-ranked[2].first)/span : .5f;
+    return {ranked[0].second,ranked[1].second,std::clamp(weight,.5f,1.f)};
 }
 
 uint8_t select_lod_facet(const std::array<std::array<float, 3>, 8> &normals, const std::array<float, 3> &direction)

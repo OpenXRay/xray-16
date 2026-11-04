@@ -530,6 +530,17 @@ int main()
         assert(result.profile == profile && result.visuals[0].lod_facets[7] == 7);
     }
     assert(select_lod_facet(result.visuals[0].lod_normals, {0, 0, -1}) == 0);
+    assert(result.models[0].lod_pairs && result.models[0].vertices.size() == 32 && result.models[0].indices.size() == 48);
+    // Each pair keeps both positions/UVs for GPU interpolation; selection is
+    // continuous at the bisector and prefers the authored view head-on.
+    assert(result.models[0].vertices[4].normal[2] == 1.f);
+    auto ranked = result.visuals[0].lod_normals;
+    ranked[0] = {1,0,0}; ranked[1] = {0,0,1};
+    for (unsigned i=2;i<8;++i) ranked[i] = {-1,0,-1};
+    auto mix = select_lod_views(ranked,{1,0,1});
+    assert(mix.first != mix.second && std::abs(mix.weight-.5f)<1e-6f);
+    auto head = select_lod_views(ranked,{1,0,0});
+    assert(head.first == 0 && head.weight > mix.weight);
     auto directional = result.visuals[0].lod_normals;
     directional[3] = {1.f, 0.f, 0.f};
     assert(select_lod_facet(directional, {1.f, 0.f, 0.f}) == 3);

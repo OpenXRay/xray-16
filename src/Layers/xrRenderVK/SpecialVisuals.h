@@ -14,7 +14,10 @@ struct LodFacets
     std::array<std::array<float, 3>, 8> normals{};
 };
 bool decode_lod_facets(LevelBytes bytes, uint16_t material, LodFacets& result,
-    std::string& error);
+    std::string& error, bool paired = false);
+struct LodSelection { uint8_t first{}, second{}; float weight{1.f}; };
+LodSelection select_lod_views(const std::array<std::array<float,3>,8>& normals,
+    const std::array<float,3>& direction);
 uint8_t select_lod_facet(const std::array<std::array<float, 3>, 8>& normals,
     const std::array<float, 3>& direction);
 

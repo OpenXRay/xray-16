@@ -1,7 +1,12 @@
 #pragma once
 #include <array>
 #include <cmath>
+#include <string_view>
 namespace xray::render::vulkan {
+inline bool particle_is_surface_ring(std::string_view name, bool distortion)
+{
+    return distortion && name.rfind("hit_fx\\effects\\hit_water_hit_distort", 0) == 0;
+}
 struct ParticleSpriteCorner { float right, up, u, v; };
 struct ParticleSpriteBasis { std::array<float,3> right,up; };
 inline ParticleSpriteBasis particle_path_basis(std::array<float,3> direction,

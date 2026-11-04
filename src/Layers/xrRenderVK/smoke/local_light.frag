@@ -18,7 +18,7 @@ layout(set=1,binding=2) uniform sampler2D spot_projection;
 layout(location = 0) in vec2 texcoord;
 layout(location = 0) out vec4 pixel_color;
 
-float visibility(vec3 world, vec3 delta)
+float visibility(vec3 world, vec3 delta, vec3 normal)
 {
     if (light.shadow_params.z < 0.5) return 1.0;
     int face = 0;
@@ -42,7 +42,14 @@ float visibility(vec3 world, vec3 delta)
     float reference_depth = receiver_clip.z / receiver_clip.w;
     // Correct each PCF tap to the receiver plane. A single centre depth
     // self-shadows sloped faces when the light texel covers several pixels.
-    vec3 dx = dFdx(projected), dy = dFdy(projected);
+    // Derive the receiver plane from its world normal. Screen derivatives
+    // cross silhouettes and are undefined after the range/cone branches.
+    vec3 tangent = normalize(cross(normal, abs(normal.y) < .9 ? vec3(0,1,0) : vec3(1,0,0)));
+    vec3 bitangent = cross(normal, tangent);
+    vec4 tx = light.shadow_matrices[face] * vec4(tangent, 0.0);
+    vec4 ty = light.shadow_matrices[face] * vec4(bitangent, 0.0);
+    vec3 dx = (tx.xyz - projected * tx.w) / clip.w;
+    vec3 dy = (ty.xyz - projected * ty.w) / clip.w;
     vec2 ux = dx.xy * .5, uy = dy.xy * .5;
     float determinant = ux.x * uy.y - ux.y * uy.x;
     vec2 gradient = abs(determinant) > 1e-12 ?
@@ -50,13 +57,13 @@ float visibility(vec3 world, vec3 delta)
     float layer = light.shadow_params.x + float(face);
     ivec2 size = textureSize(shadow_array, 0).xy;
     vec2 grid = uv * vec2(size) - 0.5;
-    ivec2 center = ivec2(floor(grid + 0.5));
+    ivec2 center = ivec2(floor(grid));
     vec2 fraction = grid - vec2(center);
     float lit = 0.0, total = 0.0;
-    for (int y = -1; y <= 1; ++y)
-        for (int x = -1; x <= 1; ++x)
+    for (int y = 0; y <= 1; ++y)
+        for (int x = 0; x <= 1; ++x)
         {
-            vec2 weight = max(vec2(1.5) - abs(vec2(x,y) - fraction), vec2(0.0));
+            vec2 weight = vec2(x == 0 ? 1.0-fraction.x : fraction.x, y == 0 ? 1.0-fraction.y : fraction.y);
             float w = weight.x * weight.y;
             ivec2 pixel = clamp(center + ivec2(x,y), ivec2(0), size - 1);
             float tap_depth = reference_depth + clamp(dot(gradient, (vec2(pixel) + .5) / vec2(size) - uv), -.01, .01);
@@ -113,6 +120,6 @@ void main()
             mix(4.0, 64.0, surface.r));
         color += specular * surface.r * mix(0.04, 0.2, surface.g) * light.color_type.rgb;
     }
-    color *= attenuation * visibility(world, delta);
+    color *= attenuation * visibility(world, delta, normal);
     pixel_color = vec4(color, 0.0);
 }

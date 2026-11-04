@@ -481,7 +481,7 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer> &vertices,
             LodFacets facets;
             std::string error;
             if (material >= material_count || !chunk(visual, ogf_lod, facet_bytes) ||
-                !decode_lod_facets(facet_bytes, material, facets, error))
+                !decode_lod_facets(facet_bytes, material, facets, error, true))
                 return false;
             nodes[node_index].lod_normals = facets.normals;
             for (size_t i = 0; i < 8; ++i)

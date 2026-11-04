@@ -401,6 +401,8 @@ int main(int argc, char **argv)
         for (auto &vertex : triangle)
         {
             vertex.normal[2] = 1;
+            vertex.static_tangent[0] = 127;
+            vertex.static_bitangent[1] = -127;
             vertex.uv[0] = vertex.uv[1] = .5f;
             vertex.lightmap_uv[0] = vertex.lightmap_uv[1] = .5f;
             vertex.baked[0] = .5f;
@@ -408,9 +410,8 @@ int main(int argc, char **argv)
             vertex.baked[2] = .75f;
             vertex.baked[3] = 1.f;
         }
-        // Normal mapping reconstructs a tangent frame from screen-space UV
-        // derivatives. Constant UVs exercise the degenerate fallback instead
-        // of the normal maps this fixture is intended to verify.
+        // Match the prepared mesh tangent frame to these UVs, independently
+        // of screen derivatives and camera angle.
         triangle[0].uv[0] = 0;
         triangle[0].uv[1] = 0;
         triangle[1].uv[0] = 2;
@@ -535,6 +536,8 @@ int main(int argc, char **argv)
         const auto terrain = module("level_terrain.ps.spv");
         const auto detail = module("level_detail.ps.spv");
         const auto flat = module("level_lightmap.ps.spv");
+        const auto lod_vertex = module("level_lod.vs.spv");
+        const auto lod_fragment = module("level_lod.ps.spv");
         const auto laemb = module("level_laemb_base.ps.spv");
         const auto reflection = module("level_environment.ps.spv");
         const auto deferred_particle = module("particle_world_deferred.ps.spv");
@@ -1061,6 +1064,33 @@ int main(int argc, char **argv)
             vkDestroySampler(device, material_sampler, nullptr);
             vkDestroySampler(device, lightmap_sampler, nullptr);
         }
+        // Singular level frames use the uploaded geometric normal rather
+        // than a UV derivative frame that changes with the view projection.
+        const auto prepared_triangle = triangle;
+        for (auto &v : triangle)
+            for (unsigned axis = 0; axis < 4; ++axis)
+                v.static_tangent[axis] = v.static_bitangent[axis] = 0;
+        check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        std::memcpy(mapped, triangle.data(), sizeof(triangle));
+        vkUnmapMemory(device, vertex_memory);
+        auto level_normal_push = push;
+        level_normal_push.modes[2] = 1;
+        for (float angle : {-.4f, 0.f, .4f})
+        {
+            auto camera = level_normal_push;
+            camera.mvp[0] = camera.mvp[10] = std::cos(angle);
+            camera.mvp[2] = -std::sin(angle);
+            camera.mvp[8] = std::sin(angle);
+            camera.mvp[14] = .5f;
+            auto level = execute(flat, camera);
+            near(level[1][0], .5f, "singular level normal X is camera independent");
+            near(level[1][1], .5f, "singular level normal Y is camera independent");
+            near(level[1][2], 1.f, "singular level normal Z is camera independent");
+        }
+        triangle = prepared_triangle;
+        check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        std::memcpy(mapped, triangle.data(), sizeof(triangle));
+        vkUnmapMemory(device, vertex_memory);
         // An authored frame rotated relative to the UV gradients must survive
         // GPU skinning, world rotation and changes to fragment material data.
         auto character_push = push;
@@ -1758,6 +1788,31 @@ int main(int argc, char **argv)
         fill(memory, cube, {projected_depth(51), 0, 0, 1}, 6);
         near(execute(local_fragment, push, false, weather_vs)[0][0], .4f,
              "world-space bias preserves visible distant receivers");
+        // Execute the paired-view foliage shaders, including both endpoint
+        // weights and the facet bisector, with the real static vertex layout.
+        triangle = prepared_triangle;
+        for (auto &v : triangle)
+        {
+            std::copy_n(v.position, 3, v.normal);
+            for (unsigned k=0;k<4;++k) v.static_tangent[k]=v.static_bitangent[k]=0;
+            v.static_tangent[2]=v.static_bitangent[2]=127;
+            v.baked[0]=v.baked[1]=.5f;
+        }
+        check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        std::memcpy(mapped, triangle.data(), sizeof(triangle));
+        vkUnmapMemory(device, vertex_memory);
+        fill(memory, input[0], {.4f,.3f,.2f,1});
+        Push lod_push{};
+        for (unsigned i=0;i<16;i+=5) lod_push.mvp[i]=1;
+        lod_push.threshold=96.f/255.f;
+        for (float weight : {0.f,.5f,1.f})
+        {
+            lod_push.scale=weight;
+            auto lod_pixel=execute(lod_fragment,lod_push,false,lod_vertex);
+            near(lod_pixel[0][0],.4f,"paired foliage preserves albedo");
+            near(lod_pixel[1][2],1.f,"paired foliage normal survives view interpolation");
+            near(lod_pixel[1][3],.9375f,"paired foliage preserves baked hemisphere");
+        }
         std::array<Vertex, 6> grass_quad{};
         const float quad_positions[6][2]{{-1, -1}, {1, -1}, {-1, 1}, {-1, 1}, {1, -1}, {1, 1}};
         for (unsigned i = 0; i < 6; ++i)
