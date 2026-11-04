@@ -18,7 +18,7 @@ layout(set=1,binding=2) uniform sampler2D spot_projection;
 layout(location = 0) in vec2 texcoord;
 layout(location = 0) out vec4 pixel_color;
 
-float visibility(vec3 world, vec3 delta)
+float visibility(vec3 world, vec3 delta, vec3 world_dx, vec3 world_dy)
 {
     if (light.shadow_params.z < 0.5) return 1.0;
     int face = 0;
@@ -42,7 +42,12 @@ float visibility(vec3 world, vec3 delta)
     float reference_depth = receiver_clip.z / receiver_clip.w;
     // Correct each PCF tap to the receiver plane. A single centre depth
     // self-shadows sloped faces when the light texel covers several pixels.
-    vec3 dx = dFdx(projected), dy = dFdy(projected);
+    // Derivatives are evaluated before the per-pixel range and cone tests in
+    // main. Taking them here, under divergent control flow, is undefined.
+    vec4 clip_dx = light.shadow_matrices[face] * vec4(world_dx, 0.0);
+    vec4 clip_dy = light.shadow_matrices[face] * vec4(world_dy, 0.0);
+    vec3 dx = (clip_dx.xyz - projected * clip_dx.w) / clip.w;
+    vec3 dy = (clip_dy.xyz - projected * clip_dy.w) / clip.w;
     vec2 ux = dx.xy * .5, uy = dy.xy * .5;
     float determinant = ux.x * uy.y - ux.y * uy.x;
     vec2 gradient = abs(determinant) > 1e-12 ?
@@ -76,10 +81,11 @@ void main()
     if (any(greaterThanEqual(screen_uv, vec2(1.0))))
     { pixel_color = vec4(0.0); return; }
     float depth = texture(depth_buffer, screen_uv).r;
-    if (depth >= 0.99999) { pixel_color = vec4(0.0); return; }
     vec4 world_clip = light.inverse_view_projection *
         vec4(screen_uv.x * 2.0 - 1.0, 1.0 - screen_uv.y * 2.0, depth, 1.0);
     vec3 world = world_clip.xyz / max(abs(world_clip.w), 1e-6) * sign(world_clip.w);
+    vec3 world_dx = dFdx(world), world_dy = dFdy(world);
+    if (depth >= 0.99999) { pixel_color = vec4(0.0); return; }
     vec3 delta = world - light.position_range.xyz;
     float distance = length(delta);
     float range = max(light.position_range.w, 0.01);
@@ -113,6 +119,6 @@ void main()
             mix(4.0, 64.0, surface.r));
         color += specular * surface.r * mix(0.04, 0.2, surface.g) * light.color_type.rgb;
     }
-    color *= attenuation * visibility(world, delta);
+    color *= attenuation * visibility(world, delta, world_dx, world_dy);
     pixel_color = vec4(color, 0.0);
 }
