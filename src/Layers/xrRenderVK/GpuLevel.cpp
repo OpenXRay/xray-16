@@ -1245,7 +1245,7 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext &frame, c
         android_set_load_context(context);
     }
 #endif
-    if (visual.type == 6 && lod < LodImpostorThreshold)
+    if (visual.type == 6 && lod < .33f)
     {
         Fvector direction;
         direction.set(visual.bounds[6] - Device.vCameraPosition.x, visual.bounds[7] - Device.vCameraPosition.y,
@@ -1414,7 +1414,7 @@ bool GpuLevel::record_hud_visual(size_t index, const FrameRecordingContext &fram
     if (index >= visuals_.size())
         return false;
     const LevelVisual &visual = visuals_[index];
-    if (visual.type == 6 && lod < LodImpostorThreshold)
+    if (visual.type == 6 && lod < .33f)
     {
         Fvector direction;
         direction.set(visual.bounds[6] - Device.vCameraPosition.x, visual.bounds[7] - Device.vCameraPosition.y,

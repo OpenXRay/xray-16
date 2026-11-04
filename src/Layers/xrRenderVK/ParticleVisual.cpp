@@ -292,11 +292,8 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
         { sx+=speed*def_->velocity_scale[0];sy+=speed*def_->velocity_scale[1]; }
         if(def_->flags & (1u<<15))
         {
-            if(def_->flags & (1u<<20))
+            if(speed<EPS_S && (def_->flags & (1u<<20)))
             {
-                // World alignment describes the sprite plane, including
-                // moving particles. Velocity must not stand a water ripple
-                // upright after its first simulation step.
                 Fmatrix basis;basis.setXYZ(def_->align_rotation[0],def_->align_rotation[1],def_->align_rotation[2]);
                 basis.mulA_43(transform_);sprite_right=basis.i;sprite_up=basis.k;
             }

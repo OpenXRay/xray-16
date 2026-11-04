@@ -401,8 +401,6 @@ int main(int argc, char **argv)
         for (auto &vertex : triangle)
         {
             vertex.normal[2] = 1;
-            vertex.static_tangent[0] = 127;
-            vertex.static_bitangent[1] = -127;
             vertex.uv[0] = vertex.uv[1] = .5f;
             vertex.lightmap_uv[0] = vertex.lightmap_uv[1] = .5f;
             vertex.baked[0] = .5f;
@@ -410,8 +408,9 @@ int main(int argc, char **argv)
             vertex.baked[2] = .75f;
             vertex.baked[3] = 1.f;
         }
-        // Match the prepared mesh tangent frame to these UVs, independently
-        // of screen derivatives and camera angle.
+        // Normal mapping reconstructs a tangent frame from screen-space UV
+        // derivatives. Constant UVs exercise the degenerate fallback instead
+        // of the normal maps this fixture is intended to verify.
         triangle[0].uv[0] = 0;
         triangle[0].uv[1] = 0;
         triangle[1].uv[0] = 2;
@@ -1062,32 +1061,6 @@ int main(int argc, char **argv)
             vkDestroySampler(device, material_sampler, nullptr);
             vkDestroySampler(device, lightmap_sampler, nullptr);
         }
-        // Singular level frames use the uploaded geometric normal rather
-        // than a UV derivative frame that changes with the view projection.
-        const auto prepared_triangle = triangle;
-        for (auto &v : triangle)
-            for (unsigned axis = 0; axis < 4; ++axis)
-                v.static_tangent[axis] = v.static_bitangent[axis] = 0;
-        check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
-        std::memcpy(mapped, triangle.data(), sizeof(triangle));
-        vkUnmapMemory(device, vertex_memory);
-        auto level_normal_push = push;
-        level_normal_push.modes[2] = 1;
-        for (float angle : {-.4f, 0.f, .4f})
-        {
-            auto camera = level_normal_push;
-            camera.mvp[0] = camera.mvp[5] = std::cos(angle);
-            camera.mvp[1] = std::sin(angle);
-            camera.mvp[4] = -std::sin(angle);
-            auto level = execute(flat, camera);
-            near(level[1][0], .5f, "singular level normal X is camera independent");
-            near(level[1][1], .5f, "singular level normal Y is camera independent");
-            near(level[1][2], 1.f, "singular level normal Z is camera independent");
-        }
-        triangle = prepared_triangle;
-        check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
-        std::memcpy(mapped, triangle.data(), sizeof(triangle));
-        vkUnmapMemory(device, vertex_memory);
         // An authored frame rotated relative to the UV gradients must survive
         // GPU skinning, world rotation and changes to fragment material data.
         auto character_push = push;

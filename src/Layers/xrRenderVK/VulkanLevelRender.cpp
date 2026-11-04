@@ -1861,7 +1861,7 @@ void VulkanLevelRender::queue_visual(IRenderable *root, IRenderVisual *visual, F
                                                                                    IKinematics *skeleton) {
             if (node.skeleton())
                 skeleton = node.skeleton();
-            if (!shadow_only && node.has_lod() && lod < LodImpostorThreshold)
+            if (!shadow_only && node.has_lod() && lod < .33f)
             {
                 std::array<std::array<float, 3>, 8> normals = node.lod_normals();
                 for (auto &normal : normals)

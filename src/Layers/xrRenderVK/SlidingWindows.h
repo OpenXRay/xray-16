@@ -7,9 +7,6 @@
 
 namespace xray::render::vulkan
 {
-// A single OGF facet is a flat impostor. Keep it below the size at which
-// its polygonal silhouette becomes apparent on a mobile viewport.
-inline constexpr float LodImpostorThreshold = 0.12f;
 struct SlideWindow
 {
     uint32_t offset{};
