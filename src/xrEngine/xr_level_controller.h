@@ -140,6 +140,8 @@ enum EGameActions : u32
 
     kEDITOR,
 
+    kTOGGLE_HUD,
+
     // Contextual actions:
     // UI
     kUI_MOVE,

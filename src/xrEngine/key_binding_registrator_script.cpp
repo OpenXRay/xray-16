@@ -158,6 +158,8 @@ void key_binding_registrator::script_register(lua_State* luaState)
 
                 value("kEDITOR",                    int(kEDITOR)),
 
+                value("kTOGGLE_HUD",                int(kTOGGLE_HUD)),
+
                 // Contextual actions:
                 // UI
                 value("kUI_MOVE",                   int(kUI_MOVE)),

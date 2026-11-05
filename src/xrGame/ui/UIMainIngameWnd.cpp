@@ -270,9 +270,23 @@ void CUIMainIngameWnd::Draw()
     if (!actor || !actor->g_Alive())
         return;
 
-    CUIWindow::Draw();
+    if (psHUD_Flags.test(HUD_INDICATORS_RT))
+        CUIWindow::Draw();
+    else
+        DrawContextualElements();
 
     RenderQuickInfos(actor);
+}
+
+// Drawn instead of the whole window while the static indicators are hidden (kTOGGLE_HUD).
+// Only the elements that react to what the player is looking at stay visible.
+void CUIMainIngameWnd::DrawContextualElements()
+{
+    for (CUIStatic* wnd : { UIStaticQuickHelp, UIPickUpItemIcon })
+    {
+        if (wnd && wnd->IsShown() && !wnd->GetCustomDraw())
+            wnd->Draw();
+    }
 }
 
 void CUIMainIngameWnd::SetMPChatLog(CUIWindow* pChat, CUIWindow* pLog)

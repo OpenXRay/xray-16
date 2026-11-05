@@ -154,6 +154,8 @@ game_action actions[] =
 
     { "editor",                 kEDITOR,                    _both },
 
+    { "toggle_hud",             kTOGGLE_HUD,                _sp },
+
     // Contextual actions:
     // UI
     { "ui_move",                kUI_MOVE,                   _both,  EKeyContext::UI },
