@@ -24,7 +24,7 @@
 LPCSTR alife_section = "alife";
 
 
-CALifeSimulator::CALifeSimulator(IPureServer* server, shared_str* command_line)
+CALifeSimulator::CALifeSimulator(xrServer* server, shared_str* command_line)
     : CALifeSimulatorBase(server, alife_section), CALifeUpdateManager(server, alife_section),
       CALifeInteractionManager(server, alife_section)
 {

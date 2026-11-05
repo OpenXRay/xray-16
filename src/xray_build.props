@@ -26,6 +26,7 @@
         IMGUI_DISABLE_OBSOLETE_FUNCTIONS;
         IMGUI_DEFINE_MATH_OPERATORS;
         XRAY_USE_LUAJIT=1;
+        STEAMNETWORKINGSOCKETS_STATIC_LINK;
         %(PreprocessorDefinitions)
       </PreprocessorDefinitions>
       <BufferSecurityCheck>false</BufferSecurityCheck>

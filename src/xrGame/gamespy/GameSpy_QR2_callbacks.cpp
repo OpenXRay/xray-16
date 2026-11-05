@@ -418,7 +418,7 @@ void __cdecl callback_cm(char* data, int len, void* userdata){};
 void __cdecl callback_deny_ip(void* userdata, unsigned int sender_ip, int* result)
 {
     *result = 0;
-    IPureServer* pServer = static_cast<xrGameSpyServer*>(userdata);
+    NET_SERVER_CLASS* pServer = static_cast<xrGameSpyServer*>(userdata);
     if (pServer && pServer->IsPlayerIPDenied(static_cast<u32>(sender_ip)))
     {
         *result = 1;

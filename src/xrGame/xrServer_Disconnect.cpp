@@ -11,7 +11,7 @@ void xrServer::Disconnect()
         xr_delete(m_file_transfers);
     }
 
-    IPureServer::Disconnect();
+    NET_SERVER_CLASS::Disconnect();
     SLS_Clear();
     xr_delete(game);
 }
