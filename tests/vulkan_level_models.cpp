@@ -557,12 +557,14 @@ int main()
     for (int i = 0; i < 16; ++i)
         f32(tree_def, i == 0 || i == 5 || i == 10 || i == 15 ? 1.f :
             i == 12 ? 3.f : 0.f);
-    tree_def.insert(tree_def.end(), 40, 0);
+    for (int i = 0; i < 10; ++i)
+        f32(tree_def, i == 3 ? .6f : i == 8 ? .1f : 0.f);
     header[1] = 7;
     part(tree_visual, 1, header); part(tree_visual, 21, container);
     part(tree_visual, 12, tree_def); part(tree_visuals, 0, tree_visual);
     assert(load_level_models(input(shaders), input(vb), input(ib), input(tree_visuals), result, error));
     assert(result.models[0].vertices[1].position[0] == 4.f);
+    assert(std::abs(result.models[0].vertices[1].baked[3] - .7f) < .001f);
     assert(result.visuals[0].bounds[9] >= 1.f);
     // Packed tree UVs use FTreeVisual's 16/32768 scale, not the ordinary
     // level shader's 32/32768 scale and T/B alpha fractions. Exercise both

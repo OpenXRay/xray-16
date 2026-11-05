@@ -1,5 +1,7 @@
 [[vk::binding(0,0)]] Texture2D<float4> atlas;
 [[vk::binding(0,0)]] SamplerState atlas_sampler;
+[[vk::binding(1,0)]] Texture2D<float4> normal_hemi_atlas;
+[[vk::binding(1,0)]] SamplerState normal_hemi_sampler;
 [[vk::push_constant]] cbuffer Material {
     float4x4 mvp;
     float alpha_ref;
@@ -20,9 +22,20 @@ struct GBuffer {
 GBuffer main(Fragment f) {
     GBuffer o;
     o.albedo=lerp(atlas.Sample(atlas_sampler,f.uv1),atlas.Sample(atlas_sampler,f.uv0),blend);
-    clip(o.albedo.a-alpha_ref);
+    clip(o.albedo.a-abs(alpha_ref));
     o.albedo.a=1;
-    o.normal=float4(normalize(f.normal)*.5+.5,.875+.125*saturate(f.hemi));
+    float3 normal = normalize(f.normal);
+    float hemi = f.hemi;
+    if (alpha_ref > 0)
+    {
+        float4 baked = lerp(normal_hemi_atlas.Sample(normal_hemi_sampler, f.uv1),
+                            normal_hemi_atlas.Sample(normal_hemi_sampler, f.uv0), blend);
+        float3 mapped = baked.rgb * 2.0 - 1.0;
+        if (dot(mapped, mapped) > 1e-6)
+            normal = normalize(mapped);
+        hemi *= baked.a * 3.1;
+    }
+    o.normal = float4(normal * .5 + .5, .875 + .125 * saturate(hemi));
     o.surface=float4(0,1.f/3.f,0,0);
     return o;
 }

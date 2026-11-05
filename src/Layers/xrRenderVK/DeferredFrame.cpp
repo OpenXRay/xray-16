@@ -38,6 +38,13 @@ void DeferredFrame::geometry(const FrameRecordingContext &frame, void *user_data
     }
     if (context.local_shadows_ && context.render_world_ && context.local_lights_ && !context.local_lights_->empty())
     {
+        std::string error;
+        if (!context.local_shadows_->reserve_lights(frame.image_index, context.local_lights_->size(), error))
+        {
+            Msg("! [renderer-vulkan] local light storage: %s", error.c_str());
+            context.recorded_ = false;
+            return;
+        }
         context.recorded_ &= context.local_shadows_->initialize_layers(frame);
         for (uint32_t i = 0; i < context.local_lights_->size(); ++i)
         {
@@ -162,7 +169,16 @@ void DeferredFrame::overlay(const FrameRecordingContext &frame, void *user_data)
 void DeferredFrame::capture_distortion(VkCommandBuffer command, VkImage image, uint32_t index, void *user_data)
 {
     auto &context = *static_cast<DeferredFrame *>(user_data);
-    context.recorded_ &= context.water_->capture_refraction(command, image, index);
+    const float mode = context.shadow_uniform_.options[1];
+    if (mode > .5f && (mode < 1.5f || mode > 2.5f))
+        return;
+    if (!context.water_->capture_refraction(command, image, index))
+    {
+        context.recorded_ = false;
+        return;
+    }
+    context.frame_->record_distortion_mask(command, index, context.distortion_, context.distortion_data_);
+    context.recorded_ &= context.water_->capture_distortion(command, image, index);
 }
 
 void DeferredFrame::distortion_overlay(const FrameRecordingContext &frame, void *user_data)
@@ -171,7 +187,7 @@ void DeferredFrame::distortion_overlay(const FrameRecordingContext &frame, void 
     const float debug_mode = context.shadow_uniform_.options[1];
     const bool isolated_gbuffer = debug_mode > .5f && (debug_mode < 1.5f || debug_mode > 2.5f);
     if (!isolated_gbuffer)
-        context.distortion_(frame, context.distortion_data_);
+        context.recorded_ &= context.pass_->composite_distortion(frame);
     foreground(frame, user_data);
 }
 

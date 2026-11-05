@@ -173,8 +173,19 @@ bool transform_tree_vertices(LevelBytes definition, LevelModel &model, std::stri
             return false;
         }
     }
+    // Desktop halves the serialized scale/bias, then multiplies by
+    // Tree_SBC (default 1.5) and the deferred factor 1.3333.
+    const float hemi_scale = real(definition.data + 76) * .999975f;
+    const float hemi_bias = real(definition.data + 96) * .999975f;
+    if (!std::isfinite(hemi_scale) || !std::isfinite(hemi_bias))
+    {
+        error = "nonfinite OGF tree lighting";
+        return false;
+    }
     for (auto &vertex : model.vertices)
     {
+        const float authored = vertex.baked[3];
+        vertex.baked[3] = std::clamp(authored * hemi_scale + hemi_bias, 0.f, 1.f);
         const std::array<float, 3> source{vertex.position[0], vertex.position[1], vertex.position[2]};
         const std::array<float, 3> normal{vertex.normal[0], vertex.normal[1], vertex.normal[2]};
         const std::array<float, 3> tangent{float(vertex.tangent[0]) / 127.f, float(vertex.tangent[1]) / 127.f,

@@ -126,6 +126,7 @@ class GpuLevel
         bool glow_alpha_add{};
         bool fog{};
         bool lightmapped{};
+        bool lod_atlas{};
         bool terrain{};
         bool surface{};
         bool single_detail{};

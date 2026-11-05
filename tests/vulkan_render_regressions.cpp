@@ -17,10 +17,6 @@
 using namespace xray::render::vulkan;
 int main()
 {
-    assert(particle_is_surface_ring("hit_fx\\effects\\hit_water_hit_distort", true));
-    assert(particle_is_surface_ring("hit_fx\\effects\\hit_water_hit_distort_big", true));
-    assert(!particle_is_surface_ring("hit_fx\\effects\\hit_water_splash", true));
-    assert(!particle_is_surface_ring("hit_fx\\effects\\hit_water_hit_distort", false));
     const auto blade = detail_instance(10, 2, 3, 1.57079632679f, 2);
     const float point[]{1, 0, 0};
     const auto transformed = detail_transform(blade, point);

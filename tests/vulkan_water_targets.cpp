@@ -72,16 +72,19 @@ int main()
     assert(targets.initialize(vk_mock::handle<VkPhysicalDevice>(4),
         vk_mock::handle<VkDevice>(1), VK_FORMAT_B8G8R8A8_UNORM,
         {800, 600}, 2, memory, dispatch, buffers, error));
-    assert(vk_mock::images.size() == 4 && targets.refraction(0) && targets.reflection(1));
+    assert(vk_mock::images.size() == 4 && targets.refraction(0) && targets.distortion_field(1));
     WaterSceneUniform scene{};
     scene.camera_position[3] = 1.f;
     assert(targets.uniform(1) && targets.write_uniform(1, scene, error));
     assert(targets.capture(vk_mock::handle<VkCommandBuffer>(2),
         vk_mock::handle<VkImage>(3), 1));
-    assert(copies == 2 && barriers == 2);
+    assert(copies == 1 && barriers == 2);
     assert(targets.capture_refraction(vk_mock::handle<VkCommandBuffer>(2),
         vk_mock::handle<VkImage>(3), 1));
-    assert(copies == 3 && barriers == 4); // Reflection is not recopied.
+    assert(copies == 2 && barriers == 4);
+    assert(targets.capture_distortion(vk_mock::handle<VkCommandBuffer>(2),
+        vk_mock::handle<VkImage>(3), 1));
+    assert(copies == 3 && barriers == 6);
     assert(!targets.capture(vk_mock::handle<VkCommandBuffer>(2),
         vk_mock::handle<VkImage>(3), 2));
     targets.destroy();

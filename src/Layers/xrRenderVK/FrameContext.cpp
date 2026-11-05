@@ -820,7 +820,7 @@ bool FrameContext::enable_interpass(std::string& error)
     attachments[1].format = m_depth_format;
     attachments[1].samples = VK_SAMPLE_COUNT_1_BIT;
     attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
-    attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachments[1].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
     attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
     const VkAttachmentReference color{0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
@@ -833,8 +833,10 @@ bool FrameContext::enable_interpass(std::string& error)
     const VkSubpassDependency dependencies[]{
     {
         VK_SUBPASS_EXTERNAL, 0,
-        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT |
+            VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT |
+            VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
         VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
         VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
             VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
@@ -854,6 +856,25 @@ bool FrameContext::enable_interpass(std::string& error)
     { error = "cannot create Vulkan water overlay pass"; return false; }
     error.clear();
     return true;
+}
+
+void FrameContext::record_distortion_mask(VkCommandBuffer command, uint32_t image_index,
+    FrameRecorder recorder, void* data) const
+{
+    VkRenderPassBeginInfo begin{VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
+    begin.renderPass = m_overlay_pass;
+    begin.framebuffer = m_framebuffers[image_index];
+    begin.renderArea.extent = m_extent;
+    m_vk.cmd_begin_render_pass(command, &begin, VK_SUBPASS_CONTENTS_INLINE);
+    VkClearAttachment clear{};
+    clear.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    clear.clearValue.color = {{127.f / 255.f, 127.f / 255.f, 0.f, 127.f / 255.f}};
+    VkClearRect rect{};
+    rect.rect.extent = m_extent;
+    rect.layerCount = 1;
+    m_vk.cmd_clear_attachments(command, 1, &clear, 1, &rect);
+    recorder({command, m_overlay_pass, begin.framebuffer, m_extent, image_index, m_current_frame}, data);
+    m_vk.cmd_end_render_pass(command);
 }
 
 void FrameContext::clear_depth(VkCommandBuffer command) const

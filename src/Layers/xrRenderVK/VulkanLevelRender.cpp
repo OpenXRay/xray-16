@@ -991,13 +991,16 @@ void VulkanLevelRender::Calculate()
     const DeferredEnvironment environment = current_environment();
     Lights.Update(lights_);
     game_device_->queue_lights(Lights.SceneLights());
+    VulkanHemiLightGrid scene_lights;
+    if (!object_specifics_.empty())
+        scene_lights.reset(Lights.SceneLights());
     unsigned ray_budget = unsigned(std::max(ros_ray_budget, 0));
     for (size_t i = 0; i < object_specifics_.size(); ++i)
     {
         auto *object = object_specifics_[(i + Device.dwFrame) % object_specifics_.size()];
         if (object)
             object->update(environment.ambient_color, environment.hemi_color, environment.sun_color,
-                           Lights.SceneLights(), &Lights.HemiLights(), &ray_budget);
+                           scene_lights, &Lights.HemiLights(), &ray_budget);
     }
 
     std::vector<uint32_t> visible_roots;

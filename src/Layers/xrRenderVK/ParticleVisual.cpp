@@ -284,7 +284,6 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     }
     auto &vertices = buffers.scratch;
     vertices.resize(count * 4);
-    const bool water_ring = particle_is_surface_ring(def_->name, distortion_);
     for (u32 i = 0; i < count; ++i)
     {
         const auto& p = particles[i];
@@ -296,42 +295,34 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
         const float speed=velocity.magnitude();
         if(def_->flags & (1u<<18))
         { sx+=speed*def_->velocity_scale[0];sy+=speed*def_->velocity_scale[1]; }
-        // These authored refraction rings describe the water surface;
-        // their emission velocity belongs to the impact, not the sprite plane.
-        if (water_ring)
+        if (def_->flags & (1u << 15))
         {
-            sprite_right.set(1.f, 0.f, 0.f);
-            sprite_up.set(0.f, 0.f, 1.f);
-        }
-        else if(def_->flags & (1u<<15))
-        {
-            if(speed<EPS_S && (def_->flags & (1u<<20)))
+            if (speed < EPS_S && (def_->flags & (1u << 20)))
             {
-                Fmatrix basis;basis.setXYZ(def_->align_rotation[0],def_->align_rotation[1],def_->align_rotation[2]);
-                basis.mulA_43(transform_);sprite_right=basis.i;sprite_up=basis.k;
+                Fmatrix basis;
+                basis.setXYZ(def_->align_rotation[0], def_->align_rotation[1], def_->align_rotation[2]);
+                basis.mulA_43(transform_);
+                sprite_right = basis.i;
+                sprite_up = basis.k;
             }
-            else if (def_->flags & (1u << 21))
+            else if (speed >= EPS_S && (def_->flags & (1u << 21)))
             {
-                Fvector direction;
+                const auto basis = particle_face_basis({velocity.x / speed, velocity.y / speed, velocity.z / speed});
+                const Fvector local_right{basis.right[0], basis.right[1], basis.right[2]};
+                const Fvector local_up{basis.up[0], basis.up[1], basis.up[2]};
+                transform_.transform_dir(sprite_right, local_right);
+                transform_.transform_dir(sprite_up, local_up);
+            }
+            else
+            {
+                Fvector direction, transformed;
                 if (speed >= EPS_S)
                     direction.div(velocity, speed);
                 else
                     direction.setHP(-def_->align_rotation[1], -def_->align_rotation[0]);
-                transform_.transform_dir(direction);
-                const auto basis = particle_face_basis({direction.x, direction.y, direction.z});
-                sprite_right.set(basis.right[0], basis.right[1], basis.right[2]);
-                sprite_up.set(basis.up[0], basis.up[1], basis.up[2]);
-            }
-            else
-            {
-                Fvector direction,camera_direction;
-                if(speed>=EPS_S) direction.div(velocity,speed);
-                else direction.setHP(-def_->align_rotation[1],-def_->align_rotation[0]);
-                transform_.transform_dir(direction);camera_direction.crossproduct(right,up);
-                const auto basis=particle_path_basis({direction.x,direction.y,direction.z},
-                    {camera_direction.x,camera_direction.y,camera_direction.z});
-                sprite_right.set(basis.right[0],basis.right[1],basis.right[2]);
-                sprite_up.set(basis.up[0],basis.up[1],basis.up[2]);
+                transform_.transform_dir(transformed, direction);
+                sprite_up = transformed;
+                sprite_right.crossproduct(sprite_up, Device.vCameraDirection).normalize_safe();
             }
         }
         const u32 sprite_frame = p.frame / 255u % def_->frame_count;
@@ -363,7 +354,7 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
         return false;
     if (distortion_)
         return pass.record_distortion(frame, buffers.vertices.handle(), buffers.indices.handle(),
-            count * 6, mvp, material_);
+            count * 6, mvp, material_, phase == GeometryPhase::Distortion);
     RenderPassGraph graph;
     if (!build_render_pass_graph({RenderConsumer::Particle,
             deferred_set ? SurfaceMode::AlphaTest : SurfaceMode::Transparent,
@@ -549,10 +540,16 @@ bool VulkanParticleGroup::record(const FrameRecordingContext& frame, const Defer
     return true;
 }
 
+bool VulkanParticleEffect::has_active_distortion() const
+{
+    return distortion_ && material_ && effect_ >= 0 &&
+        PAPI::ParticleManager()->GetParticlesCount(effect_) != 0;
+}
+
 bool VulkanParticleGroup::has_distortion() const
 {
-    for (const auto& effect : effects_) if (effect->distortion()) return true;
-    for (const auto& child : triggered_) if (child.effect->distortion()) return true;
+    for (const auto& effect : effects_) if (effect->has_active_distortion()) return true;
+    for (const auto& child : triggered_) if (child.effect->has_active_distortion()) return true;
     return false;
 }
 

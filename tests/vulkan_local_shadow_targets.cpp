@@ -128,6 +128,10 @@ int main()
     light.position_range[3] = 25.f;
     assert(targets.write_light(1, 0, light, error));
     assert(!targets.write_light(1, LocalLightCapacity, light, error));
+    const auto other_image = targets.uniform(0);
+    assert(targets.reserve_lights(1, LocalLightCapacity + 1, error));
+    assert(targets.write_light(1, LocalLightCapacity, light, error));
+    assert(targets.uniform(0) == other_image);
     FrameRecordingContext shadow;
     assert(targets.begin_face(frame, 3, 5, shadow));
     assert(shadow.render_pass == targets.render_pass() && shadow.extent.width == LocalShadowSize);

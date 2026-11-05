@@ -25,6 +25,8 @@ bool LocalShadowTargets::initialize(VkDevice device, VkFormat format, uint32_t c
         barrier_aspects_ |= VK_IMAGE_ASPECT_STENCIL_BIT;
     device_ = device;
     vk_ = dispatch;
+    memory_ = memory;
+    buffers_ = buffers;
     const VkDeviceSize alignment = uniform_alignment ? uniform_alignment : 1;
     uniform_stride_ = (sizeof(LocalLightUniform) + alignment - 1) / alignment * alignment;
     destroy_sampler_ = destroy_sampler;
@@ -176,9 +178,25 @@ bool LocalShadowTargets::initialize(VkDevice device, VkFormat format, uint32_t c
     return true;
 }
 
+bool LocalShadowTargets::reserve_lights(uint32_t image, size_t count, std::string &error)
+{
+    if (image >= image_count_)
+        return false;
+    auto &constants = targets_[image].constants;
+    if (count <= constants.size() / uniform_stride_)
+        return true;
+    const size_t capacity = std::max(count, size_t(constants.size() / uniform_stride_) * 2);
+    BufferResource replacement;
+    if (!replacement.initialize(device_, uniform_stride_ * capacity, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, memory_, buffers_, error))
+        return false;
+    constants = std::move(replacement);
+    return true;
+}
+
 bool LocalShadowTargets::write_light(uint32_t image, uint32_t index, const LocalLightUniform &value, std::string &error)
 {
-    return image < image_count_ && index < LocalLightCapacity &&
+    return image < image_count_ && index < targets_[image].constants.size() / uniform_stride_ &&
            targets_[image].constants.write(VkDeviceSize(index) * uniform_stride_, &value, sizeof(value), error);
 }
 

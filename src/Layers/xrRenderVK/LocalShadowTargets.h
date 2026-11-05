@@ -42,6 +42,7 @@ class LocalShadowTargets
                     const VkPhysicalDeviceMemoryProperties &memory, const FrameDispatch &dispatch,
                     const BufferResourceDispatch &buffers, PFN_vkCreateSampler create_sampler,
                     PFN_vkDestroySampler destroy_sampler, std::string &error, VkDeviceSize uniform_alignment = 256);
+    bool reserve_lights(uint32_t image, size_t count, std::string &error);
     bool write_light(uint32_t image, uint32_t index, const LocalLightUniform &value, std::string &error);
     bool initialize_layers(const FrameRecordingContext &frame);
     bool begin_face(const FrameRecordingContext &frame, uint32_t slot, uint32_t face,
@@ -97,6 +98,8 @@ class LocalShadowTargets
     VkSampler sampler_{};
     PFN_vkDestroySampler destroy_sampler_{};
     FrameDispatch vk_{};
+    VkPhysicalDeviceMemoryProperties memory_{};
+    BufferResourceDispatch buffers_{};
     VkDeviceSize uniform_stride_{sizeof(LocalLightUniform)};
     std::vector<Target> targets_;
 };

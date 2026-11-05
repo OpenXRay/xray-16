@@ -66,7 +66,7 @@ bool WaterTargets::initialize(VkPhysicalDevice physical, VkDevice device, VkForm
     vk_ = dispatch;
     targets_.resize(count);
     for (auto& target : targets_)
-        if (!make_image(target.refraction, error) || !make_image(target.reflection, error) ||
+        if (!make_image(target.refraction, error) || !make_image(target.field, error) ||
             !target.constants.initialize(device, sizeof(WaterSceneUniform),
                 VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -85,60 +85,57 @@ bool WaterTargets::write_uniform(uint32_t index, const WaterSceneUniform& value,
 
 bool WaterTargets::capture(VkCommandBuffer command, VkImage source, uint32_t index) const
 {
-    return capture_images(command, source, index, 2);
+    return capture_images(command, source, index, false);
 }
 
 bool WaterTargets::capture_refraction(VkCommandBuffer command, VkImage source, uint32_t index) const
 {
-    // Refresh the completed transparent world for particles, without copying
-    // the reflection image again or allowing particles to sample the HUD.
-    return capture_images(command, source, index, 1);
+    return capture(command, source, index);
 }
 
-bool WaterTargets::capture_images(VkCommandBuffer command, VkImage source, uint32_t index, uint32_t count) const
+bool WaterTargets::capture_distortion(VkCommandBuffer command, VkImage source, uint32_t index) const
+{
+    return capture_images(command, source, index, true);
+}
+
+bool WaterTargets::capture_images(VkCommandBuffer command, VkImage source, uint32_t index, bool distortion) const
 {
     if (!command || !source || index >= targets_.size()) return false;
-    const Target& target = targets_[index];
-    VkImageMemoryBarrier transitions[2]{};
-    const VkImage images[]{target.refraction.image, target.reflection.image};
-    for (uint32_t i = 0; i < count; ++i)
-    {
-        transitions[i].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        transitions[i].image = images[i];
-        transitions[i].srcQueueFamilyIndex = transitions[i].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-        transitions[i].subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        transitions[i].subresourceRange.levelCount = transitions[i].subresourceRange.layerCount = 1;
-        transitions[i].oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        transitions[i].newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        transitions[i].srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-        transitions[i].dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-    }
+    const auto& target = targets_[index];
+    VkImageMemoryBarrier barrier{VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
+    barrier.image = distortion ? target.field.image : target.refraction.image;
+    barrier.srcQueueFamilyIndex = barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.subresourceRange.levelCount = barrier.subresourceRange.layerCount = 1;
+    barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     vk_.cmd_pipeline_barrier(command, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-        VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, count, transitions);
+        VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
     VkImageCopy region{};
     region.srcSubresource.aspectMask = region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     region.srcSubresource.layerCount = region.dstSubresource.layerCount = 1;
     region.extent = {extent_.width, extent_.height, 1};
-    for (uint32_t i = 0; i < count; ++i)
-        vk_.cmd_copy_image(command, source, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            images[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
-    for (uint32_t i = 0; i < count; ++i)
-    {
-        auto &transition = transitions[i];
-        transition.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        transition.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        transition.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        transition.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-    }
+    vk_.cmd_copy_image(command, source, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+        barrier.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+    barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+    barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    VkMemoryBarrier source_read{VK_STRUCTURE_TYPE_MEMORY_BARRIER};
+    source_read.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    source_read.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
     vk_.cmd_pipeline_barrier(command, VK_PIPELINE_STAGE_TRANSFER_BIT,
-        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, count, transitions);
+        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+        0, 1, &source_read, 0, nullptr, 1, &barrier);
     return true;
 }
 
 VkImageView WaterTargets::refraction(uint32_t index) const
 { return index < targets_.size() ? targets_[index].refraction.view : VK_NULL_HANDLE; }
-VkImageView WaterTargets::reflection(uint32_t index) const
-{ return index < targets_.size() ? targets_[index].reflection.view : VK_NULL_HANDLE; }
+VkImageView WaterTargets::distortion_field(uint32_t index) const
+{ return index < targets_.size() ? targets_[index].field.view : VK_NULL_HANDLE; }
 VkBuffer WaterTargets::uniform(uint32_t index) const
 { return index < targets_.size() ? targets_[index].constants.handle() : VK_NULL_HANDLE; }
 
@@ -148,7 +145,7 @@ void WaterTargets::destroy()
         for (auto& target : targets_)
         {
             target.constants.destroy();
-            for (Image* image : {&target.refraction, &target.reflection})
+            for (Image* image : {&target.refraction, &target.field})
             {
                 if (image->view) vk_.destroy_image_view(device_, image->view, nullptr);
                 if (image->image) vk_.destroy_image(device_, image->image, nullptr);

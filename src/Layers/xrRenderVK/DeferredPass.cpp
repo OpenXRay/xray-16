@@ -1196,13 +1196,13 @@ void DeferredPass::update_light_projection(VkDescriptorSet set, VkImageView proj
     vk_.update_descriptor_sets(device_, 1, &write, 0, nullptr);
 }
 
-bool DeferredPass::water_set(uint32_t image_index, VkImageView refraction, VkImageView reflection, VkImageView depth,
+bool DeferredPass::water_set(uint32_t image_index, VkImageView refraction, VkImageView distortion_field, VkImageView depth,
                              VkSampler sampler, VkSampler depth_sampler, VkBuffer scene_uniform, std::string &error)
 {
-    if (!pool_ || !refraction || !reflection || !depth || !sampler || !depth_sampler || !scene_uniform ||
+    if (!pool_ || !refraction || !distortion_field || !depth || !sampler || !depth_sampler || !scene_uniform ||
         image_index >= 16)
     {
-        error = "water needs reflection, refraction and opaque depth";
+        error = "water needs a scene snapshot, distortion field and opaque depth";
         return false;
     }
     if (water_sets_.size() <= image_index)
@@ -1219,7 +1219,7 @@ bool DeferredPass::water_set(uint32_t image_index, VkImageView refraction, VkIma
         error = "water descriptor pool exhausted";
         return false;
     }
-    const VkImageView views[]{refraction, reflection, depth};
+    const VkImageView views[]{refraction, distortion_field, depth};
     VkDescriptorImageInfo images[3]{};
     VkWriteDescriptorSet writes[4]{};
     for (uint32_t i = 0; i < 3; ++i)
@@ -1589,7 +1589,8 @@ bool DeferredPass::record_local_light(const FrameRecordingContext &frame, VkDesc
     return true;
 }
 
-bool DeferredPass::initialize_distortion(VkShaderModule vertex, VkShaderModule fragment, std::string &error)
+bool DeferredPass::initialize_distortion(VkShaderModule vertex, VkShaderModule fragment, VkShaderModule screen_vertex,
+                                          VkShaderModule composite, std::string &error)
 {
     if (!device_ || !water_layout_ || !vertex || !fragment)
     {
@@ -1598,11 +1599,28 @@ bool DeferredPass::initialize_distortion(VkShaderModule vertex, VkShaderModule f
     }
     return make_pipeline(device_, light_pass_, water_layout_, vertex, fragment,
                          PipelineFlag::Geometry | PipelineFlag::Transparent, vk_, distortion_pipeline_, error,
-                         "particle distortion");
+                         "particle distortion") &&
+           make_pipeline(device_, light_pass_, water_layout_, screen_vertex, composite,
+                         PipelineFlag::None, vk_, distortion_composite_, error, "distortion composite");
+}
+
+bool DeferredPass::composite_distortion(const FrameRecordingContext &frame) const
+{
+    if (!distortion_composite_ || !lighting_compatible(frame) || frame.image_index >= water_sets_.size())
+        return false;
+    command_cache_.invalidate();
+    vk_.cmd_bind_pipeline(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, distortion_composite_);
+    viewport_scissor(frame, vk_);
+    vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, water_layout_, 1, 1,
+                                 &water_sets_[frame.image_index], 0, nullptr);
+    vk_.cmd_draw(frame.command_buffer, 3, 1, 0, 0);
+    ++draw_calls_;
+    ++triangles_;
+    return true;
 }
 
 bool DeferredPass::record_distortion(const FrameRecordingContext &frame, VkBuffer vertices, VkBuffer indices,
-                                     uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material) const
+                                     uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material, bool field) const
 {
     command_cache_.invalidate();
     if (!distortion_pipeline_ || !lighting_compatible(frame) || !frame.command_buffer ||
@@ -1618,7 +1636,7 @@ bool DeferredPass::record_distortion(const FrameRecordingContext &frame, VkBuffe
     vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, water_layout_, 0, 2, sets, 0,
                                  nullptr);
     command_cache_.push(vk_, frame.command_buffer, water_layout_, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(mvp), mvp);
-    const float params[]{0.f, 1.f / frame.extent.width, 1.f / frame.extent.height, 0.f};
+    const float params[]{0.f, 1.f / frame.extent.width, 1.f / frame.extent.height, field ? 1.f : 0.f};
     command_cache_.push(vk_, frame.command_buffer, water_layout_, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(mvp),
                         sizeof(params), params);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, 0, 0, 0);
@@ -1691,6 +1709,8 @@ void DeferredPass::destroy()
             vk_.destroy_pipeline(device_, local_light_pipeline_, nullptr);
         if (water_pipeline_)
             vk_.destroy_pipeline(device_, water_pipeline_, nullptr);
+        if (distortion_composite_)
+            vk_.destroy_pipeline(device_, distortion_composite_, nullptr);
         if (distortion_pipeline_)
             vk_.destroy_pipeline(device_, distortion_pipeline_, nullptr);
     }
@@ -1737,7 +1757,7 @@ void DeferredPass::destroy()
     shadow_opaque_ = shadow_cutout_ = VK_NULL_HANDLE;
     local_light_pipeline_ = VK_NULL_HANDLE;
     water_pipeline_ = VK_NULL_HANDLE;
-    distortion_pipeline_ = VK_NULL_HANDLE;
+    distortion_pipeline_ = distortion_composite_ = VK_NULL_HANDLE;
     geometry_layout_ = skinned_layout_ = light_layout_ = weather_layout_ = VK_NULL_HANDLE;
     local_light_layout_ = VK_NULL_HANDLE;
     water_layout_ = VK_NULL_HANDLE;

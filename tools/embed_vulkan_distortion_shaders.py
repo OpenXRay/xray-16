@@ -10,9 +10,10 @@ HEADER = ROOT / "src/Layers/xrRenderVK/DistortionShaders.h"
 def generate(glslc):
     lines = ["#pragma once", "", "#include <cstdint>", "", "namespace xray::render::vulkan::distortion_shaders", "{"]
     with tempfile.TemporaryDirectory() as directory:
-        for stage, name in (("vert", "Vertex"), ("frag", "Fragment")):
-            output = Path(directory) / (stage + ".spv")
-            subprocess.run([glslc, "--target-env=vulkan1.0", "-o", str(output), str(ROOT / ("src/Layers/xrRenderVK/smoke/distortion." + stage))], check=True)
+        for source, name in (("distortion.vert", "Vertex"), ("distortion.frag", "Fragment"),
+                             ("distortion_composite.frag", "Composite")):
+            output = Path(directory) / (source + ".spv")
+            subprocess.run([glslc, "--target-env=vulkan1.0", "-o", str(output), str(ROOT / ("src/Layers/xrRenderVK/smoke/" + source))], check=True)
             data = output.read_bytes()
             if len(data) < 20 or len(data) % 4 or data[:4] != b"\x03\x02\x23\x07":
                 raise ValueError("invalid distortion SPIR-V")

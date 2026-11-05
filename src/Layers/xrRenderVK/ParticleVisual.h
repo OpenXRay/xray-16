@@ -43,7 +43,7 @@ public:
         GeometryPhase phase = GeometryPhase::Transparent);
     void release_gpu(); // The owner waits for all submitted frames first.
     uint8_t priority() const { return priority_; }
-    bool distortion() const { return distortion_; }
+    bool has_active_distortion() const;
     void set_events(std::function<void(bool, PAPI::Particle&)> events);
     u32 getType() const override { return 8; }
     vis_data& getVisData() override { return visibility_; }

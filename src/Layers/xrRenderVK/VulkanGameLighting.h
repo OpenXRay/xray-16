@@ -154,6 +154,8 @@ class VulkanObjectSpecific final : public IRender_ObjectSpecific
     }
     void force_mode(u32 mode) override
     {
+        if (mode_ != (mode & TRACE_ALL))
+            next_update_ = 0;
         mode_ = mode & TRACE_ALL;
     }
     float get_luminocity() override
@@ -169,12 +171,14 @@ class VulkanObjectSpecific final : public IRender_ObjectSpecific
         return hemi_cube_.data();
     }
     void update(const float *ambient, const float *hemi, const float *sun,
-                const std::vector<VulkanLightSnapshot> &lights, const VulkanHemiLightGrid *baked = nullptr,
+                const VulkanHemiLightGrid &lights, const VulkanHemiLightGrid *baked = nullptr,
                 unsigned *ray_budget = nullptr);
 
   private:
     ObjectVisibility visibility_;
     bool lighting_initialized_{};
+    uint32_t next_update_{}, last_update_{};
+    std::array<float, 3> last_position_{};
     IRenderable *parent_{};
     u32 mode_{TRACE_ALL};
     float luminocity_{};

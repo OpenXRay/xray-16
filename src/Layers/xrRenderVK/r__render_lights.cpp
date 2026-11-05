@@ -89,8 +89,6 @@ void VulkanGameDevice::render_lights(const float (&mvp)[16], bool render_world, 
                          [](const LightCandidate &a, const LightCandidate &b) { return a.distance < b.distance; });
         for (const auto &candidate : light_candidates_)
         {
-            if (local_uniforms_.size() >= LocalLightCapacity)
-                break;
             const auto &light_snapshot = *candidate.light;
             const VkRect2D scissor = candidate.scissor;
             if (!scissor.extent.width || !scissor.extent.height)

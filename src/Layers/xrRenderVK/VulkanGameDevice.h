@@ -219,7 +219,8 @@ class VulkanGameDevice
     WaterTargets water_targets_;
     SunShadowTargets sun_shadows_;
     LocalShadowTargets local_shadows_;
-    std::vector<std::array<VkDescriptorSet, LocalLightCapacity>> local_sets_;
+    std::vector<std::vector<VkDescriptorSet>> local_sets_;
+    std::vector<VkBuffer> local_descriptor_buffers_;
     std::vector<VulkanLightSnapshot> light_snapshots_;
     struct LightCandidate
     {
@@ -232,7 +233,7 @@ class VulkanGameDevice
     std::unordered_set<std::string> failed_light_projections_;
     std::unordered_map<std::string, VkImageView> light_projections_;
     std::vector<VkImageView> local_projection_views_;
-    std::vector<std::array<VkImageView, LocalLightCapacity>> local_bound_projections_;
+    std::vector<std::vector<VkImageView>> local_bound_projections_;
     std::vector<LocalLightUniform> local_uniforms_;
     std::vector<VkRect2D> local_scissors_;
     std::vector<BufferResource> forward_buffers_;

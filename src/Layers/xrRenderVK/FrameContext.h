@@ -111,6 +111,8 @@ public:
     bool attach_scene_depth(const std::vector<VkImageView>& views, std::string& error);
     bool enable_interpass(std::string& error);
     void clear_depth(VkCommandBuffer command) const;
+    void record_distortion_mask(VkCommandBuffer command, uint32_t image_index,
+        FrameRecorder recorder, void* data) const;
     bool recreate(VkPhysicalDevice physical_device, VkSurfaceKHR surface,
         VkExtent2D requested_extent, std::string& error);
     bool release_swapchain();

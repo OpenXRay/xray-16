@@ -12,9 +12,8 @@ struct alignas(16) WaterSceneUniform
     float camera_position[4]{};
 };
 static_assert(sizeof(WaterSceneUniform) == 144);
-// Captures the lit opaque frame into two independently owned sampled images
-// between the lighting and transparent passes. Reflection is a screen-space
-// estimate; both targets are refreshed for each acquired swapchain image.
+// The opaque snapshot serves both water reflection and refraction. After
+// transparent world rendering, particles reuse that snapshot and the field image.
 class WaterTargets
 {
 public:
@@ -25,8 +24,9 @@ public:
     bool write_uniform(uint32_t index, const WaterSceneUniform& value, std::string& error);
     bool capture(VkCommandBuffer command, VkImage source, uint32_t index) const;
     bool capture_refraction(VkCommandBuffer command, VkImage source, uint32_t index) const;
+    bool capture_distortion(VkCommandBuffer command, VkImage source, uint32_t index) const;
     VkImageView refraction(uint32_t index) const;
-    VkImageView reflection(uint32_t index) const;
+    VkImageView distortion_field(uint32_t index) const;
     VkBuffer uniform(uint32_t index) const;
     void destroy();
 
@@ -37,9 +37,9 @@ private:
         VkDeviceMemory memory{};
         VkImageView view{};
     };
-    struct Target { Image refraction, reflection; BufferResource constants; };
+    struct Target { Image refraction, field; BufferResource constants; };
     bool make_image(Image& image, std::string& error);
-    bool capture_images(VkCommandBuffer command, VkImage source, uint32_t index, uint32_t count) const;
+    bool capture_images(VkCommandBuffer command, VkImage source, uint32_t index, bool distortion) const;
     VkDevice device_{};
     VkFormat format_{VK_FORMAT_UNDEFINED};
     VkExtent2D extent_{};

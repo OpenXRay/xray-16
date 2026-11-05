@@ -112,7 +112,7 @@ void VulkanGlow::set_color(float r, float g, float b)
 }
 
 void VulkanObjectSpecific::update(const float *ambient, const float *hemi, const float *sun,
-                                  const std::vector<VulkanLightSnapshot> &lights, const VulkanHemiLightGrid *baked,
+                                  const VulkanHemiLightGrid &lights, const VulkanHemiLightGrid *baked,
                                   unsigned *ray_budget)
 {
     std::array<float, 3> position{};
@@ -129,7 +129,18 @@ void VulkanObjectSpecific::update(const float *ambient, const float *hemi, const
         position = {origin.x, origin.y, origin.z};
     }
 
-    lighting_sources_.assign(lights.begin(), lights.end());
+    const float dx = position[0] - last_position_[0];
+    const float dy = position[1] - last_position_[1];
+    const float dz = position[2] - last_position_[2];
+    const uint32_t frame = Device.dwFrame;
+    if (lighting_initialized_ && int32_t(frame - next_update_) < 0 && dx*dx + dy*dy + dz*dz < .15f*.15f)
+        return;
+    const uint32_t elapsed = std::clamp(frame - last_update_, 1u, 16u);
+    last_update_ = frame;
+    last_position_ = position;
+    next_update_ = frame + 4 + uint32_t((reinterpret_cast<uintptr_t>(this) >> 4) % 5);
+    lighting_sources_.clear();
+    lights.append(position, lighting_sources_);
     if (baked)
         baked->append(position, lighting_sources_);
     visibility_.position(position);
@@ -165,7 +176,7 @@ void VulkanObjectSpecific::update(const float *ambient, const float *hemi, const
     const VulkanObjectLighting lighting =
         evaluate_object_lighting(position, ambient, hemi, sun, mode_, lighting_sources_,
                                  ray_budget ? &sky_faces : nullptr, hemi_light_scale, hemi_light_flow);
-    const float blend = lighting_initialized_ ? std::clamp(Device.fTimeDelta * hemi_smooth, 0.f, 1.f) : 1.f;
+    const float blend = lighting_initialized_ ? std::clamp(Device.fTimeDelta * elapsed * hemi_smooth, 0.f, 1.f) : 1.f;
     luminocity_ = lighting.luminocity;
     hemi_luminocity_ += blend * (lighting.hemi_luminocity - hemi_luminocity_);
     for (unsigned i = 0; i < 6; ++i)

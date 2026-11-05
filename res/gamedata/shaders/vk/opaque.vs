@@ -80,6 +80,9 @@ Fragment main(Vertex vertex)
     fragment.tangent=rotate_object(vertex.tangent);fragment.bitangent=rotate_object(vertex.bitangent);
 #endif
     fragment.hemi = saturate(0.5 + 0.5 * normalize(fragment.normal).y);
+#if defined(VK_TREE_STATIC) && defined(LEVEL_GEOMETRY)
+    fragment.hemi = vertex.baked.a;
+#endif
 #if !defined(LEVEL_GEOMETRY)
     if (base_matrix_u.z >= 0.0)
     {

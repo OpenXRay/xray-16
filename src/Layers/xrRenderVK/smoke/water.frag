@@ -1,7 +1,6 @@
 #version 450
 layout(set = 0, binding = 0) uniform sampler2D water_texture;
 layout(set = 1, binding = 0) uniform sampler2D refraction_scene;
-layout(set = 1, binding = 1) uniform sampler2D reflection_scene;
 layout(set = 1, binding = 2) uniform sampler2D opaque_depth;
 layout(set = 1, binding = 3, std140) uniform Scene {
     mat4 view_projection;
@@ -50,7 +49,7 @@ void main()
         if (blocker < 0.99999 && projected.z > blocker + 0.0008)
         { reflection_uv = candidate; break; }
     }
-    vec3 reflected = texture(reflection_scene, reflection_uv).rgb;
+    vec3 reflected = texture(refraction_scene, reflection_uv).rgb;
     vec3 water_color = mix(refracted, reflected, fresnel);
     if (!glass) water_color = mix(water_color, vec3(0.04, 0.16, 0.20), 0.18 * shore);
     float alpha = glass ? clamp(-water.params.w, 0.08, 0.65) :

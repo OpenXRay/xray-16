@@ -208,7 +208,7 @@ bool GameTextureFactory::material(const std::string &texture_list, DeferredPass 
 }
 
 bool GameTextureFactory::lightmapped_material(const std::string &diffuse_name, const std::string &lightmap_name,
-                                              DeferredPass &pass, VkDescriptorSet &result, std::string &error)
+                                              DeferredPass &pass, VkDescriptorSet &result, std::string &error, bool atlas)
 {
     result = VK_NULL_HANDLE;
     const auto trim = [](std::string text) {
@@ -220,7 +220,7 @@ bool GameTextureFactory::lightmapped_material(const std::string &diffuse_name, c
     };
     Asset *diffuse = nullptr;
     Asset *lightmap = nullptr;
-    if (!load(trim(diffuse_name), diffuse, error) || !load(trim(lightmap_name), lightmap, error))
+    if (!load(trim(diffuse_name), diffuse, error, atlas) || !load(trim(lightmap_name), lightmap, error, atlas))
         return false;
     if (diffuse->cube || lightmap->cube)
     {

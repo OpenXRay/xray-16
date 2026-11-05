@@ -51,7 +51,7 @@ class GameTextureFactory
     bool material(const std::string &texture_list, DeferredPass &pass, VkDescriptorSet &result, std::string &error,
                   bool clamp = false, bool preserve_resolution = false);
     bool lightmapped_material(const std::string &diffuse, const std::string &lightmap, DeferredPass &pass,
-                              VkDescriptorSet &result, std::string &error);
+                              VkDescriptorSet &result, std::string &error, bool atlas = false);
     void release_lightmapped_material(VkDescriptorSet set, DeferredPass &pass);
     bool terrain_material(const std::string &diffuse, const std::string &lightmap,
                           const TerrainMaterialTextures &terrain, DeferredPass &pass, VkDescriptorSet &result,

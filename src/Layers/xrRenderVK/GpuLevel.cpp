@@ -287,6 +287,7 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
             mesh.glow_alpha_add = source.glow_alpha_add;
             mesh.fog = source.fog;
             mesh.lightmapped = source.lightmapped;
+            mesh.lod_atlas = source.lod_atlas;
             mesh.terrain = source.terrain;
             mesh.surface = source.surface;
             mesh.single_detail = source.single_detail;
@@ -429,7 +430,7 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
                                                                      definition.role != MaterialDefinition::Role::Lod
                                                                  ? blend_mode
                                                                  : -1,
-                                                             definition.object_lod},
+                                                             definition.object_lod || model.tree},
                                           mesh.pass_graph, error))
         {
             error =
@@ -452,7 +453,7 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
             mesh.terrain_scale = metadata.scale;
         if (mesh.single_detail)
             mesh.terrain_scale = metadata.scale;
-        const bool surface_roles = definition.role != MaterialDefinition::Role::Lod &&
+        const bool surface_roles = !model.lod_pairs && definition.role != MaterialDefinition::Role::Lod &&
             (metadata.bump_mode >= 2 || metadata.normal || !metadata.external_normal_texture.empty() ||
              metadata.material != 1 || metadata.material_weight != 0.f || mesh.terrain);
         mesh.surface = surface_roles;
@@ -519,8 +520,13 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
                 textures.surface_material(names, surface, pass, mesh.material, error, mesh.environment && !mesh.laemb,
                                           definition.class_name == "S_SET   " && definition.pass.clamp);
         }
-        const bool material_ready =
-            surface_roles        ? surface_ready
+        if (model.lod_pairs && textures.lightmapped_material(diffuse, diffuse + "_nm", pass, mesh.material, error, true))
+        {
+            mesh.lightmapped = true;
+            mesh.lod_atlas = true;
+        }
+        const bool material_ready = mesh.lod_atlas ||
+            (surface_roles        ? surface_ready
             : mesh.terrain       ? textures.terrain_material(diffuse, lightmap, terrain, pass, mesh.material, error)
             : mesh.single_detail ? textures.detail_material(diffuse, lightmap.empty() ? diffuse : lightmap,
                                                             detail_texture, pass, mesh.material, error)
@@ -529,7 +535,7 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
             : lightmap.empty()   ? textures.material(material.textures, pass, mesh.material, error,
                                                      definition.class_name == "S_SET   " && definition.pass.clamp,
                                                      definition.role == MaterialDefinition::Role::Lod)
-                                 : textures.lightmapped_material(diffuse, lightmap, pass, mesh.material, error);
+                                 : textures.lightmapped_material(diffuse, lightmap, pass, mesh.material, error));
         if (!material_ready)
         {
             error = "level material id=" + std::to_string(model.material) + " shader='" + material.shader +
@@ -1248,7 +1254,31 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext &frame, c
         android_set_load_context(context);
     }
 #endif
-    if (visual.type == 6 && lod < .33f)
+    float billboard_alpha = 0.f;
+    if (visual.type == 6 && visual.bounds[9] > 0.f)
+    {
+        // GL/R2 uses corrected radius/distance², scaled by viewport area,
+        // FOV and the default global LOD quality. Both representations
+        // participate between the two thresholds.
+        const auto &b = visual.bounds;
+        const float radius = b[9];
+        std::array<float, 3> half_extents{(b[3]-b[0])*.5f, (b[4]-b[1])*.5f, (b[5]-b[2])*.5f};
+        std::sort(half_extents.begin(), half_extents.end());
+        const float ratio = std::clamp(half_extents[1] / radius, 0.f, 1.f);
+        const float factor = (2.f / 3.14159265f) * (std::asin(ratio) + ratio * std::sqrt(1.f-ratio*ratio));
+        const float dx = b[6] - Device.vCameraPosition.x;
+        const float dy = b[7] - Device.vCameraPosition.y;
+        const float dz = b[8] - Device.vCameraPosition.z;
+        const float fov = 90.f / std::max(Device.fFOV, 1.f);
+        const float ssa = radius * factor / std::max(dx*dx+dy*dy+dz*dz, 1e-6f) *
+            float(frame.extent.width) * float(frame.extent.height) * fov*fov * .75f;
+        if (ssa < 3.5f * 3.5f)
+            return true;
+        constexpr float near_ssa = (64.f/3.f)*(64.f/3.f);
+        constexpr float far_ssa = (48.f/3.f)*(48.f/3.f);
+        billboard_alpha = std::clamp((near_ssa - ssa) / (near_ssa - far_ssa), 0.f, 1.f);
+    }
+    if (billboard_alpha >= 96.f/255.f && phase == GeometryPhase::OpaqueAndAlphaTest)
     {
         Fvector direction;
         direction.set(visual.bounds[6] - Device.vCameraPosition.x, visual.bounds[7] - Device.vCameraPosition.y,
@@ -1290,13 +1320,24 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext &frame, c
         }
 #endif
         const char *failure = nullptr;
-        const bool completed = pass.record_geometry(frame, mesh.vertex_buffer(), mesh.index_buffer(), 6, mvp,
+        Fmatrix view_projection, offset, shifted;
+        std::memcpy(&view_projection, mvp, sizeof(mvp));
+        direction.normalize_safe().mul(-.5f * visual.bounds[9]);
+        offset.translate(direction);
+        shifted.mul(view_projection, offset);
+        float billboard_mvp[16];
+        std::memcpy(billboard_mvp, &shifted, sizeof(billboard_mvp));
+        const bool completed = pass.record_geometry(frame, mesh.vertex_buffer(), mesh.index_buffer(), 6, billboard_mvp,
             mesh.material, SurfaceMode::AlphaTest, mesh.first_index + (views.second - views.first) * 6,
-            vertex, fragment, 96.f/255.f, nullptr, views.weight, nullptr, nullptr, mesh.first_vertex);
+            vertex, fragment, (mesh.lod_atlas ? 1.f : -1.f) * (96.f/255.f) / billboard_alpha,
+            nullptr, views.weight, nullptr, nullptr, mesh.first_vertex);
         if (!completed)
             report_visual_record_failure(index, mesh_index, phase, mesh.water, mesh.index_count, lod, failure);
-        return completed;
+        if (!completed || billboard_alpha >= 1.f)
+            return completed;
     }
+    if (billboard_alpha >= 1.f)
+        return true;
     if (visual.mesh >= 0)
     {
         if (static_cast<size_t>(visual.mesh) >= meshes_.size())

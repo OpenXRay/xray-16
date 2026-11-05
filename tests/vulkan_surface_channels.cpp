@@ -262,11 +262,11 @@ int main(int argc, char **argv)
         layout_info.pBindings = bindings.data();
         VkDescriptorSetLayout descriptor_layout{};
         check(vkCreateDescriptorSetLayout(device, &layout_info, nullptr, &descriptor_layout));
-        const VkDescriptorPoolSize pool_sizes[]{{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 84},
-                                                {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3},
+        const VkDescriptorPoolSize pool_sizes[]{{VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 92},
+                                                {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 4},
                                                 {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1}};
         VkDescriptorPoolCreateInfo pool_info{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
-        pool_info.maxSets = 7;
+        pool_info.maxSets = 8;
         pool_info.poolSizeCount = 3;
         pool_info.pPoolSizes = pool_sizes;
         VkDescriptorPool pool{};
@@ -805,6 +805,24 @@ int main(int argc, char **argv)
         forward_pipeline_info.pPushConstantRanges = &range;
         VkPipelineLayout forward_pipeline_layout{};
         check(vkCreatePipelineLayout(device, &forward_pipeline_info, nullptr, &forward_pipeline_layout));
+        VkDescriptorSetLayoutBinding composite_bindings[]{bindings[0], bindings[1], bindings[2],
+            {3, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
+        VkDescriptorSetLayoutCreateInfo composite_layout_info{VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
+        composite_layout_info.bindingCount = 4;
+        composite_layout_info.pBindings = composite_bindings;
+        VkDescriptorSetLayout composite_descriptor{};
+        check(vkCreateDescriptorSetLayout(device, &composite_layout_info, nullptr, &composite_descriptor));
+        alloc.pSetLayouts = &composite_descriptor;
+        VkDescriptorSet composite_set{};
+        check(vkAllocateDescriptorSets(device, &alloc, &composite_set));
+        const VkDescriptorSetLayout composite_layouts[]{descriptor_layout, composite_descriptor};
+        auto composite_pipeline_info = pipeline_layout_info;
+        composite_pipeline_info.setLayoutCount = 2;
+        composite_pipeline_info.pSetLayouts = composite_layouts;
+        composite_pipeline_info.pPushConstantRanges = &range;
+        VkPipelineLayout composite_pipeline_layout{};
+        check(vkCreatePipelineLayout(device, &composite_pipeline_info, nullptr, &composite_pipeline_layout));
+        const auto composite_ps = embedded(distortion_shaders::Composite, sizeof(distortion_shaders::Composite));
         bool cube_initialized = false;
         bool material_mips_initialized = false;
         auto execute = [&](VkShaderModule fragment, const Push &push, bool use_cube = false,
@@ -836,7 +854,8 @@ int main(int argc, char **argv)
             scissor.extent.width = wide ? 128 : sprite ? 2 : 1;
             viewport.height = scene_test ? 96.f : sprite ? 2.f : 1.f;
             scissor.extent.height = scene_test ? 96 : sprite ? 2 : 1;
-            pipeline_info.layout = forward   ? forward_pipeline_layout
+            pipeline_info.layout = fragment == composite_ps ? composite_pipeline_layout
+                                   : forward   ? forward_pipeline_layout
                                    : local   ? local_pipeline_layout
                                    : weather ? weather_pipeline_layout
                                    : skinned ? skinned_pipeline_layout
@@ -953,6 +972,7 @@ int main(int argc, char **argv)
             const VkDescriptorSet draw_sets[]{weather ? weather_set : set, local     ? local_set
                                                                            : weather ? weather_environment_set
                                                                            : skinned ? pose_set
+                                                                           : fragment == composite_ps ? composite_set
                                                                                      : scene_set};
             const VkDescriptorSet forward_sets[]{set, forward_set, weather_environment_set};
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_info.layout, 0, forward ? 3 : 2,
@@ -1808,7 +1828,7 @@ int main(int argc, char **argv)
         fill(memory, input[0], {.4f,.3f,.2f,1});
         Push lod_push{};
         for (unsigned i=0;i<16;i+=5) lod_push.mvp[i]=1;
-        lod_push.threshold=96.f/255.f;
+        lod_push.threshold=-96.f/255.f;
         for (float weight : {0.f,.5f,1.f})
         {
             lod_push.scale=weight;
@@ -1817,6 +1837,14 @@ int main(int argc, char **argv)
             near(lod_pixel[1][2],1.f,"paired foliage normal survives view interpolation");
             near(lod_pixel[1][3],.9375f,"paired foliage preserves baked hemisphere");
         }
+        fill(memory, input[1], {.5f, 1.f, .5f, .2f});
+        lod_push.threshold = 96.f / 255.f;
+        const auto atlas_pixel = execute(lod_fragment, lod_push, false, lod_vertex);
+        near(atlas_pixel[1][1], 1.f, "foliage uses the authored normal atlas");
+        near(atlas_pixel[1][3], .875f + .125f * .5f * .2f * 3.1f, "atlas modulates baked hemisphere");
+        lod_push.threshold = 1.1f;
+        near(execute(lod_fragment, lod_push, false, lod_vertex)[0][0], 0.f, "LOD fade removes coverage");
+        fill(memory, input[1], pixels[1]);
         std::array<Vertex, 6> grass_quad{};
         const float quad_positions[6][2]{{-1, -1}, {1, -1}, {-1, 1}, {-1, 1}, {1, -1}, {1, 1}};
         for (unsigned i = 0; i < 6; ++i)
@@ -1939,6 +1967,65 @@ int main(int argc, char **argv)
         near(scene_pixels[32 * 128 + 42][1], 32.f / 95, "2D foreground depth cancels displaced sampling");
         fill(memory, input[19], {1, 0, 0, 1});
         fill(memory, input[0], {127.f / 255, 127.f / 255, .1f, 1});
+        // Encode the particle field first, then use that output to displace
+        // the complete scene. No scene color enters the particle pass.
+        fill(memory, input[0], {1, 127.f / 255, 0, 1});
+        scene_push.padding[1] = 1;
+        execute(distort_ps, scene_push, false, distort_vs);
+        near(scene_pixels[48 * 128 + 64][0], 1.f, "particle pass stores field rather than scene color");
+        const auto field = image(memory, format, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_SAMPLED_BIT,
+                                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                 1, 128, 1, 96);
+        VkSubresourceLayout field_layout{};
+        vkGetImageSubresourceLayout(device, field.image, &scene_subresource, &field_layout);
+        check(vkMapMemory(device, field.memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        for (unsigned y = 0; y < 96; ++y)
+            std::memcpy(static_cast<uint8_t *>(mapped) + field_layout.offset + y * field_layout.rowPitch,
+                        scene_pixels.data() + y * 128, 128 * 16);
+        vkUnmapMemory(device, field.memory);
+        check(vkResetCommandPool(device, commands, 0));
+        check(vkBeginCommandBuffer(cmd, &scene_begin));
+        scene_barrier.image = field.image;
+        vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                             0, 0, nullptr, 0, nullptr, 1, &scene_barrier);
+        check(vkEndCommandBuffer(cmd));
+        check(vkQueueSubmit(queue, 1, &scene_submit, VK_NULL_HANDLE));
+        check(vkQueueWaitIdle(queue));
+        float scene_constants[36]{};
+        for (unsigned i = 0; i < 16; i += 5) scene_constants[16+i] = 1;
+        check(vkMapMemory(device, weather_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        std::memcpy(mapped, scene_constants, sizeof(scene_constants));
+        vkUnmapMemory(device, weather_memory);
+        const VkDescriptorBufferInfo scene_info{weather_uniform, 0, sizeof(scene_constants)};
+        const VkDescriptorImageInfo composite_images[]{{sampler, scene_image.view, VK_IMAGE_LAYOUT_GENERAL},
+            {sampler, field.view, VK_IMAGE_LAYOUT_GENERAL}, {sampler, input[19].view, VK_IMAGE_LAYOUT_GENERAL}};
+        VkWriteDescriptorSet composite_writes[4]{};
+        for (uint32_t i = 0; i < 4; ++i)
+        {
+            auto &write = composite_writes[i];
+            write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            write.dstSet = composite_set;
+            write.dstBinding = i;
+            write.descriptorCount = 1;
+            write.descriptorType = i < 3 ? VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER : VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            if (i < 3) write.pImageInfo = &composite_images[i];
+            else write.pBufferInfo = &scene_info;
+        }
+        vkUpdateDescriptorSets(device, 4, composite_writes, 0, nullptr);
+        execute(composite_ps, scene_push, false, weather_vs);
+        const auto &composited = scene_pixels[48 * 128 + 64];
+        near(composited[0], (64.f + (1.f - 127.f / 255) * .05f * 128) / 127, "field displaces complete scene once");
+        near(composited[1], 48.f / 95, "neutral vertical component");
+        near(composited[2], .85f, "composite preserves water in scene snapshot");
+        vkDestroyImageView(device, field.view, nullptr);
+        vkDestroyImage(device, field.image, nullptr);
+        vkFreeMemory(device, field.memory, nullptr);
+        vkDestroyShaderModule(device, composite_ps, nullptr);
+        vkDestroyPipelineLayout(device, composite_pipeline_layout, nullptr);
+        vkDestroyDescriptorSetLayout(device, composite_descriptor, nullptr);
+        scene_push.padding[1] = 0;
+        fill(memory, input[0], {127.f / 255, 127.f / 255, .1f, 1});
+
         // Negative control: the old opaque-only snapshot contains no water.
         scene_images[0].imageView = input[3].view;
         vkUpdateDescriptorSets(device, 1, &scene_writes[0], 0, nullptr);

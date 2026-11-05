@@ -257,7 +257,7 @@ bool VulkanGameDevice::initialize(SDL_Window *window, VkExtent2D extent, std::st
             !create_postprocess(error))
             goto failed;
         for (uint32_t i = 0; i < frame.image_count(); ++i)
-            if (!deferred_.water_set(i, water_targets_.refraction(i), water_targets_.reflection(i),
+            if (!deferred_.water_set(i, water_targets_.refraction(i), water_targets_.distortion_field(i),
                                      targets_.sampled_depth_view(i), textures_.sampler(), targets_.sampler(),
                                      water_targets_.uniform(i), error))
                 goto failed;
@@ -790,14 +790,18 @@ bool VulkanGameDevice::render(const GpuLevel &level, const float (&mvp)[16], con
     frame_.set_shadow_recorder(record_shadow_models, this);
     frame_.set_light_grid_recorder(prepare_light_grid, this);
     bool particle_refraction = false;
+    bool world_refraction = false;
     for (const auto &particle : particle_draws_)
-        if (particle.visual->getType() == 8 ? static_cast<VulkanParticleEffect *>(particle.visual)->distortion()
-                                            : static_cast<VulkanParticleGroup *>(particle.visual)->has_distortion())
-        {
-            particle_refraction = true;
+    {
+        const bool active = particle.visual->getType() == 8
+            ? static_cast<VulkanParticleEffect *>(particle.visual)->has_active_distortion()
+            : static_cast<VulkanParticleGroup *>(particle.visual)->has_distortion();
+        particle_refraction |= active;
+        world_refraction |= active && !particle.hud;
+        if (world_refraction)
             break;
-        }
-    frame_.set_distortion_recorder(render_world && particle_refraction ? record_distortion : nullptr, this);
+    }
+    frame_.set_distortion_recorder(render_world && world_refraction ? record_distortion : nullptr, this);
     // All gameplay texture requests for this frame have now been gathered.
     // The completed copy fences provide the Adreno transfer visibility before
     // any rendering command can sample a newly loaded image.
@@ -896,6 +900,8 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string &error,
         for (auto &set : image)
             deferred_.release_gbuffer(set);
     local_sets_.clear();
+    local_descriptor_buffers_.clear();
+    local_bound_projections_.clear();
     release_forward_targets();
     postprocess_passes_.clear();
     if (!window_.frame().release_swapchain())
@@ -955,7 +961,7 @@ bool VulkanGameDevice::recreate_swapchain(VkExtent2D extent, std::string &error,
         return false;
     targets_.bind_sun_shadow(deferred_, sun_shadows_);
     for (uint32_t i = 0; i < frame.image_count(); ++i)
-        if (!deferred_.water_set(i, water_targets_.refraction(i), water_targets_.reflection(i),
+        if (!deferred_.water_set(i, water_targets_.refraction(i), water_targets_.distortion_field(i),
                                  targets_.sampled_depth_view(i), textures_.sampler(), targets_.sampler(),
                                  water_targets_.uniform(i), error))
             return false;
@@ -1058,6 +1064,8 @@ void VulkanGameDevice::destroy()
         for (auto &set : image)
             deferred_.release_gbuffer(set);
     local_sets_.clear();
+    local_descriptor_buffers_.clear();
+    local_bound_projections_.clear();
     local_shadows_.destroy();
     sun_shadows_.destroy();
     ui_pass_.destroy();

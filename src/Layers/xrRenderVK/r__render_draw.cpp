@@ -51,10 +51,18 @@ void VulkanGameDevice::record_distortion(const FrameRecordingContext &frame, voi
 {
     auto &owner = *static_cast<VulkanGameDevice *>(user);
     auto command_batch = owner.deferred_.geometry_batch();
-    for (auto &draw : owner.particle_draws_)
+    std::vector<const ParticleDraw *> sorted;
+    for (const auto &draw : owner.particle_draws_)
+        if (!draw.hud && (draw.visual->getType() == 8
+                ? static_cast<VulkanParticleEffect *>(draw.visual)->has_active_distortion()
+                : static_cast<VulkanParticleGroup *>(draw.visual)->has_distortion()))
+            sorted.push_back(&draw);
+    std::stable_sort(sorted.begin(), sorted.end(), [](const ParticleDraw *a, const ParticleDraw *b) {
+        return a->sort_distance > b->sort_distance;
+    });
+    for (const auto *entry : sorted)
     {
-        if (draw.hud)
-            continue;
+        const auto &draw = *entry;
         float mvp[16];
         std::copy(draw.mvp.begin(), draw.mvp.end(), mvp);
         const bool ok = draw.visual->getType() == 8
@@ -358,6 +366,22 @@ void VulkanGameDevice::record_local_lights(const FrameRecordingContext &frame, v
     if (Device.dwFrame % 300 == 0)
         Msg("[renderer-vulkan] light.grid frame=%u point-lights=%u total=%zu", Device.dwFrame,
             owner.light_grid_.count(frame.image_index), owner.local_uniforms_.size());
+    auto &sets = owner.local_sets_[frame.image_index];
+    auto &projections = owner.local_bound_projections_[frame.image_index];
+    owner.local_descriptor_buffers_.resize(owner.local_sets_.size());
+    auto &descriptor_buffer = owner.local_descriptor_buffers_[frame.image_index];
+    const auto uniform_buffer = owner.local_shadows_.uniform(frame.image_index);
+    if (descriptor_buffer != uniform_buffer)
+    {
+        for (auto &set : sets)
+            owner.deferred_.release_gbuffer(set);
+        sets.clear();
+        projections.clear();
+        descriptor_buffer = uniform_buffer;
+    }
+    if (sets.size() < owner.local_uniforms_.size())
+        sets.resize(owner.local_uniforms_.size());
+    projections.resize(sets.size());
     for (uint32_t i = 0; i < owner.local_uniforms_.size(); ++i)
     {
         if (owner.light_grid_.contains(frame.image_index, i))

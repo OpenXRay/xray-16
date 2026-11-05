@@ -165,7 +165,7 @@ class DeferredPass
                          VkDeviceSize range, VkDescriptorSet &set, std::string &error,
                          VkImageView projection = VK_NULL_HANDLE);
     void update_light_projection(VkDescriptorSet set, VkImageView projection, VkSampler sampler);
-    bool water_set(uint32_t image_index, VkImageView refraction, VkImageView reflection, VkImageView depth,
+    bool water_set(uint32_t image_index, VkImageView refraction, VkImageView distortion_field, VkImageView depth,
                    VkSampler sampler, VkSampler depth_sampler, VkBuffer scene_uniform, std::string &error);
     void release_water_sets();
     bool weather_set(VkImageView sky_a, VkImageView sky_b, VkImageView clouds_a, VkImageView clouds_b,
@@ -232,9 +232,11 @@ class DeferredPass
                          VkDescriptorSet weather_set = VK_NULL_HANDLE, const WeatherLighting *weather = nullptr) const;
     bool record_local_light(const FrameRecordingContext &frame, VkDescriptorSet gbuffer_set, VkDescriptorSet local_set,
                             const VkRect2D &scissor) const;
-    bool initialize_distortion(VkShaderModule vertex, VkShaderModule fragment, std::string &error);
+    bool initialize_distortion(VkShaderModule vertex, VkShaderModule fragment, VkShaderModule screen_vertex,
+                               VkShaderModule composite, std::string &error);
+    bool composite_distortion(const FrameRecordingContext &frame) const;
     bool record_distortion(const FrameRecordingContext &frame, VkBuffer vertices, VkBuffer indices,
-                           uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material) const;
+                           uint32_t index_count, const float (&mvp)[16], VkDescriptorSet material, bool field = false) const;
     bool record_water(const FrameRecordingContext &frame, VkBuffer vertices, VkBuffer indices, uint32_t index_count,
                       const float (&mvp)[16], VkDescriptorSet material, uint32_t first_index, float time,
                       float opacity = .72f, int32_t vertex_base = 0) const;
@@ -277,7 +279,7 @@ class DeferredPass
     }
     VkPipeline shadow_skin_opaque_{}, shadow_skin_cutout_{};
     VkPipeline geometry_{}, alpha_test_{}, transparent_{}, hud_{}, lighting_{}, weather_pipeline_{}, shadow_opaque_{},
-        shadow_cutout_{}, local_light_pipeline_{}, water_pipeline_{}, distortion_pipeline_{};
+        shadow_cutout_{}, local_light_pipeline_{}, water_pipeline_{}, distortion_pipeline_{}, distortion_composite_{};
     std::unordered_map<std::string, GamePipeline> game_pipelines_;
     std::unordered_map<VkDescriptorSet, SurfaceParameters> surface_parameters_;
     std::unordered_map<std::string, GamePipeline> pending_game_pipelines_;

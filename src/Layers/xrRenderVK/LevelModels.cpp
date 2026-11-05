@@ -143,6 +143,7 @@ struct VertexBuffer
     // geometry and FTreeVisual. Keep the authored tree coordinates until the
     // visual type is known; base UVs also contain fractions from T/B alpha.
     std::vector<std::array<float, 2>> tree_uv;
+    std::vector<uint8_t> packed_hemi;
     bool lightmap_uv{};
     bool depth_only{};
 };
@@ -349,6 +350,8 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer> &buffers, std::st
                                                                                  : channel)]) /
                                             255.f;
             }
+            if (normal >= 0 && normal_type != 2)
+                buffer.packed_hemi.push_back(source[normal + 3]);
             for (float coordinate : vertex.position)
                 if (!std::isfinite(coordinate))
                 {
@@ -575,6 +578,11 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer> &vertices,
     }
     if (type == 7 || type == 11)
     {
+        model.tree = true;
+        const auto &hemi = vertices[vb].packed_hemi;
+        if (!hemi.empty())
+            for (size_t i = 0; i < model.vertices.size(); ++i)
+                model.vertices[i].baked[3] = float(hemi[vbase + i]) / 255.f;
         const auto &tree_uv = vertices[vb].tree_uv;
         if (!tree_uv.empty())
             for (size_t i = 0; i < model.vertices.size(); ++i)

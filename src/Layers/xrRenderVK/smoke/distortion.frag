@@ -13,6 +13,11 @@ void main()
     // displacement field. Its RGB encodes offsets, never emitted light.
     float weight = clamp(field.a * dot(tint.rgb, vec3(0.33)), 0.0, 1.0);
     if (weight < 0.01 / 255.0) discard;
+    if (settings.params.w > .5)
+    {
+        pixel_color = vec4(field.rgb, weight);
+        return;
+    }
     vec2 screen = gl_FragCoord.xy * settings.params.yz;
     vec2 border = 0.5 / vec2(textureSize(scene_color, 0));
     vec2 displaced = clamp(screen + (field.xy - vec2(127.0 / 255.0)) * 0.05,
