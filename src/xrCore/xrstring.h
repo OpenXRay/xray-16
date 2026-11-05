@@ -124,8 +124,12 @@ public:
     }
     shared_str& operator=(shared_str&& rhs) noexcept
     {
-        p_ = rhs.p_;
-        rhs.p_ = nullptr;
+        if (this != &rhs)
+        {
+            _dec();
+            p_ = rhs.p_;
+            rhs.p_ = nullptr;
+        }
         return *this;
     }
     shared_str& operator=(std::nullptr_t) noexcept
