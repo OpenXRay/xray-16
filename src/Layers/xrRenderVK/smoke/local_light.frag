@@ -78,7 +78,7 @@ void main()
 {
     // Match the base panel's G-buffer lookup. Local lights previously vanished
     // from all four-panel screenshots, making lamps and interiors look broken.
-    vec2 screen_uv = light.debug_mode.x > 0.5 && light.debug_mode.x < 1.5 ?
+    vec2 screen_uv = ((light.debug_mode.x > 0.5 && light.debug_mode.x < 1.5) || light.debug_mode.x == 14.0) ?
         texcoord * 2.0 : texcoord;
     if (any(greaterThanEqual(screen_uv, vec2(1.0))))
     { pixel_color = vec4(0.0); return; }

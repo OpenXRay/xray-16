@@ -296,7 +296,7 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     static std::array<std::string, 8> diagnostic_names;
     static size_t diagnostic_count = 0;
     if (diagnostic_frame != Device.dwFrame) { diagnostic_frame = Device.dwFrame; diagnostic_count = 0; }
-    bool trace = diagnostics().requested && count && Device.dwFrame % 30 == 0 &&
+    bool trace = diagnostics().requested && count && (diagnostics().recording || Device.dwFrame % 30 == 0) &&
         def_->name.find("water") != std::string::npos && diagnostic_count < diagnostic_names.size();
     if (trace)
     {

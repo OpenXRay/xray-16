@@ -1990,6 +1990,15 @@ int main(int argc, char **argv)
             near(p[1], .3f * (mode == 12 ? .5f : .05f), "isolated sun/ambient green contribution");
             near(p[2], .2f * (mode == 12 ? .4f : .06f), "isolated sun/ambient blue contribution");
         }
+        constants[33] = 14;
+        check(vkMapMemory(device, weather_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        std::memcpy(mapped, constants, sizeof(constants)); vkUnmapMemory(device, weather_memory);
+        execute(weather_ps, weather_push, false, weather_vs);
+        near(scene_pixels[12*128+16][0], .4f*(.04f+.6f), "same-frame lighting pane");
+        near(scene_pixels[12*128+96][0], .5f, "same-frame world normal pane R");
+        near(scene_pixels[12*128+96][1], 1.f, "same-frame world normal pane G");
+        near(scene_pixels[72*128+16][0], .4f, "same-frame albedo pane");
+        near(scene_pixels[72*128+96][1], .4f, "same-frame baked pane");
         vkDestroyImageView(device, scene_image.view, nullptr);
         vkDestroyImage(device, scene_image.image, nullptr);
         vkFreeMemory(device, scene_image.memory, nullptr);

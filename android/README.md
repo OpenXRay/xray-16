@@ -311,43 +311,33 @@ download any of them.
 Launcher behavior is described in [apk/README.md](apk/README.md). ARM64 build
 dependencies are listed in [ARM64_DEPS.md](ARM64_DEPS.md).
 
-## Vulkan diagnostic build (0.9.186)
+## Motion diagnostics (0.9.187)
 
-Select Vulkan and choose **Автоцикл: снимки и время GPU** in the Vulkan settings.
-Normal mode defaults to **Диагностика: выключена**. Diagnostics do not change
-stored graphics quality, savegames or game resources.
+Select Vulkan and **Движение: освещение (запись кнопкой)** or
+**Движение: вода (запись кнопкой)**. Load the affected scene, press
+**Запись 10 с** in the game, and reproduce the defect by turning the camera
+or walking through water. The button can be used again without restarting.
+There is no automatic cycle or stationary waiting period in these modes.
 
-Load a save and hold the camera at the affected prop or tree for 112 seconds.
-The cycle repeats every 112 seconds, with 8 seconds per view:
-normal image, world normals, albedo, baked light channels, material channels,
-sun only, ambient and hemisphere only, no local lights, no dynamic shadows,
-no refraction particles, full tree geometry, tree LOD, no transparent world,
-and colored water-particle quads. The last view shows the actual geometry and
-UV direction of both ordinary and refractive water particles. Walk through
-water during that view, or select **Вода: геометрия частиц** for a fixed view.
-Individual modes are also available for longer inspection. Automatic capture
-is capped at 112 images per engine process; the views and timers keep cycling.
-Disable diagnostics after the investigation.
+Lighting uses four simultaneous panels from the same G-buffer/camera/frame:
+top left = opaque lighting including local lights, top right = world normals,
+bottom left = albedo, bottom right = baked sun/hemisphere/material channels.
+Postprocessing is identity in this view so exposure and gamma changes do not
+alter the diagnostic colors. Forward-only geometry is absent in this view.
+Water mode keeps the normal rendered image, including transparency, particles,
+HUD and postprocessing. The mode stays constant throughout the recording.
 
-A JPEG is captured six seconds into each automatic stage. Captures go to
-`_appdata_/screenshots/vkdiag_*.jpg`. Readback briefly stalls rendering;
-capture frames are excluded from the diagnostic GPU samples. Fixed modes
-save one automatic capture six seconds after world rendering starts.
-**Поделиться логами** includes up to 56 recent diagnostic JPEGs (at most
-128 MiB) and the usual session logs. Screenshots use the standard screenshot
-path; automatic archive collection uses the default `_appdata_/screenshots`
-under the selected game directory. For a custom fsgame screenshot alias,
-attach the `vkdiag_*.jpg` files from that custom location separately.
+A button press records ten seconds with at most twenty tagged JPEGs (2 Hz).
+The live image and lighting/particle data update every rendered frame. Logged
+particle world/clip corners, UVs and selected local lights carry the frame ID;
+JPEG filenames carry the same ID. GPU samples retain source submission/mode
+metadata and exclude readback frames. Capturing can cause short stalls, so
+image bursts must not be used as a benchmark. Unrecorded profile mode is also
+available for performance measurements.
 
-`[vkdiag]` records mode changes, camera position/direction, particle definition,
-shader, texture, flags, actual world/clip-space corners and UVs. CPU samples
-and GPU timestamps are separate. GPU samples carry the source submission
-sequence and mode, collected only after its frame fence signals. Intervals
-include grid culling, sun/local shadows, G-buffer/depth copy, base/local
-lighting, transparency, scene copies, distortion/HUD, UI and postprocessing.
-Queues without timestamp support still produce CPU logs and images.
-
-Debug channel images show deferred opaque geometry; forward-only objects may
-be absent there. Forced tree geometry and diagnostic overlays can be slower.
-Compare performance only at the same camera, resolution and scene; this build
-adds diagnostic tools and does not claim to fix the reported visual bugs.
+Return to the launcher and use **Поделиться логами** after each short test.
+It includes the latest 56 diagnostic JPEGs (up to 128 MiB) from the default
+`_appdata_/screenshots` directory and the usual session logs. For a custom
+fsgame screenshot alias, attach `vkdiag_*.jpg` from that location separately.
+Disable diagnostics after testing. Individual fixed debug modes remain for
+advanced inspection; this build adds diagnostics, not visual bug fixes.

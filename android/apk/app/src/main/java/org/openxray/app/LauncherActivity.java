@@ -458,11 +458,12 @@ public final class LauncherActivity extends Activity {
                 "Освещение: запечённые каналы", "Освещение: свойства материала", "Без локального света",
                 "Без динамических теней", "Без преломляющих частиц", "Деревья: полная геометрия",
                 "Деревья: дальние модели", "Без прозрачного мира", "Только солнечный свет",
-                "Только фоновый свет и небо", "Автоцикл: снимки и время GPU"});
+                "Только фоновый свет и небо", "Движение: освещение (запись кнопкой)", "Движение: вода (запись кнопкой)"});
         content.addView(diagnosticMode, matchWrap());
-        content.addView(bodyText("Для проверки багов выберите автоцикл. Вид меняется каждые 8 секунд; полный цикл — 112 секунд. "
-                + "Оставайтесь у проблемного объекта. Снимки попадут в архив «Поделиться логами». "
-                + "Сохранение снимка вызывает краткую паузу."), matchWrap());
+        content.addView(bodyText("В режимах движения нажмите в игре «Запись 10 с» и воспроизведите баг: "
+                + "поворачивайте камеру или идите по воде. В освещении четыре панели показывают данные одного кадра: "
+                + "непрозрачное освещение, нормали, текстура и запечённые каналы. Вода остаётся в обычном виде. "
+                + "Архив «Поделиться логами» включает последовательность снимков."), matchWrap());
         detailDistance = settingsSpinner(new String[]{"Трава: по пресету", "Трава: выключена", "Трава: 20 м",
                 "Трава: 40 м", "Трава: 60 м", "Трава: 80 м"});
         anisotropy = settingsSpinner(new String[]{"Анизотропия: по пресету", "Анизотропия: 2×", "Анизотропия: 4×",
@@ -767,7 +768,7 @@ public final class LauncherActivity extends Activity {
         showFps.setChecked(preferences.getBoolean(PREF_SHOW_FPS, true));
         detailDistance.setSelection(Math.max(0, Math.min(5, preferences.getInt(PREF_DETAIL_DISTANCE, 0))));
         anisotropy.setSelection(Math.max(0, Math.min(4, preferences.getInt(PREF_ANISOTROPY, 0))));
-        diagnosticMode.setSelection(Math.max(0, Math.min(15, preferences.getInt("vulkan_diagnostic_mode", 0))));
+        diagnosticMode.setSelection(Math.max(0, Math.min(16, preferences.getInt("vulkan_diagnostic_mode", 0))));
         sunShadows.setChecked(preferences.getBoolean(PREF_SUN_SHADOWS, true));
         toneMap.setChecked(preferences.getBoolean(PREF_TONEMAP, true));
         ambientScale.setSelection(Math.max(0, Math.min(4, preferences.getInt(PREF_AMBIENT_SCALE, 2))));

@@ -383,7 +383,7 @@ void VulkanGameDevice::record_local_lights(const FrameRecordingContext &frame, v
             bound = owner.local_projection_views_[i];
         }
         VkRect2D scissor = owner.local_scissors_[i];
-        if (owner.local_uniforms_[i].debug_mode[0] == 1.f)
+        if (owner.local_uniforms_[i].debug_mode[0] == 1.f || owner.local_uniforms_[i].debug_mode[0] == 14.f)
         {
             // Project each light's scissor into the upper-left base panel.
             // Round the far edge up so edge pixels cannot lose their light.

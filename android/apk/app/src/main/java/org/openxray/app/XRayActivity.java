@@ -64,12 +64,34 @@ public final class XRayActivity extends SDLActivity {
                 addContentView(touchControls, new ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             }
+            if (getIntent().getIntExtra(LauncherActivity.EXTRA_DIAGNOSTIC_MODE, 0) >= 15) {
+                final android.widget.Button record = new android.widget.Button(this);
+                record.setText("Запись 10 с");
+                android.widget.FrameLayout.LayoutParams params = new android.widget.FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
+                        android.view.Gravity.TOP | android.view.Gravity.CENTER_HORIZONTAL);
+                params.topMargin = (int) (32 * getResources().getDisplayMetrics().density);
+                addContentView(record, params);
+                record.setOnClickListener(view -> {
+                    try {
+                        writeDiagnostic("diagnostic recording requested; mode=" + getIntent().getIntExtra(LauncherActivity.EXTRA_DIAGNOSTIC_MODE, 0));
+                        nativeDiagnosticRecord();
+                        record.setEnabled(false); record.setText("Запись: двигайся");
+                        record.postDelayed(() -> { record.setEnabled(true); record.setText("Запись 10 с"); }, 10000);
+                    } catch (UnsatisfiedLinkError error) {
+                        writeDiagnostic("diagnostic recording unavailable: " + error);
+                        android.widget.Toast.makeText(this, "Не удалось начать запись", android.widget.Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
             applyImmersiveMode();
         } catch (RuntimeException error) {
             writeDiagnostic("SDL activity startup failed: " + Log.getStackTraceString(error));
             throw error;
         }
     }
+
+    private static native void nativeDiagnosticRecord();
 
     @Override
     protected void onResume() {
@@ -173,7 +195,7 @@ public final class XRayActivity extends SDLActivity {
         boolean splashEnabled = getIntent().getBooleanExtra(LauncherActivity.EXTRA_SPLASH_ENABLED, false);
         int gameVariant = getIntent().getIntExtra(LauncherActivity.EXTRA_GAME_VARIANT, 3);
         String[] additionalArgs = getIntent().getStringArrayExtra(LauncherActivity.EXTRA_ADDITIONAL_ARGS);
-        int diagnosticMode = Math.max(0, Math.min(15, getIntent().getIntExtra(LauncherActivity.EXTRA_DIAGNOSTIC_MODE, 0)));
+        int diagnosticMode = Math.max(0, Math.min(16, getIntent().getIntExtra(LauncherActivity.EXTRA_DIAGNOSTIC_MODE, 0)));
         int rendererMode = getIntent().getIntExtra(
                 LauncherActivity.EXTRA_RENDERER_MODE, LauncherActivity.RENDERER_AUTO);
         int graphicsPreset = getIntent().getIntExtra(

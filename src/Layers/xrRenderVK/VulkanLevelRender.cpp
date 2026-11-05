@@ -1,4 +1,11 @@
 #include "VulkanDiagnostics.h"
+#if defined(__ANDROID__)
+#include <jni.h>
+extern "C" JNIEXPORT void JNICALL Java_org_openxray_app_XRayActivity_nativeDiagnosticRecord(JNIEnv*, jclass)
+{
+    xray::render::vulkan::diagnostic_record_request().store(true);
+}
+#endif
 #include "xrEngine/stdafx.h"
 #include "VulkanLevelRender.h"
 #include "VulkanSettings.h"
@@ -1255,6 +1262,15 @@ void VulkanLevelRender::End()
             Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z,
             Device.vCameraDirection.x, Device.vCameraDirection.y, Device.vCameraDirection.z);
     }
+    if (diag.recording)
+    {
+        Msg("[vkdiag] camera frame=%u mode=%d capture=%d position=(%.6f,%.6f,%.6f) direction=(%.6f,%.6f,%.6f)",
+            Device.dwFrame, diag.mode, diagnostic_capture, Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z,
+            Device.vCameraDirection.x, Device.vCameraDirection.y, Device.vCameraDirection.z);
+        for (unsigned row = 0; row < 4; ++row)
+            Msg("[vkdiag] vp frame=%u row=%u values=(%.8g,%.8g,%.8g,%.8g)", Device.dwFrame, row,
+                mvp[row*4], mvp[row*4+1], mvp[row*4+2], mvp[row*4+3]);
+    }
     if (diagnostic_capture && !screenshot_)
     {
         string_path name; string64 time;
@@ -1279,7 +1295,7 @@ void VulkanLevelRender::End()
             last_render_error_.c_str());
     repeated_render_errors_ = 0;
     last_render_error_.clear();
-    if (diagnostics().requested && render_world && Device.dwFrame % 30 == 0 && !diagnostic_capture)
+    if (diagnostics().requested && render_world && (diagnostics().recording || Device.dwFrame % 30 == 0) && !diagnostic_capture)
     {
         const auto& profile = game_device_->window().frame();
         Msg("[vkdiag] sample frame=%u source=%llu mode=%d capture=0 camera=(%.4f,%.4f,%.4f) draws=%u",
@@ -1299,7 +1315,7 @@ void VulkanLevelRender::End()
                                 ? std::chrono::duration<double, std::milli>(now - last_metric_frame_).count()
                                 : cpu_ms;
     last_metric_frame_ = now;
-    if (diagnostics().requested && render_world && Device.dwFrame % 30 == 0 && !diagnostic_capture)
+    if (diagnostics().requested && render_world && (diagnostics().recording || Device.dwFrame % 30 == 0) && !diagnostic_capture)
     {
         const auto& cpu = game_device_->window().frame().cpu_timing();
         Msg("[vkdiag] cpu frame=%u mode=%d frame-interval=%.3f render=%.3f record=%.3f fence=%.3f acquire=%.3f submit=%.3f present=%.3f",

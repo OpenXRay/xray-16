@@ -167,6 +167,18 @@ void VulkanGameDevice::render_lights(const float (&mvp)[16], bool render_world, 
     std::copy_n(sun_uniform.ambient_color, 4, forward_lighting_.ambient_color);
     std::copy_n(sun_uniform.hemi_color, 4, forward_lighting_.hemi_color);
     std::copy_n(light.color, 3, forward_lighting_.sun_color_count);
+    if (diagnostics().recording)
+    {
+        Msg("[vkdiag] lights frame=%u count=%zu camera=(%.4f,%.4f,%.4f)", Device.dwFrame, local_uniforms_.size(),
+            Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z);
+        for (size_t i = 0; i < local_uniforms_.size(); ++i)
+        {
+            const auto& l = local_uniforms_[i];
+            Msg("[vkdiag] light frame=%u slot=%zu position=(%.5f,%.5f,%.5f) range=%.4f rgb=(%.4f,%.4f,%.4f) type=%.0f shadow=%.0f",
+                Device.dwFrame, i, l.position_range[0], l.position_range[1], l.position_range[2], l.position_range[3],
+                l.color_type[0], l.color_type[1], l.color_type[2], l.color_type[3], l.shadow_params[2]);
+        }
+    }
     const uint32_t forward_count = std::min<size_t>(local_uniforms_.size(), ForwardLightCapacity);
     forward_lighting_.sun_color_count[3] = static_cast<float>(forward_count);
     const VkExtent2D forward_extent = window_.frame().extent();

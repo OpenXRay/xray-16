@@ -128,7 +128,7 @@ void DeferredFrame::lighting(const FrameRecordingContext &frame, void *user_data
     context.frame_->mark_gpu_stage(frame.command_buffer, "base-lighting");
     // The base panel receives local lights in both full-screen and four-pane
     // views; the other three panels display G-buffer channels only.
-    if (context.render_world_ && context.local_lighting_ && diagnostics().mode != 7 && context.shadow_uniform_.options[1] < 2.5f)
+    if (context.render_world_ && context.local_lighting_ && diagnostics().mode != 7 && (context.shadow_uniform_.options[1] < 2.5f || context.shadow_uniform_.options[1] == 14.f))
         context.local_lighting_(frame, context.local_data_);
     if (!context.water_)
         overlay(frame, user_data);
