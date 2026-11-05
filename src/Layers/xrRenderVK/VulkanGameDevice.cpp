@@ -1,3 +1,4 @@
+#include "VulkanDiagnostics.h"
 #include "xrEngine/stdafx.h"
 #include "VulkanGameDevice.h"
 #include "ShadowStability.h"
@@ -706,6 +707,8 @@ bool VulkanGameDevice::render(const GpuLevel &level, const float (&mvp)[16], con
         }
     }
     SunShadowUniform sun_uniform{};
+    const int diag = diagnostics().mode;
+    window_.frame().set_gpu_diagnostics(diagnostics().requested != 0 && render_world, diag, screenshot_requested_);
     if (render_world && Core.Params)
     {
         // The old argument remains accepted for existing custom launchers.
@@ -719,6 +722,10 @@ bool VulkanGameDevice::render(const GpuLevel &level, const float (&mvp)[16], con
         else if (strstr(Core.Params, "-vk-light-diagnostic"))
             sun_uniform.options[1] = 1.f;
     }
+    const int views[]{0, 0, 0, 10, 5, 4, 11};
+    if (diag >= 3 && diag <= 6) sun_uniform.options[1] = float(views[diag]);
+    if (diag == 13) sun_uniform.options[1] = 12.f;
+    if (diag == 14) sun_uniform.options[1] = 13.f;
     for (int channel = 0; channel < 3; ++channel)
     {
         const auto valid = [](float value) { return std::isfinite(value) ? std::max(value, 0.f) : 0.f; };
@@ -791,13 +798,13 @@ bool VulkanGameDevice::render(const GpuLevel &level, const float (&mvp)[16], con
     frame_.set_light_grid_recorder(prepare_light_grid, this);
     bool particle_refraction = false;
     for (const auto &particle : particle_draws_)
-        if (particle.visual->getType() == 8 ? static_cast<VulkanParticleEffect *>(particle.visual)->distortion()
+        if (particle.visual->getType() == 8 ? (static_cast<VulkanParticleEffect *>(particle.visual)->distortion() || static_cast<VulkanParticleEffect *>(particle.visual)->diagnostic_geometry())
                                             : static_cast<VulkanParticleGroup *>(particle.visual)->has_distortion())
         {
             particle_refraction = true;
             break;
         }
-    frame_.set_distortion_recorder(render_world && particle_refraction ? record_distortion : nullptr, this);
+    frame_.set_distortion_recorder(render_world && particle_refraction && diag != 9 && diag != 12 ? record_distortion : nullptr, this);
     // All gameplay texture requests for this frame have now been gathered.
     // The completed copy fences provide the Adreno transfer visibility before
     // any rendering command can sample a newly loaded image.

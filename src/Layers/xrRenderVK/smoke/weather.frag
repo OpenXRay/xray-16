@@ -141,6 +141,8 @@ void main()
             eye_clip = shadow.inverse_view_projection * vec4(0.0, 0.0, 0.0, 1.0);
         vec3 camera_position = eye_clip.xyz / eye_clip.w;
         vec3 normal = normalize(encoded_normal.rgb * 2.0 - 1.0);
+        if (shadow.options.y == 10.0) { pixel_color = vec4(normal * .5 + .5, 1); return; }
+        if (shadow.options.y == 11.0) { pixel_color = vec4(surface.rgb, 1); return; }
         float diffuse = max(dot(normal, normalize(-weather.direction_ambient.xyz)), 0.0);
         bool static_lightmap = encoded_normal.a < 0.8;
         float hemisphere = static_lightmap ? clamp(encoded_normal.a / 0.75, 0.0, 1.0) :
@@ -178,6 +180,8 @@ void main()
         vec3 indirect = comparison_mode == 4 ?
             shadow.hemi_color.rgb * tested_hemi :
             environment_indirect(normal, tested_hemi, surface.g);
+        if (shadow.options.y == 12.0) { pixel_color = vec4(albedo.rgb * sunlight, 1); return; }
+        if (shadow.options.y == 13.0) { pixel_color = vec4(albedo.rgb * (shadow.ambient_color.rgb + indirect), 1); return; }
         vec3 lit = albedo.rgb * (shadow.ambient_color.rgb + indirect + sunlight);
         if (surface.r > 0.0 && comparison_mode != 4)
         {

@@ -1,3 +1,4 @@
+#include "VulkanDiagnostics.h"
 #include "xrEngine/stdafx.h"
 #include "VulkanLevelRender.h"
 #include "VulkanSettings.h"
@@ -288,8 +289,11 @@ void VulkanLevelRender::save_screenshot()
     if (request->mode == SM_NORMAL)
     {
         string64 time;
-        xr_sprintf(filename, "ss_%s_%s_(%s).jpg", Core.UserName, timestamp(time),
-                   g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
+        if (request->name.rfind("vkdiag_", 0) == 0)
+            xr_sprintf(filename, "%s.jpg", request->name.c_str());
+        else
+            xr_sprintf(filename, "ss_%s_%s_(%s).jpg", Core.UserName, timestamp(time),
+                       g_pGameLevel ? g_pGameLevel->name().c_str() : "mainmenu");
         writer = FS.w_open("$screenshots$", filename);
     }
     else if (request->mode == SM_FOR_GAMESAVE)
@@ -311,7 +315,7 @@ void VulkanLevelRender::save_screenshot()
         for (size_t i = 0, j = 0; i < pixels.size(); i += 4, j += 3)
             std::copy_n(pixels.data() + i, 3, rgb.data() + j);
         XRay::Media::Image img(extent.width, extent.height, rgb.data(), XRay::Media::ImageDataFormat::RGB8);
-        if (!img.SaveJPEG(*writer, 100))
+        if (!img.SaveJPEG(*writer, request->name.rfind("vkdiag_", 0) == 0 ? 95 : 100))
             Msg("! [renderer-vulkan] JPEG screenshot encoding failed");
     }
     else if (request->mode == SM_FOR_GAMESAVE)
@@ -1241,6 +1245,23 @@ void VulkanLevelRender::End()
     const bool clear_target = frame_clear_target_ || loading;
     frame_clear_target_ = false;
     const auto cpu_begin = std::chrono::steady_clock::now();
+    const bool diagnostic_capture = update_diagnostics(Core.Params, Device.dwTimeGlobal, render_world);
+    auto& diag = diagnostics();
+    if (diag.requested && render_world && diag.previous != diag.mode)
+    {
+        diag.previous = diag.mode;
+        Msg("[vkdiag] stage frame=%u mode=%d name=%s cycle=%llu camera=(%.4f,%.4f,%.4f) direction=(%.4f,%.4f,%.4f)",
+            Device.dwFrame, diag.mode, diagnostic_name(diag.mode), static_cast<unsigned long long>(diag.slot),
+            Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z,
+            Device.vCameraDirection.x, Device.vCameraDirection.y, Device.vCameraDirection.z);
+    }
+    if (diagnostic_capture && !screenshot_)
+    {
+        string_path name; string64 time;
+        xr_sprintf(name, "vkdiag_%s_m%02d_f%u", timestamp(time), diag.mode, Device.dwFrame);
+        Msg("[vkdiag] capture frame=%u mode=%d file=%s.jpg measurement-exclude=1", Device.dwFrame, diag.mode, name);
+        Screenshot(SM_NORMAL, name);
+    }
     if (!game_device_->render(level_, mvp, light, status, error, render_world, clear_target, &environment))
     {
         const auto elapsed =
@@ -1258,6 +1279,16 @@ void VulkanLevelRender::End()
             last_render_error_.c_str());
     repeated_render_errors_ = 0;
     last_render_error_.clear();
+    if (diagnostics().requested && render_world && Device.dwFrame % 30 == 0 && !diagnostic_capture)
+    {
+        const auto& profile = game_device_->window().frame();
+        Msg("[vkdiag] sample frame=%u source=%llu mode=%d capture=0 camera=(%.4f,%.4f,%.4f) draws=%u",
+            Device.dwFrame, static_cast<unsigned long long>(profile.gpu_profile_sequence()), profile.gpu_profile_mode(),
+            Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z, frame_draw_calls_);
+        if (!profile.gpu_profile_capture()) for (const auto& stage : profile.gpu_stages())
+            Msg("[vkdiag] gpu source=%llu mode=%d pass=%s ms=%.4f",
+                static_cast<unsigned long long>(profile.gpu_profile_sequence()), profile.gpu_profile_mode(), stage.name, stage.ms);
+    }
     const auto now = std::chrono::steady_clock::now();
     const double cpu_ms = std::chrono::duration<double, std::milli>(now - cpu_begin).count();
     if (Device.dwPrecacheFrame &&
@@ -1268,6 +1299,12 @@ void VulkanLevelRender::End()
                                 ? std::chrono::duration<double, std::milli>(now - last_metric_frame_).count()
                                 : cpu_ms;
     last_metric_frame_ = now;
+    if (diagnostics().requested && render_world && Device.dwFrame % 30 == 0 && !diagnostic_capture)
+    {
+        const auto& cpu = game_device_->window().frame().cpu_timing();
+        Msg("[vkdiag] cpu frame=%u mode=%d frame-interval=%.3f render=%.3f record=%.3f fence=%.3f acquire=%.3f submit=%.3f present=%.3f",
+            Device.dwFrame, diagnostics().mode, frame_ms, cpu_ms, cpu.record_ms, cpu.fence_ms, cpu.acquire_ms, cpu.submit_ms, cpu.present_ms);
+    }
     uint64_t geometry_bytes = level_.geometry_bytes();
     std::unordered_set<const GpuModel *> counted;
     const std::function<void(const VulkanModelVisual &)> count_model = [&](const VulkanModelVisual &visual) {

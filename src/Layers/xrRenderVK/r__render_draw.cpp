@@ -1,3 +1,4 @@
+#include "VulkanDiagnostics.h"
 #include "xrEngine/stdafx.h"
 #include "VulkanGameDevice.h"
 #include "ShadowStability.h"
@@ -38,7 +39,7 @@ struct PassCpuSample
     std::chrono::steady_clock::time_point begin{std::chrono::steady_clock::now()};
     ~PassCpuSample()
     {
-        if (Device.dwFrame % 300 == 0)
+        if (Device.dwFrame % (diagnostics().requested ? 30 : 300) == 0)
             Msg("[renderer-vulkan] pass.cpu frame=%u pass=%s ms=%.3f draws=%u", Device.dwFrame, name,
                 std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - begin).count(),
                 pass.draw_calls() - draws);
@@ -49,6 +50,7 @@ struct PassCpuSample
 
 void VulkanGameDevice::record_distortion(const FrameRecordingContext &frame, void *user)
 {
+    if (diagnostics().mode == 9 || diagnostics().mode == 12) return;
     auto &owner = *static_cast<VulkanGameDevice *>(user);
     auto command_batch = owner.deferred_.geometry_batch();
     for (auto &draw : owner.particle_draws_)
@@ -219,7 +221,7 @@ void VulkanGameDevice::record_transparent(const FrameRecordingContext &frame, vo
     }
     sort_transparent_draws(draws);
 #if defined(XR_PLATFORM_ANDROID)
-    if (Device.dwFrame % 300 == 0)
+    if (Device.dwFrame % (diagnostics().requested ? 30 : 300) == 0)
     {
         size_t counts[4][3]{}; // priority 1..3: level, model, particle
         bool ordered = true;
@@ -331,7 +333,7 @@ void VulkanGameDevice::prepare_light_grid(const FrameRecordingContext &frame, vo
     if (!owner.light_grid_.prepare(frame, owner.local_uniforms_, owner.local_scissors_, owner.model_error_))
     {
         owner.light_grid_.discard_frame(frame.image_index);
-        if (Device.dwFrame % 300 == 0)
+        if (Device.dwFrame % (diagnostics().requested ? 30 : 300) == 0)
             Msg("! [renderer-vulkan] light grid frame fallback: %s", owner.model_error_.c_str());
     }
 }
@@ -355,7 +357,7 @@ void VulkanGameDevice::record_local_lights(const FrameRecordingContext &frame, v
     }
     if (owner.light_grid_.count(frame.image_index))
         owner.deferred_.account_light_grid_draw();
-    if (Device.dwFrame % 300 == 0)
+    if (Device.dwFrame % (diagnostics().requested ? 30 : 300) == 0)
         Msg("[renderer-vulkan] light.grid frame=%u point-lights=%u total=%zu", Device.dwFrame,
             owner.light_grid_.count(frame.image_index), owner.local_uniforms_.size());
     for (uint32_t i = 0; i < owner.local_uniforms_.size(); ++i)

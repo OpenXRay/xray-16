@@ -212,6 +212,15 @@ bool FrameContext::release_swapchain()
     return true;
 }
 
+void FrameContext::mark_gpu_stage(VkCommandBuffer command, const char* name)
+{
+    auto& count = m_timestamp_written[m_current_frame];
+    if (!m_profile_enabled || !m_timestamp_pool || count == 0 || count >= TimestampStride - 1) return;
+    m_timestamp_names[m_current_frame][count - 1] = name;
+    m_vk.cmd_write_timestamp(command, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+        m_timestamp_pool, TimestampStride * m_current_frame + count++);
+}
+
 bool FrameContext::wait_idle()
 {
     if (!m_device || !m_vk.device_wait_idle)
@@ -259,7 +268,7 @@ bool FrameContext::initialize(VkPhysicalDevice physical_device, VkDevice device,
     {
         VkQueryPoolCreateInfo query_info{VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO};
         query_info.queryType = VK_QUERY_TYPE_TIMESTAMP;
-        query_info.queryCount = 2 * FramesInFlight;
+        query_info.queryCount = TimestampStride * FramesInFlight;
         if (m_vk.create_query_pool(m_device, &query_info, nullptr, &m_timestamp_pool) == VK_SUCCESS)
         {
             m_timestamp_period_ns = timestamp_period_ns;
@@ -973,14 +982,22 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     m_cpu_timing.fence_ms = milliseconds(fence_begin);
     if (m_timestamp_pool && m_timestamp_submitted[m_current_frame])
     {
-        uint64_t ticks[2]{};
-        if (m_vk.get_query_pool_results(m_device, m_timestamp_pool, 2 * m_current_frame, 2,
-                sizeof(ticks), ticks, sizeof(uint64_t), VK_QUERY_RESULT_64_BIT) == VK_SUCCESS)
+        uint64_t ticks[TimestampStride]{};
+        const uint32_t count = m_timestamp_written[m_current_frame];
+        m_gpu_stages.clear();
+        if (count >= 2 && m_vk.get_query_pool_results(m_device, m_timestamp_pool, TimestampStride * m_current_frame, count,
+                count * sizeof(uint64_t), ticks, sizeof(uint64_t), VK_QUERY_RESULT_64_BIT) == VK_SUCCESS)
         {
             const uint64_t mask = m_timestamp_valid_bits == 64 ? UINT64_MAX :
                 ((uint64_t{1} << m_timestamp_valid_bits) - 1);
-            const uint64_t elapsed = (ticks[1] - ticks[0]) & mask;
+            const uint64_t elapsed = (ticks[count - 1] - ticks[0]) & mask;
             m_last_gpu_ms = static_cast<double>(elapsed) * m_timestamp_period_ns / 1000000.0;
+            m_last_profile_mode = m_profile_modes[m_current_frame];
+            m_last_profile_capture = m_profile_captures[m_current_frame];
+            m_last_profile_sequence = m_profile_sequences[m_current_frame];
+            for (uint32_t i = 1; i < count; ++i)
+                if (const char* name = m_timestamp_names[m_current_frame][i - 1])
+                    m_gpu_stages.push_back({name, double((ticks[i] - ticks[i - 1]) & mask) * m_timestamp_period_ns / 1000000.0});
         }
         m_timestamp_submitted[m_current_frame] = false;
     }
@@ -1049,9 +1066,14 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     }
     if (m_timestamp_pool)
     {
-        m_vk.cmd_reset_query_pool(command, m_timestamp_pool, 2 * m_current_frame, 2);
+        m_vk.cmd_reset_query_pool(command, m_timestamp_pool, TimestampStride * m_current_frame, m_profile_enabled ? TimestampStride : 2);
+        m_timestamp_written[m_current_frame] = 1;
+        m_timestamp_names[m_current_frame].fill(nullptr);
+        m_profile_modes[m_current_frame] = m_profile_mode;
+        m_profile_captures[m_current_frame] = m_profile_capture;
+        m_profile_sequences[m_current_frame] = ++m_profile_sequence;
         m_vk.cmd_write_timestamp(command, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-            m_timestamp_pool, 2 * m_current_frame);
+            m_timestamp_pool, TimestampStride * m_current_frame);
     }
     if (prepass)
     {
@@ -1090,30 +1112,36 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
         recorder(frame, user_data);
     }
     m_vk.cmd_end_render_pass(command);
+    mark_gpu_stage(command, "lighting-and-forward");
     if (interpass)
     {
         crash_stage("vulkan frame: record overlay");
         interpass(command, m_images[image_index], image_index, interpass_data);
+        mark_gpu_stage(command, "opaque-scene-copy");
         render_info.renderPass = m_overlay_pass;
         m_vk.cmd_begin_render_pass(command, &render_info, VK_SUBPASS_CONTENTS_INLINE);
         const FrameRecordingContext overlay_frame{command, m_overlay_pass,
             m_framebuffers[image_index], m_extent, image_index, m_current_frame};
         overlay(overlay_frame, overlay_data);
         m_vk.cmd_end_render_pass(command);
+        mark_gpu_stage(command, "transparent-world");
     }
     if (refraction_capture)
     {
         refraction_capture(command, m_images[image_index], image_index, refraction_capture_data);
+        mark_gpu_stage(command, "refraction-scene-copy");
         render_info.renderPass = m_overlay_pass;
         m_vk.cmd_begin_render_pass(command, &render_info, VK_SUBPASS_CONTENTS_INLINE);
         const FrameRecordingContext refraction_frame{command, m_overlay_pass,
             m_framebuffers[image_index], m_extent, image_index, m_current_frame};
         refraction_overlay(refraction_frame, refraction_overlay_data);
         m_vk.cmd_end_render_pass(command);
+        mark_gpu_stage(command, "distortion-and-hud");
     }
     if (final_capture)
     {
         final_capture(command, m_images[image_index], image_index, final_capture_data);
+        mark_gpu_stage(command, "ui-scene-copy");
         render_info.renderPass = m_overlay_pass;
         m_vk.cmd_begin_render_pass(command, &render_info, VK_SUBPASS_CONTENTS_INLINE);
         const FrameRecordingContext final_frame{command, m_overlay_pass,
@@ -1121,6 +1149,7 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
         final_overlay(final_frame, final_overlay_data);
         m_vk.cmd_end_render_pass(command);
     }
+    mark_gpu_stage(command, "ui-distortion");
     if (m_postprocess)
     {
         crash_stage("vulkan frame: record postprocess");
@@ -1202,6 +1231,7 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
         const FrameRecordingContext context{command, m_composite_pass,
             m_composite_framebuffers[image_index], m_extent, image_index, m_current_frame};
         compositor(context, compositor_data);
+        mark_gpu_stage(command, "postprocess");
         m_vk.cmd_end_render_pass(command);
     }
     if (m_allow_readback)
@@ -1222,8 +1252,12 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
             VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &present_barrier);
     }
     if (m_timestamp_pool)
+    {
+        auto& count = m_timestamp_written[m_current_frame];
+        m_timestamp_names[m_current_frame][count - 1] = m_profile_enabled ? "frame-tail" : nullptr;
         m_vk.cmd_write_timestamp(command, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-            m_timestamp_pool, 2 * m_current_frame + 1);
+            m_timestamp_pool, TimestampStride * m_current_frame + count++);
+    }
     crash_stage("vulkan frame: end command buffer");
     const VkResult end_result = m_vk.end_command_buffer(command);
     if (end_result != VK_SUCCESS)
@@ -1323,6 +1357,8 @@ void FrameContext::destroy()
     m_timestamp_valid_bits = 0;
     m_timestamp_submitted = {};
     m_last_gpu_ms.reset();
+    m_gpu_stages.clear();
+    m_timestamp_written = {};
     m_extent = {};
     m_format = VK_FORMAT_UNDEFINED;
     m_color_space = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;

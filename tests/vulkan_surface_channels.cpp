@@ -1939,12 +1939,57 @@ int main(int argc, char **argv)
         near(scene_pixels[32 * 128 + 42][1], 32.f / 95, "2D foreground depth cancels displaced sampling");
         fill(memory, input[19], {1, 0, 0, 1});
         fill(memory, input[0], {127.f / 255, 127.f / 255, .1f, 1});
+        // Diagnostic mode displays the actual particle quad even if its
+        // authored distortion texture is transparent or neutral.
+        for (auto &v : triangle) { v.uv[0] = (v.position[0] + 1) * .5f; v.uv[1] = (v.position[1] + 1) * .5f; }
+        check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        std::memcpy(mapped, triangle.data(), sizeof(triangle)); vkUnmapMemory(device, vertex_memory);
+        fill(memory, input[0], {0, 0, 0, 0});
+        scene_push.padding[1] = 1;
+        execute(distort_ps, scene_push, false, distort_vs);
+        near(scene_pixels[48 * 128 + 64][0], 64.5f / 128, "diagnostic quad displays actual U coordinate");
+        near(scene_pixels[48 * 128 + 64][1], 1 - 48.5f / 96, "diagnostic quad displays actual V coordinate");
+        near(scene_pixels[48 * 128 + 64][2], .15f, "diagnostic quad bypasses authored offset map");
+        scene_push.padding[1] = 0;
+        fill(memory, input[0], {127.f / 255, 127.f / 255, .1f, 1});
         // Negative control: the old opaque-only snapshot contains no water.
         scene_images[0].imageView = input[3].view;
         vkUpdateDescriptorSets(device, 1, &scene_writes[0], 0, nullptr);
         fill(memory, input[3], {.2f, .3f, .05f, 1});
         execute(distort_ps, scene_push, false, distort_vs);
         near(scene_pixels[48 * 128 + 64][2], .05f, "stale snapshot visibly replaces water with the opaque background");
+        // Raw debug channels must not acquire a lighting/reflection term.
+        fill(memory, input[19], {.5f, 0, 0, 0});
+        fill(memory, weather_normal, {.5f, 1, .5f, .4f});
+        fill(memory, input[2], {.2f, .7f, .4f, 0});
+        for (float mode : {10.f, 11.f})
+        {
+            constants[33] = mode;
+            check(vkMapMemory(device, weather_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+            std::memcpy(mapped, constants, sizeof(constants)); vkUnmapMemory(device, weather_memory);
+            execute(weather_ps, weather_push, false, weather_vs);
+            const auto &p = scene_pixels[48 * 128 + 64];
+            near(p[0], mode == 10 ? .5f : .2f, "diagnostic channel red");
+            near(p[1], mode == 10 ? 1.f : .7f, "diagnostic channel green");
+            near(p[2], mode == 10 ? .5f : .4f, "diagnostic channel blue");
+        }
+        fill(memory, input[0], {.4f, .3f, .2f, 1});
+        fill(memory, input[2], {0, .7f, 0, 0});
+        fill(memory, weather_shadow, {1, 1, 1, 1});
+        constants[36] = .04f; constants[37] = .05f; constants[38] = .06f;
+        constants[40] = constants[41] = constants[42] = 0;
+        w[16] = .6f; w[17] = .5f; w[18] = .4f;
+        for (float mode : {12.f, 13.f})
+        {
+            constants[33] = mode;
+            check(vkMapMemory(device, weather_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+            std::memcpy(mapped, constants, sizeof(constants)); vkUnmapMemory(device, weather_memory);
+            execute(weather_ps, weather_push, false, weather_vs);
+            const auto &p = scene_pixels[48 * 128 + 64];
+            near(p[0], .4f * (mode == 12 ? .6f : .04f), "isolated sun/ambient red contribution");
+            near(p[1], .3f * (mode == 12 ? .5f : .05f), "isolated sun/ambient green contribution");
+            near(p[2], .2f * (mode == 12 ? .4f : .06f), "isolated sun/ambient blue contribution");
+        }
         vkDestroyImageView(device, scene_image.view, nullptr);
         vkDestroyImage(device, scene_image.image, nullptr);
         vkFreeMemory(device, scene_image.memory, nullptr);

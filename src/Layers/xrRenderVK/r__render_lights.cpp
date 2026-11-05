@@ -1,3 +1,4 @@
+#include "VulkanDiagnostics.h"
 #include "xrEngine/stdafx.h"
 #include "VulkanGameDevice.h"
 #include "VulkanSettings.h"
@@ -61,7 +62,7 @@ void VulkanGameDevice::render_lights(const float (&mvp)[16], bool render_world, 
     local_uniforms_.clear();
     local_scissors_.clear();
     local_projection_views_.clear();
-    if (render_world)
+    if (render_world && diagnostics().mode != 7)
     {
         Fmatrix camera, inverse;
         std::memcpy(&camera, mvp, sizeof(camera));
@@ -115,7 +116,7 @@ void VulkanGameDevice::render_lights(const float (&mvp)[16], bool render_world, 
             local.direction_cone[3] = std::cos(cone * .5f);
             const uint64_t pixels = uint64_t(scissor.extent.width) * scissor.extent.height;
             const uint64_t screen_pixels = uint64_t(extent.width) * extent.height;
-            const bool cast = light_snapshot.shadow && shadow_slot < LocalShadowSlots &&
+            const bool cast = diagnostics().mode != 8 && light_snapshot.shadow && shadow_slot < LocalShadowSlots &&
                               (spot ? spot_slots < uint32_t(std::max(spot_shadow_budget, 0))
                                     : point_slots < uint32_t(std::max(point_shadow_budget, 0))) &&
                               pixels * 20 >= screen_pixels;

@@ -134,6 +134,14 @@ public:
         double fence_ms{}, acquire_ms{}, record_ms{}, submit_ms{}, present_ms{};
     };
     const CpuTiming& cpu_timing() const { return m_cpu_timing; }
+    struct GpuStage { const char* name; double ms; };
+    void set_gpu_diagnostics(bool enabled, int mode, bool capture = false) { m_profile_enabled = enabled; m_profile_mode = mode; m_profile_capture = capture; }
+    void mark_gpu_stage(VkCommandBuffer command, const char* name);
+    const std::vector<GpuStage>& gpu_stages() const { return m_gpu_stages; }
+    int gpu_profile_mode() const { return m_last_profile_mode; }
+    bool gpu_profile_capture() const { return m_last_profile_capture; }
+    uint64_t gpu_profile_sequence() const { return m_last_profile_sequence; }
+    static constexpr uint32_t TimestampStride = 32;
     VkExtent2D extent() const { return m_extent; }
     VkFormat format() const { return m_format; }
     VkRenderPass render_pass() const { return m_render_pass; }
@@ -175,6 +183,15 @@ private:
     uint32_t m_timestamp_valid_bits{};
     std::array<bool, FramesInFlight> m_timestamp_submitted{};
     std::optional<double> m_last_gpu_ms;
+    bool m_profile_enabled = false, m_profile_capture = false, m_last_profile_capture = false;
+    std::array<bool, FramesInFlight> m_profile_captures{};
+    int m_profile_mode = 0, m_last_profile_mode = 0;
+    uint64_t m_profile_sequence = 0, m_last_profile_sequence = 0;
+    std::array<uint32_t, FramesInFlight> m_timestamp_written{};
+    std::array<int, FramesInFlight> m_profile_modes{};
+    std::array<uint64_t, FramesInFlight> m_profile_sequences{};
+    std::array<std::array<const char*, TimestampStride>, FramesInFlight> m_timestamp_names{};
+    std::vector<GpuStage> m_gpu_stages;
     CpuTiming m_cpu_timing{};
     VkExtent2D m_extent{};
     VkFormat m_format = VK_FORMAT_UNDEFINED;

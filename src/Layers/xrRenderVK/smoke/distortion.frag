@@ -8,6 +8,12 @@ layout(location = 3) in vec4 tint;
 layout(location = 0) out vec4 pixel_color;
 void main()
 {
+    if (settings.params.w > .5)
+    {
+        float edge = min(min(texcoord.x, texcoord.y), min(1.0 - texcoord.x, 1.0 - texcoord.y));
+        pixel_color = vec4(edge < .025 ? vec3(1) : vec3(texcoord, .15), 1.0);
+        return;
+    }
     vec4 field = texture(distortion_map, texcoord);
     // particles_xdistort.s / particle_distort.ps: alpha weights the
     // displacement field. Its RGB encodes offsets, never emitted light.

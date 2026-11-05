@@ -173,6 +173,7 @@ public final class XRayActivity extends SDLActivity {
         boolean splashEnabled = getIntent().getBooleanExtra(LauncherActivity.EXTRA_SPLASH_ENABLED, false);
         int gameVariant = getIntent().getIntExtra(LauncherActivity.EXTRA_GAME_VARIANT, 3);
         String[] additionalArgs = getIntent().getStringArrayExtra(LauncherActivity.EXTRA_ADDITIONAL_ARGS);
+        int diagnosticMode = Math.max(0, Math.min(15, getIntent().getIntExtra(LauncherActivity.EXTRA_DIAGNOSTIC_MODE, 0)));
         int rendererMode = getIntent().getIntExtra(
                 LauncherActivity.EXTRA_RENDERER_MODE, LauncherActivity.RENDERER_AUTO);
         int graphicsPreset = getIntent().getIntExtra(
@@ -259,6 +260,7 @@ public final class XRayActivity extends SDLActivity {
             args.add("-no_gamepad");
         if (!splashEnabled)
             args.add("-nosplash");
+        if (!rendererSmoke && diagnosticMode > 0) args.add("-vk-diagnostic=" + diagnosticMode);
         if (additionalArgs != null) {
             for (String argument : additionalArgs) {
                 if (argument != null && !argument.isEmpty())

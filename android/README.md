@@ -310,3 +310,44 @@ download any of them.
 
 Launcher behavior is described in [apk/README.md](apk/README.md). ARM64 build
 dependencies are listed in [ARM64_DEPS.md](ARM64_DEPS.md).
+
+## Vulkan diagnostic build (0.9.186)
+
+Select Vulkan and choose **Автоцикл: снимки и время GPU** in the Vulkan settings.
+Normal mode defaults to **Диагностика: выключена**. Diagnostics do not change
+stored graphics quality, savegames or game resources.
+
+Load a save and hold the camera at the affected prop or tree for 112 seconds.
+The cycle repeats every 112 seconds, with 8 seconds per view:
+normal image, world normals, albedo, baked light channels, material channels,
+sun only, ambient and hemisphere only, no local lights, no dynamic shadows,
+no refraction particles, full tree geometry, tree LOD, no transparent world,
+and colored water-particle quads. The last view shows the actual geometry and
+UV direction of both ordinary and refractive water particles. Walk through
+water during that view, or select **Вода: геометрия частиц** for a fixed view.
+Individual modes are also available for longer inspection. Automatic capture
+is capped at 112 images per engine process; the views and timers keep cycling.
+Disable diagnostics after the investigation.
+
+A JPEG is captured six seconds into each automatic stage. Captures go to
+`_appdata_/screenshots/vkdiag_*.jpg`. Readback briefly stalls rendering;
+capture frames are excluded from the diagnostic GPU samples. Fixed modes
+save one automatic capture six seconds after world rendering starts.
+**Поделиться логами** includes up to 56 recent diagnostic JPEGs (at most
+128 MiB) and the usual session logs. Screenshots use the standard screenshot
+path; automatic archive collection uses the default `_appdata_/screenshots`
+under the selected game directory. For a custom fsgame screenshot alias,
+attach the `vkdiag_*.jpg` files from that custom location separately.
+
+`[vkdiag]` records mode changes, camera position/direction, particle definition,
+shader, texture, flags, actual world/clip-space corners and UVs. CPU samples
+and GPU timestamps are separate. GPU samples carry the source submission
+sequence and mode, collected only after its frame fence signals. Intervals
+include grid culling, sun/local shadows, G-buffer/depth copy, base/local
+lighting, transparency, scene copies, distortion/HUD, UI and postprocessing.
+Queues without timestamp support still produce CPU logs and images.
+
+Debug channel images show deferred opaque geometry; forward-only objects may
+be absent there. Forced tree geometry and diagnostic overlays can be slower.
+Compare performance only at the same camera, resolution and scene; this build
+adds diagnostic tools and does not claim to fix the reported visual bugs.
