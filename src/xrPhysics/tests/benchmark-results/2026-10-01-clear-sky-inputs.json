@@ -1,0 +1,33 @@
+{
+    "mode":  "cs",
+    "starting_save_backend":  "ODE",
+    "starting_population":  23,
+    "files":  [
+                  {
+                      "file":  "userdata/savedgames/clear-sky-benchmark-start.sav",
+                      "bytes":  1100535,
+                      "sha256":  "4DA53E84714F32A5DE76888EFCD0CE95D74EB843F712A2FB28F9E833EC134A94"
+                  },
+                  {
+                      "file":  "gamedata/scripts/_g.script",
+                      "bytes":  36101,
+                      "sha256":  "362C6BA1AE94B0A0C76209060DF5001ED8C384A842BACCDB3D3533D99D8DCC57"
+                  },
+                  {
+                      "file":  "gamedata/scripts/gulag_general.script",
+                      "bytes":  59803,
+                      "sha256":  "4518AF45DCA5C145A23B3767B8F207818E35B99ABD118300643013E0845A8B9B"
+                  },
+                  {
+                      "file":  "gamedata/scripts/xr_logic.script",
+                      "bytes":  52154,
+                      "sha256":  "5D23E0014F6E2C36E924A70580A44AB1AC6150067DB3A4F15114625E66EA7660"
+                  },
+                  {
+                      "file":  "gamedata/scripts/bind_smart_cover.script",
+                      "bytes":  987,
+                      "sha256":  "89B93ADF6882892A2C45814A384C1E3C9058C26CADC02817429CC50A31D9FAD0"
+                  }
+              ],
+    "patch_sha256":  "31EBFF9EBE0F62E1E055744368888FB85E3B99BC31640CD9761489FFB669C13C"
+}

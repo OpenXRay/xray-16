@@ -150,33 +150,6 @@
     <ClCompile Include="ShellHit.cpp">
       <Filter>physics</Filter>
     </ClCompile>
-    <ClCompile Include="tri-colliderknoopc\dcTriListCollider.cpp">
-      <Filter>physics\colliders\tri</Filter>
-    </ClCompile>
-    <ClCompile Include="tri-colliderknoopc\dSortTriPrimitive.cpp">
-      <Filter>physics\colliders\tri</Filter>
-    </ClCompile>
-    <ClCompile Include="tri-colliderknoopc\dTriBox.cpp">
-      <Filter>physics\colliders\tri</Filter>
-    </ClCompile>
-    <ClCompile Include="tri-colliderknoopc\dTriCallideK.cpp">
-      <Filter>physics\colliders\tri</Filter>
-    </ClCompile>
-    <ClCompile Include="tri-colliderknoopc\dTriCylinder.cpp">
-      <Filter>physics\colliders\tri</Filter>
-    </ClCompile>
-    <ClCompile Include="tri-colliderknoopc\dTriList.cpp">
-      <Filter>physics\colliders\tri</Filter>
-    </ClCompile>
-    <ClCompile Include="tri-colliderknoopc\dTriSphere.cpp">
-      <Filter>physics\colliders\tri</Filter>
-    </ClCompile>
-    <ClCompile Include="dcylinder\dCylinder.cpp">
-      <Filter>physics\colliders\cyl</Filter>
-    </ClCompile>
-    <ClCompile Include="dRayMotions.cpp">
-      <Filter>physics\colliders\RayMotions</Filter>
-    </ClCompile>
     <ClCompile Include="IActivationShape.cpp">
       <Filter>physics\ActivationBox</Filter>
     </ClCompile>
@@ -195,17 +168,11 @@
     <ClCompile Include="MathUtils.cpp">
       <Filter>physics\Base\Objects\Utils\Math</Filter>
     </ClCompile>
-    <ClCompile Include="PHDynamicData.cpp">
-      <Filter>physics\Base\Objects\Utils\Math</Filter>
-    </ClCompile>
     <ClCompile Include="PHContactBodyEffector.cpp">
       <Filter>physics\Base\Objects\BodyEffectors</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\PHNetState.cpp">
       <Filter>physics\Base\Objects\PHNet</Filter>
-    </ClCompile>
-    <ClCompile Include="PHMoveStorage.cpp">
-      <Filter>physics\Base\Objects\MoveStorage</Filter>
     </ClCompile>
     <ClCompile Include="DisablingParams.cpp">
       <Filter>physics\Base\Objects\Disabling</Filter>
@@ -285,9 +252,6 @@
     <ClCompile Include="PHObject.cpp">
       <Filter>physics\Base\Objects\PHObject</Filter>
     </ClCompile>
-    <ClCompile Include="PHIsland.cpp">
-      <Filter>physics\Base\Objects\PHIsland</Filter>
-    </ClCompile>
     <ClCompile Include="GeometryBits.cpp">
       <Filter>physics\Base\Objects\World</Filter>
     </ClCompile>
@@ -344,51 +308,6 @@
     <ClInclude Include="console_vars.h">
       <Filter>physics</Filter>
     </ClInclude>
-    <ClInclude Include="tri-colliderknoopc\__aabb_tri.h">
-      <Filter>physics\colliders\tri</Filter>
-    </ClInclude>
-    <ClInclude Include="tri-colliderknoopc\dcTriangle.h">
-      <Filter>physics\colliders\tri</Filter>
-    </ClInclude>
-    <ClInclude Include="tri-colliderknoopc\dcTriListCollider.h">
-      <Filter>physics\colliders\tri</Filter>
-    </ClInclude>
-    <ClInclude Include="tri-colliderknoopc\dSortTriPrimitive.h">
-      <Filter>physics\colliders\tri</Filter>
-    </ClInclude>
-    <ClInclude Include="tri-colliderknoopc\dTriBox.h">
-      <Filter>physics\colliders\tri</Filter>
-    </ClInclude>
-    <ClInclude Include="tri-colliderknoopc\dTriCollideK.h">
-      <Filter>physics\colliders\tri</Filter>
-    </ClInclude>
-    <ClInclude Include="tri-colliderknoopc\dTriColliderCommon.h">
-      <Filter>physics\colliders\tri</Filter>
-    </ClInclude>
-    <ClInclude Include="tri-colliderknoopc\dTriColliderMath.h">
-      <Filter>physics\colliders\tri</Filter>
-    </ClInclude>
-    <ClInclude Include="tri-colliderknoopc\dTriCylinder.h">
-      <Filter>physics\colliders\tri</Filter>
-    </ClInclude>
-    <ClInclude Include="tri-colliderknoopc\dTriList.h">
-      <Filter>physics\colliders\tri</Filter>
-    </ClInclude>
-    <ClInclude Include="tri-colliderknoopc\dTriSphere.h">
-      <Filter>physics\colliders\tri</Filter>
-    </ClInclude>
-    <ClInclude Include="tri-colliderknoopc\dxTriList.h">
-      <Filter>physics\colliders\tri</Filter>
-    </ClInclude>
-    <ClInclude Include="tri-colliderknoopc\TriPrimitiveCollideClassDef.h">
-      <Filter>physics\colliders\tri</Filter>
-    </ClInclude>
-    <ClInclude Include="dcylinder\dCylinder.h">
-      <Filter>physics\colliders\cyl</Filter>
-    </ClInclude>
-    <ClInclude Include="dRayMotions.h">
-      <Filter>physics\colliders\RayMotions</Filter>
-    </ClInclude>
     <ClInclude Include="IActivationShape.h">
       <Filter>physics\ActivationBox</Filter>
     </ClInclude>
@@ -396,12 +315,6 @@
       <Filter>physics\ActivationBox</Filter>
     </ClInclude>
     <ClInclude Include="DamageSource.h">
-      <Filter>physics\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="ode_include.h">
-      <Filter>physics\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="ode_redefine.h">
       <Filter>physics\Base</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsCommon.h">
@@ -412,9 +325,6 @@
     </ClInclude>
     <ClInclude Include="PHDefs.h">
       <Filter>physics\Base\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="ph_valid_ode.h">
-      <Filter>physics\Base\Objects\Utils</Filter>
     </ClInclude>
     <ClInclude Include="phvalide.h">
       <Filter>physics\Base\Objects\Utils</Filter>
@@ -431,13 +341,7 @@
     <ClInclude Include="CycleConstStorage.h">
       <Filter>physics\Base\Objects\Utils\Storage</Filter>
     </ClInclude>
-    <ClInclude Include="CalculateTriangle.h">
-      <Filter>physics\Base\Objects\Utils\Math</Filter>
-    </ClInclude>
     <ClInclude Include="MathUtils.h">
-      <Filter>physics\Base\Objects\Utils\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="MathUtilsOde.h">
       <Filter>physics\Base\Objects\Utils\Math</Filter>
     </ClInclude>
     <ClInclude Include="matrix_utils.h">
@@ -454,9 +358,6 @@
     </ClInclude>
     <ClInclude Include="..\xrServerEntities\PHNetState.h">
       <Filter>physics\Base\Objects\PHNet</Filter>
-    </ClInclude>
-    <ClInclude Include="PHMoveStorage.h">
-      <Filter>physics\Base\Objects\MoveStorage</Filter>
     </ClInclude>
     <ClInclude Include="DisablingParams.h">
       <Filter>physics\Base\Objects\Disabling</Filter>
@@ -556,9 +457,6 @@
     </ClInclude>
     <ClInclude Include="PHUpdateObject.h">
       <Filter>physics\Base\Objects\PHObject</Filter>
-    </ClInclude>
-    <ClInclude Include="PHIsland.h">
-      <Filter>physics\Base\Objects\PHIsland</Filter>
     </ClInclude>
     <ClInclude Include="GeometryBits.h">
       <Filter>physics\Base\Objects\World</Filter>

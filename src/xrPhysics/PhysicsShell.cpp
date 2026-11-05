@@ -5,22 +5,20 @@
 #include "Physics.h"
 #include "PHJoint.h"
 #include "PHShell.h"
-#include "PHJoint.h"
 #include "PHJointDestroyInfo.h"
 #include "PHSplitedShell.h"
 
 #include "IPhysicsShellHolder.h"
 
-#include "phvalide.h"
-
 #include "Include/xrRender/Kinematics.h"
 #include "xrEngine/xr_object.h"
 #include "xrCore/Animation/Bone.hpp"
+#include "xrPhysicsCore/IPhysicsCore.h"
 
 extern CPHWorld* ph_world;
+
 CPhysicsShell::~CPhysicsShell()
 {
-    // if(ph_world)ph_world->NetRelcase(this);
 }
 
 CPhysicsElement* P_create_Element()
@@ -52,9 +50,6 @@ CPhysicsShell* P_build_Shell(
 {
     VERIFY(obj);
     phys_shell_verify_object_model(*obj);
-    // IRenderVisual*	V = obj->ObjectVisual();
-    // IKinematics* pKinematics=smart_cast<IKinematics*>(V);
-    // IKinematics* pKinematics	=  V->dcast_PKinematics			();
     IKinematics* pKinematics = obj->ObjectKinematics();
 
     CPhysicsShell* pPhysicsShell = P_create_Shell();
@@ -65,9 +60,8 @@ CPhysicsShell* P_build_Shell(
 
     pPhysicsShell->set_PhysicsRefObject(obj);
     pPhysicsShell->mXFORM.set(obj->ObjectXFORM());
-    pPhysicsShell->Activate(not_active_state, not_set_bone_callbacks); //,
-    // m_pPhysicsShell->SmoothElementsInertia(0.3f);
-    pPhysicsShell->SetAirResistance(); // 0.0014f,1.5f
+    pPhysicsShell->Activate(not_active_state, not_set_bone_callbacks);
+    pPhysicsShell->SetAirResistance();
 
     return pPhysicsShell;
 }
@@ -90,11 +84,11 @@ void fix_bones(LPCSTR fixed_bones, CPhysicsShell* shell)
             E->Fix();
     }
 }
+
 CPhysicsShell* P_build_Shell(
     IPhysicsShellHolder* obj, bool not_active_state, BONE_P_MAP* p_bone_map, LPCSTR fixed_bones)
 {
     CPhysicsShell* pPhysicsShell = 0;
-    // IKinematics* pKinematics=smart_cast<IKinematics*>(obj->ObjectVisual());
     IKinematics* pKinematics = obj->ObjectKinematics();
     if (fixed_bones)
     {
@@ -109,8 +103,6 @@ CPhysicsShell* P_build_Shell(
         }
 
         pPhysicsShell = P_build_Shell(obj, not_active_state, p_bone_map);
-
-        // m_pPhysicsShell->add_Joint(P_create_Joint(CPhysicsJoint::enumType::full_control,0,fixed_element));
     }
     else
         pPhysicsShell = P_build_Shell(obj, not_active_state);
@@ -122,7 +114,6 @@ CPhysicsShell* P_build_Shell(
     {
         CPhysicsElement* fixed_element = i->second.element;
         R_ASSERT2(fixed_element, "fixed bone has no physics");
-        // if(!fixed_element) continue;
         fixed_element->Fix();
     }
     return pPhysicsShell;
@@ -133,7 +124,6 @@ CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, LP
     xr_vector<u16> f_bones;
     if (fixed_bones)
     {
-        // IKinematics* K		= smart_cast<IKinematics*>(obj->ObjectVisual());
         IKinematics* K = obj->ObjectKinematics();
         VERIFY(K);
         int count = _GetItemCount(fixed_bones);
@@ -158,14 +148,12 @@ CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, xr
             bone_map.insert(std::make_pair(*it, physicsBone()));
     pPhysicsShell = P_build_Shell(obj, not_active_state, &bone_map);
 
-    // fix bones
     auto i = bone_map.begin(), e = bone_map.end();
     if (i != e)
         pPhysicsShell->SetPrefereExactIntegration();
     for (; i != e; ++i)
     {
         CPhysicsElement* fixed_element = i->second.element;
-        // R_ASSERT2(fixed_element,"fixed bone has no physics");
         if (!fixed_element)
             continue;
         fixed_element->Fix();
@@ -179,7 +167,6 @@ CPhysicsShell* P_build_SimpleShell(IPhysicsShellHolder* obj, float mass, bool no
 #ifdef DEBUG
     pPhysicsShell->dbg_obj = (obj);
 #endif
-    // Fobb obb; obj->ObjectVisual()->getVisData().box.get_CD( obb.m_translate, obb.m_halfsize );
     VERIFY(obj);
     VERIFY(obj->ObjectKinematics());
 
@@ -204,7 +191,6 @@ void ApplySpawnIniToPhysicShell(CInifile const* ini, CPhysicsShell* physics_shel
     if (ini->section_exist("physics_common"))
     {
         fixed = fixed || (ini->line_exist("physics_common", "fixed_bones"));
-#pragma todo("not ignore static if non realy fixed! ")
         fix_bones(ini->r_string("physics_common", "fixed_bones"), physics_shell);
     }
     if (ini->section_exist("collide"))
@@ -212,7 +198,7 @@ void ApplySpawnIniToPhysicShell(CInifile const* ini, CPhysicsShell* physics_shel
         if ((ini->line_exist("collide", "ignore_static") && fixed) ||
             (ini->line_exist("collide", "ignore_static") && ini->section_exist("animated_object")))
         {
-            physics_shell->SetIgnoreStatic();
+            physics_shell->SetElementsCollideWithStatics(false);
         }
         if (ini->line_exist("collide", "small_object"))
         {
@@ -227,18 +213,14 @@ void ApplySpawnIniToPhysicShell(CInifile const* ini, CPhysicsShell* physics_shel
             physics_shell->SetIgnoreRagDoll();
         }
 
-        // If need, then show here that it is needed to ignore collisions with "animated_object"
         if (ini->line_exist("collide", "ignore_animated_objects"))
         {
             physics_shell->SetIgnoreAnimated();
         }
     }
-    // If next section is available then given "PhysicShell" is classified
-    // as animated and we read options for his animation
 
     if (ini->section_exist("animated_object"))
     {
-        // Show that given "PhysicShell" animated
         physics_shell->CreateShellAnimator(ini, "animated_object");
     }
 }
@@ -253,13 +235,6 @@ void destroy_physics_shell(CPhysicsShell*& p)
 
 bool bone_has_pysics(IKinematics& K, u16 bone_id)
 {
-    // CBoneData	* pBonedata1 = &K.LL_GetData( bone_id );
-    // CBoneData	* pBonedata2 = K.LL_GetBoneData( bone_id );
-
-    // u32	sz = sizeof(vecBones);
-    // u32	sz1=  sizeof(pBonedata1->children);
-
-    //	VERIFY(pBonedata1 == pBonedata2);
     return K.LL_GetBoneVisible(bone_id) && shape_is_physic(K.GetBoneData(bone_id).get_shape());
 }
 
@@ -274,8 +249,6 @@ bool has_physics_collision_shapes(IKinematics& K)
 
 void phys_shell_verify_model(IKinematics& K)
 {
-    // IRenderVisual* V = K.dcast_RenderVisual();
-    // VERIFY( V );
     VERIFY2(has_physics_collision_shapes(K),
         make_string("Can not create physics shell for model %s because it has no physics collision shapes set",
             K.getDebugName().c_str()));
@@ -283,14 +256,7 @@ void phys_shell_verify_model(IKinematics& K)
 
 void phys_shell_verify_object_model(IPhysicsShellHolder& O)
 {
-    // IRenderVisual	*V = O.ObjectVisual();
-
-    // VERIFY2( V, make_string( "Can not create physics shell for object %s it has no model", O.ObjectName() )/*+
-    // make_string("\n object dump: \n") + dbg_object_full_dump_string( &O )*/ );
-
-    // IKinematics		*K = V->dcast_PKinematics();
-
-    [[maybe_unused]] IKinematics* K = O.ObjectKinematics();
+    IKinematics* K = O.ObjectKinematics();
 
     VERIFY2(K, make_string("Can not create physics shell for object %s, model %s is not skeleton", O.ObjectName(),
                    O.ObjectNameVisual()));
@@ -298,11 +264,11 @@ void phys_shell_verify_object_model(IPhysicsShellHolder& O)
     VERIFY2(has_physics_collision_shapes(*K),
         make_string("Can not create physics shell for object %s, model %s has no physics collision shapes set",
             O.ObjectName(),
-            O.ObjectNameVisual()) /*+ make_string("\n object dump: \n") + dbg_object_full_dump_string( &O )*/);
+            O.ObjectNameVisual()));
 
     VERIFY2(_valid(O.ObjectXFORM()),
         make_string(
-            "create physics shell: object matrix is not valid") /*+ make_string("\n object dump: \n") + dbg_object_full_dump_string( &O )*/);
+            "create physics shell: object matrix is not valid"));
 
     VERIFY2(valid_pos(O.ObjectXFORM().c), dbg_valide_pos_string(O.ObjectXFORM().c, &O, "create physics shell"));
 }
@@ -344,30 +310,42 @@ bool can_create_phys_shell(string1024& reason, IPhysicsShellHolder& O)
     return result;
 }
 
-float NonElasticCollisionEnergy(CPhysicsElement* e1, CPhysicsElement* e2, const Fvector& norm) // norm - from 2 to 1
+float NonElasticCollisionEnergy(CPhysicsElement* e1, CPhysicsElement* e2, const Fvector& norm)
 {
     VERIFY(e1);
     VERIFY(e2);
-    dBodyID b1 = static_cast<CPHElement*>(e1)->get_body();
-    VERIFY(b1);
-    dBodyID b2 = static_cast<CPHElement*>(e2)->get_body();
-    VERIFY(b2);
-    return E_NL(b1, b2, cast_fp(norm));
+
+    CharacterVirtualHandle b1 = static_cast<CPHElement*>(e1)->get_body();
+    CharacterVirtualHandle b2 = static_cast<CPHElement*>(e2)->get_body();
+
+    if (b1 == INVALID_CHARACTER_VIRTUAL_HANDLE || b2 == INVALID_CHARACTER_VIRTUAL_HANDLE) return 0.f;
+
+    // В Jolt Physics энергия вычисляется через разницу скоростей (приблизительная формула)
+    Fvector v1, v2;
+    GetPhysicsCore()->GetBodyLinearVelocity(b1, v1);
+    GetPhysicsCore()->GetBodyLinearVelocity(b2, v2);
+
+    Fvector rel_vel;
+    rel_vel.sub(v1, v2);
+
+    float m1 = e1->getMass();
+    float m2 = e2->getMass();
+    float reduced_mass = (m1 * m2) / (m1 + m2 + EPS);
+
+    float speed = _abs(rel_vel.dotproduct(norm));
+    return 0.5f * reduced_mass * speed * speed;
 }
 
-void StaticEnvironmentCB(bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
+void StaticEnvironmentCB(
+    bool& do_colide, bool bo1,
+    CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+    const Fvector& contact_normal, const Fvector& contact_pos,
+    SGameMtl* material_1, SGameMtl* material_2)
 {
-    dJointID contact_joint = dJointCreateContact(0, ContactGroup, &c);
-
-    if (bo1)
-    {
-        ((CPHIsland*)(retrieveGeomUserData(c.geom.g1)->callback_data))->DActiveIsland()->ConnectJoint(contact_joint);
-        dJointAttach(contact_joint, dGeomGetBody(c.geom.g1), 0);
+    auto* geometry = bo1 ? my_geom : oposite_geom;
+    if (geometry && geometry->contact_response) {
+        do_colide = true;
+        if (bo1) geometry->contact_response->static_body2 = true;
+        else geometry->contact_response->static_body1 = true;
     }
-    else
-    {
-        ((CPHIsland*)(retrieveGeomUserData(c.geom.g2)->callback_data))->DActiveIsland()->ConnectJoint(contact_joint);
-        dJointAttach(contact_joint, 0, dGeomGetBody(c.geom.g2));
-    }
-    do_colide = false;
 }

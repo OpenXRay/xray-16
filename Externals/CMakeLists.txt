@@ -6,8 +6,10 @@ endif()
 
 add_subdirectory(luabind)
 add_subdirectory(xrLuaFix)
-add_subdirectory(OPCODE)
-add_subdirectory(ode)
+add_subdirectory(Jolt-proj)
+if (NOT XRAY_USE_JOLT_CDB)
+    add_subdirectory(OPCODE)
+endif()
 
 # Silence all warnings for external libraries
 add_compile_options(${XRAY_DISABLE_WARNINGS})

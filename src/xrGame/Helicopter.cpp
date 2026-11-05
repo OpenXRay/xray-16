@@ -122,12 +122,22 @@ void CHelicopter::Load(LPCSTR section)
 }
 
 void CHelicopter::reload(LPCSTR section) { inherited::reload(section); }
-void CollisionCallbackAlife(bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
+void CollisionCallbackAlife(
+    bool& do_colide, bool bo1,
+    CPhysicsGeom* geom1, CPhysicsGeom* geom2,
+    const Fvector& contact_normal, const Fvector& contact_pos,
+    SGameMtl* material_1, SGameMtl* material_2
+)
 {
     do_colide = false;
 }
 
-void ContactCallbackAlife(CDB::TRI* T, dContactGeom* c) {}
+void ContactCallbackAlife(
+    bool& do_colide, bool bo1,
+    CPhysicsGeom* geom1, CPhysicsGeom* geom2,
+    const Fvector& contact_normal, const Fvector& contact_pos,
+    SGameMtl* material_1, SGameMtl* material_2
+) {}
 bool CHelicopter::net_Spawn(CSE_Abstract* DC)
 {
     SetfHealth(100.0f);

@@ -1,0 +1,28 @@
+{
+    "cop":  {
+                "template":  "C:/code/jolt-physics-gameplay",
+                "assets":  "C:/Users/kotlo/Downloads/S.T.A.L.K.E.R. Call of Pripyat",
+                "save":  "collision-start.scop",
+                "save_sha256":  "2F840D2CDB7F2E50D59E5248C790973A335799D20D3C704D4956D3DB9EF7C496"
+            },
+    "clear_sky":  {
+                      "template":  "C:/code/jolt-clear-sky-benchmark",
+                      "assets":  "C:/Users/kotlo/Downloads/S.T.A.L.K.E.R. Clear Sky",
+                      "save":  "clear-sky-benchmark-start.sav",
+                      "save_sha256":  "4DA53E84714F32A5DE76888EFCD0CE95D74EB843F712A2FB28F9E833EC134A94"
+                  },
+    "scripts":  [
+                    {
+                        "path":  "src/xrPhysics/tests/gameplay_benchmark.script",
+                        "sha256":  "07B36A5FF02DB0CB4794902522C4FC99AB1E0A752A92952DAEA04D239C0D500F"
+                    },
+                    {
+                        "path":  "src/xrPhysics/tests/gameplay_reload.script",
+                        "sha256":  "B251E072A0F1A141B4465BEC1B40719F28E94476808B4FCE4F04FB8F1A07D217"
+                    }
+                ],
+    "runner":  {
+                   "path":  "misc/windows/benchmark-gameplay.ps1",
+                   "sha256":  "86D63253292043F0963DB3A94AD042D9661C65C8D456E68EDB1459964F57C9DF"
+               }
+}

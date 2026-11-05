@@ -1,15 +1,23 @@
 #include "StdAfx.h"
-
 #include "GeometryBits.h"
-
 #include "PHWorld.h"
-#include "Geometry.h"
+#include "ExtendedGeom.h"
+#include "xrPhysicsCore/IPhysicsCore.h"
 
-enum geom_category { gct_static = 1 << 0, gct_dynamic = 1 << 1 };
-
-void CPHGeometryBits::init_geom(CODEGeom& g) {}
-void CPHGeometryBits::init_geom(CPHMesh& g) { dGeomSetCategoryBits(g.GetGeom(), gct_static); }
-void CPHGeometryBits::set_ignore_static(CODEGeom& g)
+void CPHGeometryBits::init_geom(CPhysicsGeom& g)
 {
-    dGeomSetCollideBits(g.geometry_transform(), dGeomGetCollideBits(g.geometry_transform()) & ~gct_static);
+
+}
+
+void CPHGeometryBits::init_geom(CPHMesh& g)
+{
+
+}
+
+void CPHGeometryBits::set_ignore_static(CPhysicsGeom& g)
+{
+    if (g.get_body() != INVALID_CHARACTER_VIRTUAL_HANDLE)
+    {
+        GetPhysicsCore()->SetBodyIgnoreStatic(g.get_body());
+    }
 }
