@@ -1,0 +1,5 @@
+add_executable(xrPhysicsTests BackendTests.cpp)
+target_include_directories(xrPhysicsTests PRIVATE "${XRAY_SOURCE_DIR}/src")
+target_link_libraries(xrPhysicsTests PRIVATE xrPhysics xrCore)
+add_test(NAME xrPhysics.backend COMMAND xrPhysicsTests)
+set_tests_properties(xrPhysics.backend PROPERTIES TIMEOUT 60)

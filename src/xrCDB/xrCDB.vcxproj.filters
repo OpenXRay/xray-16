@@ -83,6 +83,9 @@
     <ClInclude Include="Intersect.hpp">
       <Filter>Kernel</Filter>
     </ClInclude>
+    <ClInclude Include="ModelTree.h">
+      <Filter>Kernel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\OpenXRay.natvis" />
