@@ -1,5 +1,6 @@
 #pragma once
 
+#include "StdAfx.h"
 #include "xrPhysics/PhysicsExternalCommon.h"
 #include "xrPhysics/MathUtils.h"
 #include "xrPhysics/MovementBoxDynamicActivate.h"

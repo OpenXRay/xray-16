@@ -193,7 +193,11 @@ bool CCar::net_Spawn(CSE_Abstract* DC)
     return (CScriptEntity::net_Spawn(DC) && R);
 }
 
-void CCar::ActorObstacleCallback(bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
+void CCar::ActorObstacleCallback(
+    bool& do_colide, bool bo1,
+    CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+    const Fvector& contact_normal, const Fvector& contact_pos,
+    SGameMtl* material_1, SGameMtl* material_2)
 {
     if (!do_colide)
     {

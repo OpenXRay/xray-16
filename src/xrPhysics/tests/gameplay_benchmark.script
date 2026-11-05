@@ -1,0 +1,107 @@
+-- Run `run_script gameplay_benchmark` after loading the same isolated save.
+-- Requires XRAY_GAMEPLAY_BENCHMARK=ON. Writes CSVs, then closes the game.
+local function report(message) log1("GAMEPLAY_BENCHMARK " .. message) end
+local function population(phase)
+    local alive, dead = 0, 0
+    for _, entry in pairs(db.storage or {}) do
+        local object = entry.object
+        if object and IsStalker(object) then
+            if object:alive() then alive = alive + 1 else dead = dead + 1 end
+        end
+    end
+    local p = db.actor:position()
+    report(string.format("POPULATION phase=%s alive=%d dead=%d actor=%.3f,%.3f,%.3f",
+                         phase, alive, dead, p.x, p.y, p.z))
+end
+local function wait(milliseconds)
+    local finish = time_global() + milliseconds
+    while time_global() < finish do coroutine.yield() end
+end
+local function impulse(npc, power, phase)
+    local impact = hit()
+    impact.power = power
+    impact.impulse = 20
+    impact.direction = vector():set(math.sin(phase) * .3, 1, math.cos(phase) * .3):normalize()
+    impact.draftsman = db.actor
+    impact.type = hit.wound
+    npc:hit(impact)
+end
+
+function main()
+    local console = get_console()
+    console:execute("rs_always_active on")
+    console:execute("rs_v_sync off")
+    console:execute("rs_stats off")
+    console:execute("rs_fps_limit 501")
+    console:execute("ph_frequency 100")
+    console:execute("ph_iterations 18")
+    if not db.actor then report("FAIL no actor"); return end
+    local world = level.physics_world()
+    if world.benchmark_native_checks and not world:benchmark_native_checks(db.actor:position()) then
+        report("FAIL native gameplay checks"); return
+    end
+    report("WARMUP")
+    population("load")
+    wait(10000)
+    population("idle")
+    local p = db.actor:position()
+    -- Round to the same level coordinates even if the actor settles slightly
+    -- differently between solvers. The comparator checks these coordinates.
+    local origin = vector():set(math.floor(p.x / 4) * 4, math.floor(p.y / 4) * 4, math.floor(p.z / 4) * 4)
+    world:benchmark_begin("idle")
+    wait(10000)
+    world:benchmark_end()
+    population("after-idle")
+    world:benchmark_queries(origin)
+
+    local ids = {}
+    for i = 1, 12 do
+        local position = vector():set(origin.x + ((i - 1) % 4 - 1.5) * 1.25,
+                                      p.y + .25, origin.z + 5 + math.floor((i - 1) / 4) * 1.25)
+        local vertex = level.vertex_id(position)
+        if not level.valid_vertex(vertex) then report("FAIL invalid spawn vertex"); return end
+        local server = alife():create("sim_default_stalker_0", position, vertex, db.actor:game_vertex_id())
+        if not server then report("FAIL NPC spawn"); return end
+        ids[#ids + 1] = server.id
+    end
+    wait(3000)
+    for i, id in ipairs(ids) do
+        local npc = level.object_by_id(id)
+        if not npc or not npc:alive() then report("FAIL NPC not online/alive"); return end
+        impulse(npc, 100, i)
+    end
+    wait(2000)
+    for _, id in ipairs(ids) do
+        local npc = level.object_by_id(id)
+        if not npc or npc:alive() then report("FAIL NPC did not die"); return end
+    end
+    report("RAGDOLLS count=" .. tostring(#ids))
+    world:benchmark_begin("ragdolls")
+    for _, id in ipairs(ids) do
+        local npc = level.object_by_id(id)
+        local shell = npc and npc:get_physics_shell()
+        if not shell then report("FAIL no ragdoll shell"); world:benchmark_end(); return end
+        world:benchmark_force_shell(shell)
+    end
+    wait(20000)
+    world:benchmark_end()
+    -- Validate a real save separately from the timed phases.
+    wait(2000)
+    for _, id in ipairs(ids) do
+        local npc = level.object_by_id(id)
+        local shell = npc and npc:get_physics_shell()
+        if not shell then report("FAIL shell missing before save"); return end
+        local position, mass = npc:position(), 0
+        local root = shell:get_element_by_order(0):global_transform().c
+        for index = 0, shell:get_elements_number() - 1 do
+            mass = mass + shell:get_element_by_order(index):get_mass()
+        end
+        report(string.format("SAVE_OBJECT id=%d elements=%d joints=%d mass=%.6f x=%.6f y=%.6f z=%.6f bx=%.6f by=%.6f bz=%.6f",
+            id, shell:get_elements_number(), shell:get_joints_number(), mass, position.x, position.y, position.z, root.x, root.y, root.z))
+    end
+    console:execute("save native-physics-validation")
+    wait(2000)
+    report("DONE")
+    wait(1000)
+    console:execute("quit")
+end

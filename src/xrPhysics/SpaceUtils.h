@@ -1,16 +1,25 @@
 #pragma once
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#pragma warning(disable : 4267)
-#include "ode/ode/src/collision_kernel.h"
-#pragma warning(pop)
+#include "xrPhysicsCore/IPhysicsCore.h"
 
-IC void spatialParsFromDGeom(dGeomID d_space, Fvector& center, Fvector& AABB, float& radius)
+IC void spatialParsFromShape(PhysicsShapeHandle shape, Fvector& center, Fvector& AABB, float& radius)
 {
-    d_space->computeAABB();
-    dReal* dAABB = d_space->aabb;
-    center.set((dAABB[0] + dAABB[1]) / 2.f, (dAABB[2] + dAABB[3]) / 2.f, (dAABB[4] + dAABB[5]) / 2.f);
-    AABB.x = dAABB[1] - center.x, AABB.y = dAABB[3] - center.y, AABB.z = dAABB[5] - center.z;
-    radius = _max(AABB.x, _max(AABB.y, AABB.z));
+    if (!shape)
+    {
+        center.set(0.f, 0.f, 0.f);
+        AABB.set(0.f, 0.f, 0.f);
+        radius = 0.f;
+        return;
+    }
+
+    GetPhysicsCore()->GetCDBModelBounds(shape, center, AABB);
+
+    float sq_len = (AABB.x * AABB.x) + (AABB.y * AABB.y) + (AABB.z * AABB.z);
+    if (sq_len < 0.0001f)
+    {
+        radius = 100.f;
+        return;
+    }
+
+    radius = _sqrt(sq_len);
 }
