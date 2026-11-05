@@ -16,6 +16,12 @@ void CPHWorld::script_register(lua_State* luaState)
 		    .def("set_gravity",					&CPHWorld::SetGravity)
 		    .def("gravity",						&CPHWorld::Gravity)
 		    .def("add_call",					&CPHWorld::AddCall)
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+            .def("benchmark_begin", &CPHWorld::BenchmarkBegin)
+            .def("benchmark_end", &CPHWorld::BenchmarkEnd)
+            .def("benchmark_force_shell", &CPHWorld::BenchmarkForceShell)
+            .def("benchmark_queries", &CPHWorld::BenchmarkQueries)
+#endif
 	];
 
     module(luaState, "level")
