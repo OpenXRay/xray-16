@@ -149,7 +149,14 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
         if (oBlend.value)
             C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3DBLEND_ZERO, D3DBLEND_ONE, TRUE, 200);
         else
+#if RENDER == R_GL
+            // GL only: in a core profile a draw without a valid fragment shader is not
+            // executed, so the opaque caster (trunk) never got written into the shadow map.
+            // DX10/11 keep the previous behaviour ('null').
+            C.r_Pass(tvs_s, "dumb", FALSE);
+#else
             C.r_Pass(tvs_s, "null", FALSE);
+#endif
         C.SampledImage("smp_linear", "s_base", C.L_textures[0]);
         C.r_ColorWriteEnable(false, false, false, false);
         C.r_End();

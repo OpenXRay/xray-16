@@ -114,7 +114,13 @@ void render_sun_old::render_sun()
         if (_abs(glm::dot(L_up, L_dir)) > .99f) L_up = glm::vec3(0.f, 0.f, 1.f);
         L_right = glm::normalize(glm::cross(L_up, L_dir));
         L_up = glm::normalize(glm::cross(L_dir, L_right));
-        mdir_View = glm::lookAt(L_pos, L_dir, L_up);
+        // NOTE: glm::lookAt(eye, center, up) takes a TARGET POINT, not a direction.
+        // DX counterpart uses build_camera_dir(L_pos, L_dir, L_up) == look from L_pos
+        // ALONG L_dir. sun->position is camera - dir*500 (Light_DB.cpp), so passing
+        // L_dir as 'center' aimed the shadow camera at the origin instead of along the
+        // sun direction -> sun shadow map was rendered along a wrong axis, which made
+        // sunlight leak through roofs/walls into interiors.
+        mdir_View = glm::lookAt(L_pos, L_pos + L_dir, L_up);
 
         // projection: box
         Fbox frustum_bb;
@@ -127,8 +133,15 @@ void render_sun_old::render_sun()
         Fbox& bb = frustum_bb;
         bb.grow(EPS);
 
+        // NOTE: bb bounds come from a RIGHT-HANDED glm::lookAt view, where geometry in
+        // front of the light camera has NEGATIVE z. glm::ortho() (GL convention) expects
+        // near/far as POSITIVE distances, so the old call (bb.vMin.z - tweak, bb.vMax.z)
+        // passed -530..-480 and mapped the whole geometry outside the [-1,1] clip range:
+        // the near shadow map ended up empty => no shadows within the near range =>
+        // sunlight leaked into interiors/through roofs and nearby objects (gates) cast
+        // nothing. DX (LH, positive z) code uses the same expression legitimately.
         mdir_Project = glm::ortho(bb.vMin.x, bb.vMax.x, bb.vMin.y, bb.vMax.y,
-                                  bb.vMin.z - tweak_ortho_xform_initial_offs, bb.vMax.z);
+                                  -bb.vMax.z - tweak_ortho_xform_initial_offs, -bb.vMin.z);
 
         // full-xform
         cull_xform = mdir_Project * mdir_View;
@@ -593,7 +606,13 @@ void render_sun_old::render_sun_near()
         if (_abs(glm::dot(L_right, L_dir)) > .99f) L_right = glm::vec3(0.f, 0.f, 1.f);
         L_up = glm::normalize(glm::cross(L_dir, L_right));
         L_right = glm::normalize(glm::cross(L_up, L_dir));
-        mdir_View = glm::lookAt(L_pos, L_dir, L_up);
+        // NOTE: glm::lookAt(eye, center, up) takes a TARGET POINT, not a direction.
+        // DX counterpart uses build_camera_dir(L_pos, L_dir, L_up) == look from L_pos
+        // ALONG L_dir. sun->position is camera - dir*500 (Light_DB.cpp), so passing
+        // L_dir as 'center' aimed the shadow camera at the origin instead of along the
+        // sun direction -> sun shadow map was rendered along a wrong axis, which made
+        // sunlight leak through roofs/walls into interiors.
+        mdir_View = glm::lookAt(L_pos, L_pos + L_dir, L_up);
 
         //	Simple
         Fbox frustum_bb;
@@ -605,8 +624,15 @@ void render_sun_old::render_sun_near()
         }
         Fbox& bb = frustum_bb;
         bb.grow(EPS);
+        // NOTE: bb bounds come from a RIGHT-HANDED glm::lookAt view, where geometry in
+        // front of the light camera has NEGATIVE z. glm::ortho() (GL convention) expects
+        // near/far as POSITIVE distances, so the old call (bb.vMin.z - tweak, bb.vMax.z)
+        // passed -530..-480 and mapped the whole geometry outside the [-1,1] clip range:
+        // the near shadow map ended up empty => no shadows within the near range =>
+        // sunlight leaked into interiors/through roofs and nearby objects (gates) cast
+        // nothing. DX (LH, positive z) code uses the same expression legitimately.
         mdir_Project = glm::ortho(bb.vMin.x, bb.vMax.x, bb.vMin.y, bb.vMax.y,
-                                  bb.vMin.z - tweak_ortho_xform_initial_offs, bb.vMax.z);
+                                  -bb.vMax.z - tweak_ortho_xform_initial_offs, -bb.vMin.z);
 
         // build viewport xform
         const float view_dim = float(RImplementation.o.smapsize);
