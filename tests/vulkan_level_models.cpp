@@ -564,6 +564,58 @@ int main()
     assert(load_level_models(input(shaders), input(vb), input(ib), input(tree_visuals), result, error));
     assert(result.models[0].vertices[1].position[0] == 4.f);
     assert(result.visuals[0].bounds[9] >= 1.f);
+    // Packed tree UVs use FTreeVisual's 16/32768 scale, not the ordinary
+    // level shader's 32/32768 scale and T/B alpha fractions. Exercise both
+    // SHORT2 and SHORT4, negative coordinates and a shared nonzero VB base.
+    for (uint8_t uv_type : {6, 7})
+    {
+        Bytes packed_tree_vb;
+        u32(packed_tree_vb, 1);
+        decl(packed_tree_vb, 0, 2, 0);
+        decl(packed_tree_vb, 12, 4, 3);
+        decl(packed_tree_vb, 16, 4, 6);
+        decl(packed_tree_vb, 20, 4, 7);
+        decl(packed_tree_vb, 24, uv_type, 5);
+        packed_tree_vb.insert(packed_tree_vb.end(), {0xff, 0, 0, 0, 17, 0, 0, 0});
+        u32(packed_tree_vb, 4);
+        for (unsigned v = 0; v < 4; ++v)
+        {
+            f32(packed_tree_vb, float(v));
+            f32(packed_tree_vb, 0); f32(packed_tree_vb, 0);
+            u32(packed_tree_vb, 0x008080ff);
+            u32(packed_tree_vb, 0x7f0080ff);
+            u32(packed_tree_vb, 0x3f80ff80);
+            u16(packed_tree_vb, uint16_t(v * 1024));
+            u16(packed_tree_vb, uint16_t(-int(v) * 1024));
+            if (uv_type == 7) { u16(packed_tree_vb, 321); u16(packed_tree_vb, 0); }
+        }
+        Bytes shared_container = container;
+        shared_container[4] = 1; // vbase: skip the first shared-buffer vertex
+        for (uint8_t type : {0, 7, 11})
+        {
+            Bytes packed_visual, packed_visuals;
+            header[1] = type;
+            part(packed_visual, 1, header); part(packed_visual, 21, shared_container);
+            if (type != 0) part(packed_visual, 12, tree_def);
+            Bytes windows, reference;
+            u32(windows, 1); windows.insert(windows.end(), 16, 0);
+            u32(windows, 1); u32(windows, 0); u16(windows, 1); u16(windows, 3);
+            if (type == 11) { u32(reference, 0); part(packed_visual, 20, reference); }
+            part(packed_visuals, 0, packed_visual);
+            assert(load_level_models(input(shaders), input(packed_tree_vb), input(ib), input(packed_visuals),
+                                     result, error, {}, {}, input(windows)));
+            const auto &uv = result.models[0].vertices[0].uv;
+            if (type == 0)
+            {
+                const float u_fraction = uv_type == 6 ? 127.f / 255.f : 0.f;
+                const float v_fraction = uv_type == 6 ? 63.f / 255.f : 0.f;
+                assert(std::abs(uv[0] - (1024.f + u_fraction) / 1024.f) < 1e-6f);
+                assert(std::abs(uv[1] - (-1024.f + v_fraction) / 1024.f) < 1e-6f);
+            }
+            else
+                assert(uv[0] == .5f && uv[1] == -.5f);
+        }
+    }
     header[1] = 11;
     tree_visual.clear(); tree_visuals.clear();
     part(tree_visual, 1, header); part(tree_visual, 21, container);

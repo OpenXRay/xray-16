@@ -139,6 +139,10 @@ bool chunk(LevelBytes bytes, uint32_t id, LevelBytes &out)
 struct VertexBuffer
 {
     std::vector<LevelVertex> vertices;
+    // The same SHORT2/SHORT4 declaration has different meanings in base
+    // geometry and FTreeVisual. Keep the authored tree coordinates until the
+    // visual type is known; base UVs also contain fractions from T/B alpha.
+    std::vector<std::array<float, 2>> tree_uv;
     bool lightmap_uv{};
     bool depth_only{};
 };
@@ -279,6 +283,8 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer> &buffers, std::st
         buffer.depth_only = depth_only;
         buffer.lightmap_uv = uv1 >= 0;
         buffer.vertices.reserve(vertex_count);
+        if (uv >= 0 && (uv_type == 6 || uv_type == 7))
+            buffer.tree_uv.reserve(vertex_count);
         for (uint32_t v = 0; v < vertex_count; ++v)
         {
             LevelVertex vertex;
@@ -305,6 +311,8 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer> &buffers, std::st
             if (uv >= 0 && uv_type == 1)
                 std::memcpy(vertex.uv, source + uv, sizeof(vertex.uv));
             else if (uv_type == 6 || uv_type == 7)
+            {
+                std::array<float, 2> tree_uv{};
                 for (int axis = 0; axis < 2; ++axis)
                 {
                     const auto primary =
@@ -312,7 +320,12 @@ bool read_vertices(LevelBytes bytes, std::vector<VertexBuffer> &buffers, std::st
                     const int extra = axis == 0 ? tangent : binormal;
                     const float fraction = extra >= 0 && uv_type == 6 ? float(source[extra + 3]) * (1.f / 255.f) : 0.f;
                     vertex.uv[axis] = (float(primary) + fraction) * (32.f / 32768.f);
+                    // FTreeVisual_tile=16; tree shaders use I.tc.xy / 2048
+                    // without unpack_tc_base's T.w/B.w fractional offsets.
+                    tree_uv[axis] = float(primary) * (16.f / 32768.f);
                 }
+                buffer.tree_uv.push_back(tree_uv);
+            }
             if (uv1 >= 0)
             {
                 if (uv1_type == 1)
@@ -562,6 +575,10 @@ bool decode_visual(LevelBytes visual, const std::vector<VertexBuffer> &vertices,
     }
     if (type == 7 || type == 11)
     {
+        const auto &tree_uv = vertices[vb].tree_uv;
+        if (!tree_uv.empty())
+            for (size_t i = 0; i < model.vertices.size(); ++i)
+                std::copy(tree_uv[vbase + i].begin(), tree_uv[vbase + i].end(), model.vertices[i].uv);
         LevelBytes definition;
         std::string error;
         if (!chunk(visual, ogf_tree, definition) || !transform_tree_vertices(definition, model, error))
