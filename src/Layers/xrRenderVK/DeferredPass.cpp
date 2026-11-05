@@ -1,4 +1,3 @@
-#include "VulkanDiagnostics.h"
 #include "xrEngine/stdafx.h"
 #include "DeferredPass.h"
 #include "SunShadowTargets.h"
@@ -1619,7 +1618,7 @@ bool DeferredPass::record_distortion(const FrameRecordingContext &frame, VkBuffe
     vk_.cmd_bind_descriptor_sets(frame.command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, water_layout_, 0, 2, sets, 0,
                                  nullptr);
     command_cache_.push(vk_, frame.command_buffer, water_layout_, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(mvp), mvp);
-    const float params[]{0.f, 1.f / frame.extent.width, 1.f / frame.extent.height, diagnostics().mode == 2 ? 1.f : 0.f};
+    const float params[]{0.f, 1.f / frame.extent.width, 1.f / frame.extent.height, 0.f};
     command_cache_.push(vk_, frame.command_buffer, water_layout_, VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(mvp),
                         sizeof(params), params);
     vk_.cmd_draw_indexed(frame.command_buffer, index_count, 1, 0, 0, 0);

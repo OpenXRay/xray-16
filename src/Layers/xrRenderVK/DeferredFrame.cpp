@@ -1,4 +1,3 @@
-#include "VulkanDiagnostics.h"
 #include "xrEngine/stdafx.h"
 #include "DeferredFrame.h"
 
@@ -14,7 +13,6 @@ void DeferredFrame::geometry(const FrameRecordingContext &frame, void *user_data
     context.pass_->notify_frame_ready(frame.frame_index);
     if (context.render_world_ && context.light_grid_)
         context.light_grid_(frame, context.light_grid_data_);
-    context.frame_->mark_gpu_stage(frame.command_buffer, "light-grid-cull");
     const auto shadow_begin = std::chrono::steady_clock::now();
     if (context.shadows_)
     {
@@ -27,18 +25,17 @@ void DeferredFrame::geometry(const FrameRecordingContext &frame, void *user_data
         }
         // Keep the depth image cleared and shader-readable, but do not
         // traverse the whole scene for a black sun (rainy/cloudy weather).
-        if (context.render_world_ && (diagnostics().mode != 8 && (!Core.Params || !strstr(Core.Params, "-vk-no-sun-shadows"))) &&
+        if (context.render_world_ && (!Core.Params || !strstr(Core.Params, "-vk-no-sun-shadows")) &&
             (context.light_.color[0] > 1e-4f || context.light_.color[1] > 1e-4f || context.light_.color[2] > 1e-4f))
             context.recorded_ &= context.level_->record_sun_shadow(shadow_frame, *context.pass_,
                                                                    context.shadow_uniform_.sun_view_projection);
         if (context.render_world_ && context.shadow_models_ &&
-            (diagnostics().mode != 8 && (!Core.Params || !strstr(Core.Params, "-vk-no-sun-shadows"))) &&
+            (!Core.Params || !strstr(Core.Params, "-vk-no-sun-shadows")) &&
             (context.light_.color[0] > 1e-4f || context.light_.color[1] > 1e-4f || context.light_.color[2] > 1e-4f))
             context.shadow_models_(shadow_frame, context.shadow_uniform_.sun_view_projection,
                                    context.shadow_models_data_);
         context.shadows_->end(frame.command_buffer);
     }
-    context.frame_->mark_gpu_stage(frame.command_buffer, "sun-shadows");
     if (context.local_shadows_ && context.render_world_ && context.local_lights_ && !context.local_lights_->empty())
     {
         context.recorded_ &= context.local_shadows_->initialize_layers(frame);
@@ -95,7 +92,6 @@ void DeferredFrame::geometry(const FrameRecordingContext &frame, void *user_data
     if (Device.dwFrame % 300 == 0)
         Msg("[renderer-vulkan] pass.cpu frame=%u pass=shadow-total ms=%.3f", Device.dwFrame,
             std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - shadow_begin).count());
-    context.frame_->mark_gpu_stage(frame.command_buffer, "local-shadows");
     FrameRecordingContext geometry_frame;
     if (!context.targets_->begin(frame, geometry_frame))
     {
@@ -116,7 +112,6 @@ void DeferredFrame::geometry(const FrameRecordingContext &frame, void *user_data
     }
     context.targets_->end(frame.command_buffer);
     context.recorded_ &= context.targets_->copy_depth(frame);
-    context.frame_->mark_gpu_stage(frame.command_buffer, "gbuffer-and-depth-copy");
 }
 
 void DeferredFrame::lighting(const FrameRecordingContext &frame, void *user_data)
@@ -125,10 +120,9 @@ void DeferredFrame::lighting(const FrameRecordingContext &frame, void *user_data
     context.recorded_ &=
         context.pass_->record_lighting(frame, context.targets_->lighting_set(frame.image_index), context.light_,
                                        context.weather_set_, context.weather_set_ ? &context.weather_ : nullptr);
-    context.frame_->mark_gpu_stage(frame.command_buffer, "base-lighting");
     // The base panel receives local lights in both full-screen and four-pane
     // views; the other three panels display G-buffer channels only.
-    if (context.render_world_ && context.local_lighting_ && diagnostics().mode != 7 && (context.shadow_uniform_.options[1] < 2.5f || context.shadow_uniform_.options[1] == 14.f))
+    if (context.render_world_ && context.local_lighting_ && context.shadow_uniform_.options[1] < 2.5f)
         context.local_lighting_(frame, context.local_data_);
     if (!context.water_)
         overlay(frame, user_data);
@@ -150,7 +144,7 @@ void DeferredFrame::overlay(const FrameRecordingContext &frame, void *user_data)
     // Their screen-space coordinates do not map into the repeated G-buffer
     // panels and would contaminate the shadow, lightmap and albedo views.
     const bool isolated_gbuffer = debug_mode > 0.5f && (debug_mode < 1.5f || debug_mode > 2.5f);
-    if (diagnostics().mode != 12 && context.render_world_ && !isolated_gbuffer)
+    if (context.render_world_ && !isolated_gbuffer)
     {
         if (context.transparent_)
             context.transparent_(frame, context.transparent_data_);

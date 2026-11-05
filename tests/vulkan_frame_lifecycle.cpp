@@ -96,16 +96,16 @@ VkResult VKAPI_PTR present(VkQueue, const VkPresentInfoKHR* info)
 VkResult VKAPI_PTR idle(VkDevice) { ++idle_calls; return next_idle; }
 VkResult VKAPI_PTR create_queries(VkDevice, const VkQueryPoolCreateInfo* info,
     const VkAllocationCallbacks*, VkQueryPool* out)
-{ assert(info->queryType == VK_QUERY_TYPE_TIMESTAMP && info->queryCount == FrameContext::TimestampStride * 2);
+{ assert(info->queryType == VK_QUERY_TYPE_TIMESTAMP && info->queryCount == 4);
   *out = handle<VkQueryPool>(++next_handle); ++query_creates; return VK_SUCCESS; }
 void VKAPI_PTR destroy_queries(VkDevice, VkQueryPool, const VkAllocationCallbacks*) { ++query_destroys; }
 void VKAPI_PTR reset_queries(VkCommandBuffer, VkQueryPool, uint32_t, uint32_t count)
-{ assert(count == 2 || count == FrameContext::TimestampStride); }
+{ assert(count == 2); }
 void VKAPI_PTR write_timestamp(VkCommandBuffer, VkPipelineStageFlagBits, VkQueryPool, uint32_t)
 { ++timestamp_writes; }
 VkResult VKAPI_PTR query_results(VkDevice, VkQueryPool, uint32_t, uint32_t count,
     size_t, void* output, VkDeviceSize, VkQueryResultFlags)
-{ assert(count >= 2 && count <= FrameContext::TimestampStride); auto* ticks = static_cast<uint64_t*>(output); for (uint32_t i=0;i<count;++i) ticks[i]=100+500000*i; return VK_SUCCESS; }
+{ assert(count == 2); auto* ticks = static_cast<uint64_t*>(output); ticks[0] = 100; ticks[1] = 500100; return VK_SUCCESS; }
 VkResult VKAPI_PTR success_command(VkCommandBuffer, VkCommandBufferResetFlags) { return VK_SUCCESS; }
 VkResult VKAPI_PTR begin(VkCommandBuffer, const VkCommandBufferBeginInfo*) { return VK_SUCCESS; }
 VkResult VKAPI_PTR end(VkCommandBuffer) { return VK_SUCCESS; }
@@ -193,7 +193,7 @@ int main()
         false, false, false, false, 1.f, 64));
     assert(frame.image_count() == 2 && swapchain_creates == 1);
     assert(frame.render_frame(clear, status, error) && status == FrameStatus::Presented);
-    assert(submissions == 1 && presents == 1 && timestamp_writes == 2);
+    assert(submissions == 1 && presents == 1);
     next_acquire = VK_ERROR_OUT_OF_DATE_KHR;
     assert(frame.render_frame(clear, status, error) && status == FrameStatus::RecreateRequired);
     assert(submissions == 1); // No submission or unsignaled fence after failed acquire.
@@ -229,8 +229,7 @@ int main()
     world_dispatch.free_memory = depth_free;
     world_dispatch.bind_image_memory = depth_bind;
     assert(frame.initialize(physical, device, surface, queue, 0, {640, 480}, world_dispatch, error,
-        true, true, true, false, 1.f, 48));
-    frame.set_gpu_diagnostics(true, 3);
+        true, true, true));
     assert(frame.attach_scene_depth({handle<VkImageView>(801), handle<VkImageView>(802)}, error));
     assert(frame.enable_interpass(error));
     int opaque = 1, opaque_copy = 2, transparent = 3, world_copy = 4, distortion_and_hud = 5,
@@ -245,17 +244,6 @@ int main()
     assert(frame.render_frame(clear, status, error, record_stage, &opaque, nullptr, nullptr,
         nullptr, nullptr, false, nullptr, nullptr, capture_stage, &opaque_copy, record_stage, &transparent));
     assert((pass_order == std::vector<int>{1, 2, 3}));
-    // Collect a prior frame only after its fence; profile mode and interval
-    // labels must survive a mode change and in-flight slot reuse.
-    frame.set_gpu_diagnostics(true, 9, true);
-    assert(frame.render_frame(clear, status, error));
-    assert(frame.gpu_profile_mode() == 3);
-    assert(!frame.gpu_stages().empty());
-    for (const auto& stage : frame.gpu_stages()) assert(stage.name && stage.ms == .5);
-    assert(!frame.gpu_profile_capture());
-    assert(frame.render_frame(clear, status, error));
-    assert(frame.render_frame(clear, status, error));
-    assert(frame.gpu_profile_mode() == 9 && frame.gpu_profile_capture());
     frame.destroy();
     assert(swapchain_creates == swapchain_destroys && fences_created == fences_destroyed &&
         semaphores_created == semaphores_destroyed && query_creates == query_destroys && timestamp_writes >= 4);

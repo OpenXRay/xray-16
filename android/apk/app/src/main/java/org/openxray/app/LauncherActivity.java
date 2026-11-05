@@ -61,7 +61,6 @@ import java.util.concurrent.Executors;
 public final class LauncherActivity extends Activity {
     public static final String EXTRA_GAME_PATH = "org.openxray.extra.GAME_PATH";
     public static final String EXTRA_GAME_VARIANT = "org.openxray.extra.GAME_VARIANT";
-    public static final String EXTRA_DIAGNOSTIC_MODE = "org.openxray.extra.DIAGNOSTIC_MODE";
     public static final String EXTRA_ADDITIONAL_ARGS = "org.openxray.extra.ADDITIONAL_ARGS";
     public static final String EXTRA_RENDERER_SMOKE = "org.openxray.extra.RENDERER_SMOKE";
     public static final String EXTRA_RENDERER_VULKAN_SMOKE = "org.openxray.extra.RENDERER_VULKAN_SMOKE";
@@ -139,7 +138,6 @@ public final class LauncherActivity extends Activity {
     private EditText gamePath;
     private EditText customArgs;
     private Spinner gameVariant;
-    private Spinner diagnosticMode;
     private Spinner rendererMode;
     private Spinner graphicsPreset;
     private Spinner renderResolution;
@@ -453,17 +451,6 @@ public final class LauncherActivity extends Activity {
         content.addView(graphicsPreset, matchWrap());
 
         addSectionTitle(content, "Настройки Vulkan");
-        diagnosticMode = settingsSpinner(new String[]{"Диагностика: выключена", "Время GPU по проходам",
-                "Вода: геометрия частиц", "Освещение: нормали", "Освещение: цвет текстуры",
-                "Освещение: запечённые каналы", "Освещение: свойства материала", "Без локального света",
-                "Без динамических теней", "Без преломляющих частиц", "Деревья: полная геометрия",
-                "Деревья: дальние модели", "Без прозрачного мира", "Только солнечный свет",
-                "Только фоновый свет и небо", "Движение: освещение (запись кнопкой)", "Движение: вода (запись кнопкой)"});
-        content.addView(diagnosticMode, matchWrap());
-        content.addView(bodyText("В режимах движения нажмите в игре «Запись 10 с» и воспроизведите баг: "
-                + "поворачивайте камеру или идите по воде. В освещении четыре панели показывают данные одного кадра: "
-                + "непрозрачное освещение, нормали, текстура и запечённые каналы. Вода остаётся в обычном виде. "
-                + "Архив «Поделиться логами» включает последовательность снимков."), matchWrap());
         detailDistance = settingsSpinner(new String[]{"Трава: по пресету", "Трава: выключена", "Трава: 20 м",
                 "Трава: 40 м", "Трава: 60 м", "Трава: 80 м"});
         anisotropy = settingsSpinner(new String[]{"Анизотропия: по пресету", "Анизотропия: 2×", "Анизотропия: 4×",
@@ -768,7 +755,6 @@ public final class LauncherActivity extends Activity {
         showFps.setChecked(preferences.getBoolean(PREF_SHOW_FPS, true));
         detailDistance.setSelection(Math.max(0, Math.min(5, preferences.getInt(PREF_DETAIL_DISTANCE, 0))));
         anisotropy.setSelection(Math.max(0, Math.min(4, preferences.getInt(PREF_ANISOTROPY, 0))));
-        diagnosticMode.setSelection(Math.max(0, Math.min(16, preferences.getInt("vulkan_diagnostic_mode", 0))));
         sunShadows.setChecked(preferences.getBoolean(PREF_SUN_SHADOWS, true));
         toneMap.setChecked(preferences.getBoolean(PREF_TONEMAP, true));
         ambientScale.setSelection(Math.max(0, Math.min(4, preferences.getInt(PREF_AMBIENT_SCALE, 2))));
@@ -803,7 +789,6 @@ public final class LauncherActivity extends Activity {
                 .putBoolean(PREF_SHOW_FPS, showFps.isChecked())
                 .putInt(PREF_DETAIL_DISTANCE, detailDistance.getSelectedItemPosition())
                 .putInt(PREF_ANISOTROPY, anisotropy.getSelectedItemPosition())
-                .putInt("vulkan_diagnostic_mode", diagnosticMode.getSelectedItemPosition())
                 .putBoolean(PREF_SUN_SHADOWS, sunShadows.isChecked())
                 .putBoolean(PREF_TONEMAP, toneMap.isChecked())
                 .putInt(PREF_AMBIENT_SCALE, ambientScale.getSelectedItemPosition())
@@ -1149,7 +1134,6 @@ public final class LauncherActivity extends Activity {
         intent.putExtra(EXTRA_SHOW_FPS, showFps.isChecked());
         intent.putExtra(EXTRA_DETAIL_DISTANCE, DETAIL_DISTANCE_VALUES[detailDistance.getSelectedItemPosition()]);
         intent.putExtra(EXTRA_ANISOTROPY, ANISOTROPY_VALUES[anisotropy.getSelectedItemPosition()]);
-        intent.putExtra(EXTRA_DIAGNOSTIC_MODE, diagnosticMode.getSelectedItemPosition());
         intent.putExtra(EXTRA_SUN_SHADOWS, sunShadows.isChecked());
         intent.putExtra(EXTRA_TONEMAP, toneMap.isChecked());
         intent.putExtra(EXTRA_AMBIENT_SCALE, LIGHT_SCALES[ambientScale.getSelectedItemPosition()]);
@@ -1689,28 +1673,14 @@ public final class LauncherActivity extends Activity {
     }
 
     private void shareLogs() {
-        final String diagnosticRoot = gamePath.getText().toString().trim();
         logExecutor.execute(() -> {
             saveAndroidCrashReport();
             File[] files = SessionLogs.latest(this);
-            java.util.ArrayList<File> archiveFiles = new java.util.ArrayList<>(java.util.Arrays.asList(files));
-            File screenshotDirectory = new File(diagnosticRoot, "_appdata_/screenshots");
-            File[] captures = screenshotDirectory.listFiles((dir, name) -> name.startsWith("vkdiag_") && name.endsWith(".jpg"));
-            if (captures != null) {
-                java.util.Arrays.sort(captures, (a, b) -> Long.compare(b.lastModified(), a.lastModified()));
-                long captureBytes = 0;
-                for (int i = 0; i < Math.min(56, captures.length); ++i) {
-                    long bytes = captures[i].length();
-                    if (bytes <= 0 || captureBytes + bytes > 128L * 1024 * 1024) continue;
-                    captureBytes += bytes;
-                    archiveFiles.add(captures[i]);
-                }
-            }
             File archive = new File(getCacheDir(), "openxray-diagnostics.zip");
             try (java.util.zip.ZipOutputStream zip = new java.util.zip.ZipOutputStream(
                     new FileOutputStream(archive))) {
                 byte[] buffer = new byte[65536];
-                for (File file : archiveFiles) {
+                for (File file : files) {
                     if (!file.isFile()) continue;
                     zip.putNextEntry(new java.util.zip.ZipEntry(file.getName()));
                     try (FileInputStream input = new FileInputStream(file)) {

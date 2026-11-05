@@ -310,34 +310,3 @@ download any of them.
 
 Launcher behavior is described in [apk/README.md](apk/README.md). ARM64 build
 dependencies are listed in [ARM64_DEPS.md](ARM64_DEPS.md).
-
-## Motion diagnostics (0.9.187)
-
-Select Vulkan and **Движение: освещение (запись кнопкой)** or
-**Движение: вода (запись кнопкой)**. Load the affected scene, press
-**Запись 10 с** in the game, and reproduce the defect by turning the camera
-or walking through water. The button can be used again without restarting.
-There is no automatic cycle or stationary waiting period in these modes.
-
-Lighting uses four simultaneous panels from the same G-buffer/camera/frame:
-top left = opaque lighting including local lights, top right = world normals,
-bottom left = albedo, bottom right = baked sun/hemisphere/material channels.
-Postprocessing is identity in this view so exposure and gamma changes do not
-alter the diagnostic colors. Forward-only geometry is absent in this view.
-Water mode keeps the normal rendered image, including transparency, particles,
-HUD and postprocessing. The mode stays constant throughout the recording.
-
-A button press records ten seconds with at most twenty tagged JPEGs (2 Hz).
-The live image and lighting/particle data update every rendered frame. Logged
-particle world/clip corners, UVs and selected local lights carry the frame ID;
-JPEG filenames carry the same ID. GPU samples retain source submission/mode
-metadata and exclude readback frames. Capturing can cause short stalls, so
-image bursts must not be used as a benchmark. Unrecorded profile mode is also
-available for performance measurements.
-
-Return to the launcher and use **Поделиться логами** after each short test.
-It includes the latest 56 diagnostic JPEGs (up to 128 MiB) from the default
-`_appdata_/screenshots` directory and the usual session logs. For a custom
-fsgame screenshot alias, attach `vkdiag_*.jpg` from that location separately.
-Disable diagnostics after testing. Individual fixed debug modes remain for
-advanced inspection; this build adds diagnostics, not visual bug fixes.

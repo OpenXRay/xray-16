@@ -1,4 +1,3 @@
-#include "VulkanDiagnostics.h"
 #include "xrEngine/stdafx.h"
 #include "GpuLevel.h"
 #include "TangentBasis.h"
@@ -1249,17 +1248,6 @@ bool GpuLevel::record_visual(size_t index, const FrameRecordingContext &frame, c
         android_set_load_context(context);
     }
 #endif
-    if (visual.type == 6 && diagnostics().mode == 10) lod = 1.f;
-    if (visual.type == 6 && diagnostics().mode == 11) lod = 0.f;
-    if (visual.type == 6 && diagnostics().requested && Device.dwFrame % 120 == 0)
-    {
-        static u32 logged_frame = ~0u;
-        if (logged_frame != Device.dwFrame)
-        {
-            logged_frame = Device.dwFrame;
-            Msg("[vkdiag] lod frame=%u visual=%u value=%.4f path=%s", Device.dwFrame, index, lod, lod < .33f ? "billboard" : "children");
-        }
-    }
     if (visual.type == 6 && lod < .33f)
     {
         Fvector direction;

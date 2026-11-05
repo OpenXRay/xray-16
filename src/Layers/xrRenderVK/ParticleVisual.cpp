@@ -1,4 +1,3 @@
-#include "VulkanDiagnostics.h"
 #include "xrEngine/stdafx.h"
 #include "ParticleVisual.h"
 #include "ParticleSprite.h"
@@ -241,11 +240,6 @@ void VulkanParticleEffect::OnFrame(u32 dt)
     visibility_.box.getsphere(visibility_.sphere.P, visibility_.sphere.R);
 }
 
-bool VulkanParticleEffect::diagnostic_geometry() const
-{
-    return diagnostics().mode == 2 && def_ && def_->name.find("water") != std::string::npos;
-}
-
 bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const DeferredPass& pass,
     const float (&mvp)[16], const Fvector& right, const Fvector& up, bool hud, std::string& error,
     GeometryPhase phase)
@@ -253,12 +247,11 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     if (!material_ || !device_) return true;
     // Refraction samples a snapshot of the completed transparent world.
     // Ordinary geometry phases must not consume the earlier opaque snapshot.
-    const bool refraction = distortion_ || diagnostic_geometry();
-    if (refraction ? (hud ? phase != GeometryPhase::Transparent && phase != GeometryPhase::Hud
+    if (distortion_ ? (hud ? phase != GeometryPhase::Transparent && phase != GeometryPhase::Hud
                           : phase != GeometryPhase::Distortion)
                     : phase == GeometryPhase::Distortion) return true;
     const bool deferred_set = !hud && !screen_set_ && blend_mode_ == 0;
-    if (!refraction && !particle_records_in_phase(hud, screen_set_, blend_mode_, phase)) return true;
+    if (!distortion_ && !particle_records_in_phase(hud, screen_set_, blend_mode_, phase)) return true;
     PAPI::Particle* particles = nullptr;
     u32 count = 0;
     PAPI::ParticleManager()->GetParticles(effect_, particles, count);
@@ -292,17 +285,6 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     auto &vertices = buffers.scratch;
     vertices.resize(count * 4);
     const bool water_ring = particle_is_surface_ring(def_->name, distortion_);
-    static u32 diagnostic_frame = ~0u;
-    static std::array<std::string, 8> diagnostic_names;
-    static size_t diagnostic_count = 0;
-    if (diagnostic_frame != Device.dwFrame) { diagnostic_frame = Device.dwFrame; diagnostic_count = 0; }
-    bool trace = diagnostics().requested && count && (diagnostics().recording || Device.dwFrame % 30 == 0) &&
-        def_->name.find("water") != std::string::npos && diagnostic_count < diagnostic_names.size();
-    if (trace)
-    {
-        for (size_t i = 0; i < diagnostic_count; ++i) if (diagnostic_names[i] == def_->name.c_str()) trace = false;
-        if (trace) diagnostic_names[diagnostic_count++] = def_->name.c_str();
-    }
     for (u32 i = 0; i < count; ++i)
     {
         const auto& p = particles[i];
@@ -368,7 +350,6 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
             v.normal[0] = 0.f; v.normal[1] = 1.f; v.normal[2] = 0.f;
             v.uv[0] = u0 + sprite.u * du;
             v.uv[1] = v0 + sprite.v * dv;
-            if (refraction && diagnostics().mode == 2) { v.uv[0] = sprite.u; v.uv[1] = sprite.v; }
             // FVF::LIT sends the simulation's ARGB tint to the particle
             // shader. Ignoring it turns a translucent muzzle sprite into a
             // large opaque patch and loses its animated fade-out.
@@ -378,22 +359,9 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
             v.baked[3] = float((p.color >> 24) & 255) / 255.f;
         }
     }
-    if (trace)
-    {
-        Msg("[vkdiag] particle frame=%u mode=%d name='%s' shader='%s' texture='%s' flags=0x%x count=%u ring=%d",
-            Device.dwFrame, diagnostics().mode, def_->name.c_str(), def_->shader.c_str(), def_->texture.c_str(), def_->flags, count, water_ring);
-        for (unsigned c = 0; c < 4; ++c)
-        {
-            const auto& v = vertices[c];
-            Fmatrix vp; std::memcpy(&vp, mvp, sizeof(vp));
-            Fvector4 clip; const Fvector point{v.position[0], v.position[1], v.position[2]}; vp.transform(clip, point);
-            Msg("[vkdiag] corner=%u world=(%.5f,%.5f,%.5f) clip=(%.5f,%.5f,%.5f,%.5f) uv=(%.5f,%.5f)",
-                c, point.x, point.y, point.z, clip.x, -clip.y, clip.z, clip.w, v.uv[0], v.uv[1]);
-        }
-    }
     if (!buffers.vertices.write(0, vertices.data(), vertices.size() * sizeof(LevelVertex), error))
         return false;
-    if (refraction)
+    if (distortion_)
         return pass.record_distortion(frame, buffers.vertices.handle(), buffers.indices.handle(),
             count * 6, mvp, material_);
     RenderPassGraph graph;
@@ -583,8 +551,8 @@ bool VulkanParticleGroup::record(const FrameRecordingContext& frame, const Defer
 
 bool VulkanParticleGroup::has_distortion() const
 {
-    for (const auto& effect : effects_) if (effect->distortion() || effect->diagnostic_geometry()) return true;
-    for (const auto& child : triggered_) if (child.effect->distortion() || child.effect->diagnostic_geometry()) return true;
+    for (const auto& effect : effects_) if (effect->distortion()) return true;
+    for (const auto& child : triggered_) if (child.effect->distortion()) return true;
     return false;
 }
 

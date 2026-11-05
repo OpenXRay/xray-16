@@ -1,4 +1,3 @@
-#include "VulkanDiagnostics.h"
 #include "xrEngine/stdafx.h"
 #include "VulkanGameDevice.h"
 #include "VulkanSettings.h"
@@ -62,7 +61,7 @@ void VulkanGameDevice::render_lights(const float (&mvp)[16], bool render_world, 
     local_uniforms_.clear();
     local_scissors_.clear();
     local_projection_views_.clear();
-    if (render_world && diagnostics().mode != 7)
+    if (render_world)
     {
         Fmatrix camera, inverse;
         std::memcpy(&camera, mvp, sizeof(camera));
@@ -116,7 +115,7 @@ void VulkanGameDevice::render_lights(const float (&mvp)[16], bool render_world, 
             local.direction_cone[3] = std::cos(cone * .5f);
             const uint64_t pixels = uint64_t(scissor.extent.width) * scissor.extent.height;
             const uint64_t screen_pixels = uint64_t(extent.width) * extent.height;
-            const bool cast = diagnostics().mode != 8 && light_snapshot.shadow && shadow_slot < LocalShadowSlots &&
+            const bool cast = light_snapshot.shadow && shadow_slot < LocalShadowSlots &&
                               (spot ? spot_slots < uint32_t(std::max(spot_shadow_budget, 0))
                                     : point_slots < uint32_t(std::max(point_shadow_budget, 0))) &&
                               pixels * 20 >= screen_pixels;
@@ -167,18 +166,6 @@ void VulkanGameDevice::render_lights(const float (&mvp)[16], bool render_world, 
     std::copy_n(sun_uniform.ambient_color, 4, forward_lighting_.ambient_color);
     std::copy_n(sun_uniform.hemi_color, 4, forward_lighting_.hemi_color);
     std::copy_n(light.color, 3, forward_lighting_.sun_color_count);
-    if (diagnostics().recording)
-    {
-        Msg("[vkdiag] lights frame=%u count=%zu camera=(%.4f,%.4f,%.4f)", Device.dwFrame, local_uniforms_.size(),
-            Device.vCameraPosition.x, Device.vCameraPosition.y, Device.vCameraPosition.z);
-        for (size_t i = 0; i < local_uniforms_.size(); ++i)
-        {
-            const auto& l = local_uniforms_[i];
-            Msg("[vkdiag] light frame=%u slot=%zu position=(%.5f,%.5f,%.5f) range=%.4f rgb=(%.4f,%.4f,%.4f) type=%.0f shadow=%.0f",
-                Device.dwFrame, i, l.position_range[0], l.position_range[1], l.position_range[2], l.position_range[3],
-                l.color_type[0], l.color_type[1], l.color_type[2], l.color_type[3], l.shadow_params[2]);
-        }
-    }
     const uint32_t forward_count = std::min<size_t>(local_uniforms_.size(), ForwardLightCapacity);
     forward_lighting_.sun_color_count[3] = static_cast<float>(forward_count);
     const VkExtent2D forward_extent = window_.frame().extent();

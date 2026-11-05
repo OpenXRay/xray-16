@@ -113,10 +113,9 @@ void main()
     // The four-pane view repeats one G-buffer; modes 2..5 fill the screen
     // with the corresponding panel at its native resolution.
     bool diagnostic = shadow.options.y > 0.5;
-    bool motion = shadow.options.y == 14.0;
-    bool comparison = diagnostic && shadow.options.y > 5.5 && !motion;
-    bool four_panes = motion || (diagnostic && (shadow.options.y < 1.5 ||
-        (comparison && shadow.options.y < 6.5)));
+    bool comparison = diagnostic && shadow.options.y > 5.5;
+    bool four_panes = diagnostic && (shadow.options.y < 1.5 ||
+        (comparison && shadow.options.y < 6.5));
     vec2 pane = four_panes ? floor(min(texcoord * 2.0, vec2(1.9999))) : vec2(0.0);
     int panel = four_panes ? int(pane.x) + 2 * int(pane.y) :
         diagnostic && !comparison ? clamp(int(shadow.options.y) - 2, 0, 3) : 0;
@@ -142,13 +141,6 @@ void main()
             eye_clip = shadow.inverse_view_projection * vec4(0.0, 0.0, 0.0, 1.0);
         vec3 camera_position = eye_clip.xyz / eye_clip.w;
         vec3 normal = normalize(encoded_normal.rgb * 2.0 - 1.0);
-        // All panels read the SAME G-buffer and camera, without changing
-        // render mode between frames while the player turns the camera.
-        if (motion && panel == 1) { pixel_color = vec4(normal * .5 + .5, 1); return; }
-        if (motion && panel == 2) { pixel_color = vec4(albedo.rgb, 1); return; }
-        if (motion && panel == 3) { pixel_color = vec4(albedo.a, encoded_normal.a, surface.g, 1); return; }
-        if (shadow.options.y == 10.0) { pixel_color = vec4(normal * .5 + .5, 1); return; }
-        if (shadow.options.y == 11.0) { pixel_color = vec4(surface.rgb, 1); return; }
         float diffuse = max(dot(normal, normalize(-weather.direction_ambient.xyz)), 0.0);
         bool static_lightmap = encoded_normal.a < 0.8;
         float hemisphere = static_lightmap ? clamp(encoded_normal.a / 0.75, 0.0, 1.0) :
@@ -186,8 +178,6 @@ void main()
         vec3 indirect = comparison_mode == 4 ?
             shadow.hemi_color.rgb * tested_hemi :
             environment_indirect(normal, tested_hemi, surface.g);
-        if (shadow.options.y == 12.0) { pixel_color = vec4(albedo.rgb * sunlight, 1); return; }
-        if (shadow.options.y == 13.0) { pixel_color = vec4(albedo.rgb * (shadow.ambient_color.rgb + indirect), 1); return; }
         vec3 lit = albedo.rgb * (shadow.ambient_color.rgb + indirect + sunlight);
         if (surface.r > 0.0 && comparison_mode != 4)
         {
