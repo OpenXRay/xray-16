@@ -47,6 +47,25 @@ struct PassCpuSample
 
 } // namespace
 
+void VulkanGameDevice::record_distortion(const FrameRecordingContext &frame, void *user)
+{
+    auto &owner = *static_cast<VulkanGameDevice *>(user);
+    auto command_batch = owner.deferred_.geometry_batch();
+    for (auto &draw : owner.particle_draws_)
+    {
+        if (draw.hud)
+            continue;
+        float mvp[16];
+        std::copy(draw.mvp.begin(), draw.mvp.end(), mvp);
+        const bool ok = draw.visual->getType() == 8
+            ? static_cast<VulkanParticleEffect *>(draw.visual)->record(
+                  frame, owner.deferred_, mvp, draw.right, draw.up, false, owner.model_error_, GeometryPhase::Distortion)
+            : static_cast<VulkanParticleGroup *>(draw.visual)->record(
+                  frame, owner.deferred_, mvp, draw.right, draw.up, false, owner.model_error_, GeometryPhase::Distortion);
+        owner.models_recorded_ &= ok;
+    }
+}
+
 void VulkanGameDevice::capture_ui(VkCommandBuffer command, VkImage image, uint32_t index, void *user)
 {
     auto &owner = *static_cast<VulkanGameDevice *>(user);

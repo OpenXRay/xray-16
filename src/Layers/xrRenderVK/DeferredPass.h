@@ -51,7 +51,8 @@ enum class GeometryPhase
     OpaqueAndAlphaTest,
     SecondaryOpaque,
     Transparent,
-    Hud
+    Hud,
+    Distortion
 };
 
 DeferredLight make_environment_deferred_light(const DeferredEnvironment &environment);

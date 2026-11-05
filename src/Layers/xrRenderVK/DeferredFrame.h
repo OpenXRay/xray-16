@@ -14,6 +14,11 @@ using ShadowRecorder = void (*)(const FrameRecordingContext &, const float (&)[1
 class DeferredFrame
 {
   public:
+    void set_distortion_recorder(FrameRecorder recorder, void *user)
+    {
+        distortion_ = recorder;
+        distortion_data_ = user;
+    }
     void set_shadow_recorder(ShadowRecorder recorder, void *user)
     {
         shadow_models_ = recorder;
@@ -49,6 +54,9 @@ class DeferredFrame
     static void geometry(const FrameRecordingContext &frame, void *user_data);
     static void lighting(const FrameRecordingContext &frame, void *user_data);
     static void overlay(const FrameRecordingContext &frame, void *user_data);
+    static void foreground(const FrameRecordingContext &frame, void *user_data);
+    static void distortion_overlay(const FrameRecordingContext &frame, void *user_data);
+    static void capture_distortion(VkCommandBuffer command, VkImage image, uint32_t index, void *user_data);
     static void capture(VkCommandBuffer command, VkImage image, uint32_t index, void *user_data);
     GBufferTargets *targets_{};
     SunShadowTargets *shadows_{};
@@ -73,6 +81,8 @@ class DeferredFrame
     FrameRecorder models_{};
     void *models_data_{};
     FrameRecorder transparent_{};
+    FrameRecorder distortion_{};
+    void *distortion_data_{};
     void *transparent_data_{};
     FrameRecorder level_visuals_{};
     void *level_data_{};

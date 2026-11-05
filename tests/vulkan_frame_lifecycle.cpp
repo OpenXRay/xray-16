@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cstdint>
 #include <type_traits>
+#include <vector>
 
 using namespace xray::render::vulkan;
 
@@ -28,7 +29,7 @@ VkResult VKAPI_PTR capabilities(VkPhysicalDevice, VkSurfaceKHR, VkSurfaceCapabil
     out->currentExtent = {UINT32_MAX, UINT32_MAX};
     out->minImageExtent = {1, 1};
     out->maxImageExtent = {4096, 4096};
-    out->supportedUsageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    out->supportedUsageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
     out->supportedCompositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     return VK_SUCCESS;
 }
@@ -111,6 +112,24 @@ VkResult VKAPI_PTR end(VkCommandBuffer) { return VK_SUCCESS; }
 void VKAPI_PTR begin_pass(VkCommandBuffer, const VkRenderPassBeginInfo*, VkSubpassContents) {}
 void VKAPI_PTR end_pass(VkCommandBuffer) {}
 void VKAPI_PTR unused() {}
+void VKAPI_PTR depth_formats(VkPhysicalDevice, VkFormat, VkFormatProperties *out)
+{ out->optimalTilingFeatures = VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT; }
+void VKAPI_PTR memory_types(VkPhysicalDevice, VkPhysicalDeviceMemoryProperties *out)
+{ *out = {}; out->memoryTypeCount = 1; out->memoryTypes[0].propertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT; }
+VkResult VKAPI_PTR depth_image(VkDevice, const VkImageCreateInfo *, const VkAllocationCallbacks *, VkImage *out)
+{ *out = handle<VkImage>(++next_handle); return VK_SUCCESS; }
+void VKAPI_PTR destroy_depth_image(VkDevice, VkImage, const VkAllocationCallbacks *) {}
+void VKAPI_PTR depth_requirements(VkDevice, VkImage, VkMemoryRequirements *out)
+{ *out = {}; out->size = 4096; out->alignment = 16; out->memoryTypeBits = 1; }
+VkResult VKAPI_PTR depth_allocate(VkDevice, const VkMemoryAllocateInfo *, const VkAllocationCallbacks *, VkDeviceMemory *out)
+{ *out = handle<VkDeviceMemory>(++next_handle); return VK_SUCCESS; }
+void VKAPI_PTR depth_free(VkDevice, VkDeviceMemory, const VkAllocationCallbacks *) {}
+VkResult VKAPI_PTR depth_bind(VkDevice, VkImage, VkDeviceMemory, VkDeviceSize) { return VK_SUCCESS; }
+std::vector<int> pass_order;
+void record_stage(const FrameRecordingContext &, void *stage)
+{ pass_order.push_back(*static_cast<int *>(stage)); }
+void capture_stage(VkCommandBuffer, VkImage, uint32_t, void *stage)
+{ pass_order.push_back(*static_cast<int *>(stage)); }
 FrameDispatch dispatch()
 {
     FrameDispatch d{};
@@ -199,6 +218,32 @@ int main()
     assert(frame.initialize(physical, device, surface, queue, 0, {640, 480}, dispatch(), error,
         false, false, false, false, 1.f, 64));
     assert(!frame.device_lost() && frame.render_frame(clear, status, error));
+    frame.destroy();
+    auto world_dispatch = dispatch();
+    world_dispatch.get_format_properties = depth_formats;
+    world_dispatch.get_memory_properties = memory_types;
+    world_dispatch.create_image = depth_image;
+    world_dispatch.destroy_image = destroy_depth_image;
+    world_dispatch.get_image_memory_requirements = depth_requirements;
+    world_dispatch.allocate_memory = depth_allocate;
+    world_dispatch.free_memory = depth_free;
+    world_dispatch.bind_image_memory = depth_bind;
+    assert(frame.initialize(physical, device, surface, queue, 0, {640, 480}, world_dispatch, error,
+        true, true, true));
+    assert(frame.attach_scene_depth({handle<VkImageView>(801), handle<VkImageView>(802)}, error));
+    assert(frame.enable_interpass(error));
+    int opaque = 1, opaque_copy = 2, transparent = 3, world_copy = 4, distortion_and_hud = 5,
+        ui_copy = 6, ui_distortion = 7;
+    assert(frame.render_frame(clear, status, error, record_stage, &opaque, nullptr, nullptr,
+        nullptr, nullptr, false, nullptr, nullptr, capture_stage, &opaque_copy, record_stage, &transparent,
+        capture_stage, &ui_copy, record_stage, &ui_distortion,
+        capture_stage, &world_copy, record_stage, &distortion_and_hud));
+    assert((pass_order == std::vector<int>{1, 2, 3, 4, 5, 6, 7}));
+    pass_order.clear();
+    // Frames without refractive particles retain the original two passes.
+    assert(frame.render_frame(clear, status, error, record_stage, &opaque, nullptr, nullptr,
+        nullptr, nullptr, false, nullptr, nullptr, capture_stage, &opaque_copy, record_stage, &transparent));
+    assert((pass_order == std::vector<int>{1, 2, 3}));
     frame.destroy();
     assert(swapchain_creates == swapchain_destroys && fences_created == fences_destroyed &&
         semaphores_created == semaphores_destroyed && query_creates == query_destroys && timestamp_writes >= 4);

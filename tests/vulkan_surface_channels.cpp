@@ -208,7 +208,7 @@ int main(int argc, char **argv)
         for (auto &target : output)
             target = image(memory, format, VK_IMAGE_TILING_OPTIMAL,
                            VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
-                           VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 1, 128, 1, 2);
+                           VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 1, 128, 1, 96);
         // Each slot and each channel has a different value; neutral slots are
         // overridden for the variant under test below.
         std::array<std::array<float, 4>, 20> pixels{};
@@ -325,7 +325,7 @@ int main(int argc, char **argv)
         check(vkCreatePipelineLayout(device, &pipeline_layout_info, nullptr, &skinned_pipeline_layout));
         const Image floor_depth =
             image(memory, VK_FORMAT_D32_SFLOAT, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-                  VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 1, 128, 1, 2);
+                  VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 1, 128, 1, 96);
         std::array<VkAttachmentDescription, 4> attachments{};
         std::array<VkAttachmentReference, 3> references{};
         for (uint32_t i = 0; i < 3; ++i)
@@ -377,7 +377,7 @@ int main(int argc, char **argv)
         framebuffer_info.attachmentCount = 4;
         framebuffer_info.pAttachments = views.data();
         framebuffer_info.width = 128;
-        framebuffer_info.height = 2;
+        framebuffer_info.height = 96;
         framebuffer_info.layers = 1;
         VkFramebuffer framebuffer{};
         check(vkCreateFramebuffer(device, &framebuffer_info, nullptr, &framebuffer));
@@ -450,7 +450,7 @@ int main(int argc, char **argv)
         pose_write.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
         pose_write.pBufferInfo = &pose_info;
         vkUpdateDescriptorSets(device, 1, &pose_write, 0, nullptr);
-        buffer_info.size = 256 * 3 * 16;
+        buffer_info.size = 128 * 96 * 3 * 16;
         buffer_info.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
         VkBuffer readback{};
         check(vkCreateBuffer(device, &buffer_info, nullptr, &readback));
@@ -557,6 +557,8 @@ int main(int argc, char **argv)
         const auto ui_vs = embedded(scene_shaders::UiVertex, sizeof(scene_shaders::UiVertex));
         const auto ui_ps = embedded(scene_shaders::UiFragment, sizeof(scene_shaders::UiFragment));
         std::array<std::array<float, 4>, 128> last_ui_pixels{};
+        std::array<std::array<float, 4>, 128 * 96> scene_pixels{};
+        bool scene_test = false;
         std::array<std::array<float, 4>, 4> sprite_pixels{};
         const auto weather_ps = embedded(weather_shaders::Fragment, sizeof(weather_shaders::Fragment));
         const auto weather_vs = embedded(deferred_shaders::LightVertex, sizeof(deferred_shaders::LightVertex));
@@ -829,11 +831,11 @@ int main(int argc, char **argv)
             const bool local = fragment == local_fragment;
             const bool forward = fragment == forward_fragment;
             const bool instanced = custom_vertex == instanced_vertex;
-            const bool wide = ui || weather;
+            const bool wide = ui || weather || scene_test;
             viewport.width = wide ? 128.f : sprite ? 2.f : 1.f;
             scissor.extent.width = wide ? 128 : sprite ? 2 : 1;
-            viewport.height = sprite ? 2.f : 1.f;
-            scissor.extent.height = sprite ? 2 : 1;
+            viewport.height = scene_test ? 96.f : sprite ? 2.f : 1.f;
+            scissor.extent.height = scene_test ? 96 : sprite ? 2 : 1;
             pipeline_info.layout = forward   ? forward_pipeline_layout
                                    : local   ? local_pipeline_layout
                                    : weather ? weather_pipeline_layout
@@ -943,7 +945,7 @@ int main(int argc, char **argv)
             rp.framebuffer = framebuffer;
             rp.renderArea.extent = {1, 1};
             rp.renderArea.extent.width = wide ? 128 : sprite ? 2 : 1;
-            rp.renderArea.extent.height = sprite ? 2 : 1;
+            rp.renderArea.extent.height = scene_test ? 96 : sprite ? 2 : 1;
             rp.clearValueCount = 4;
             rp.pClearValues = clear.data();
             vkCmdBeginRenderPass(cmd, &rp, VK_SUBPASS_CONTENTS_INLINE);
@@ -965,10 +967,10 @@ int main(int argc, char **argv)
             std::array<VkBufferImageCopy, 3> copies{};
             for (uint32_t i = 0; i < 3; ++i)
             {
-                copies[i].bufferOffset = i * 256 * 16;
+                copies[i].bufferOffset = i * (128 * 96) * 16;
                 copies[i].imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
                 copies[i].imageSubresource.layerCount = 1;
-                copies[i].imageExtent = {wide ? 128u : sprite ? 2u : 1u, sprite ? 2u : 1u, 1};
+                copies[i].imageExtent = {wide ? 128u : sprite ? 2u : 1u, scene_test ? 96u : sprite ? 2u : 1u, 1};
             }
             for (uint32_t i = 0; i < 3; ++i)
                 vkCmdCopyImageToBuffer(cmd, output[i].image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, readback, 1,
@@ -977,7 +979,7 @@ int main(int argc, char **argv)
             host.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
             host.dstAccessMask = VK_ACCESS_HOST_READ_BIT;
             host.buffer = readback;
-            host.size = 256 * 48;
+            host.size = 128 * 96 * 48;
             vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_HOST_BIT, 0, 0, nullptr, 1,
                                  &host, 0, nullptr);
             check(vkEndCommandBuffer(cmd));
@@ -990,7 +992,9 @@ int main(int argc, char **argv)
             void *data{};
             check(vkMapMemory(device, readback_memory, 0, VK_WHOLE_SIZE, 0, &data));
             for (unsigned i = 0; i < 3; ++i)
-                std::memcpy(result[i].data(), static_cast<uint8_t *>(data) + i * 256 * 16, 16);
+                std::memcpy(result[i].data(), static_cast<uint8_t *>(data) + i * (128 * 96) * 16, 16);
+            if (scene_test)
+                std::memcpy(scene_pixels.data(), data, sizeof(scene_pixels));
             if (wide)
                 std::memcpy(last_ui_pixels.data(), data, sizeof(last_ui_pixels));
             if (sprite)
@@ -1839,7 +1843,7 @@ int main(int argc, char **argv)
         near(grass_result[1][2], 1, "first grass normal uses instance yaw");
         check(vkMapMemory(device, readback_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
         float right_normal[4];
-        std::memcpy(right_normal, static_cast<char *>(mapped) + 256 * 16 + 16, 16);
+        std::memcpy(right_normal, static_cast<char *>(mapped) + (128 * 96) * 16 + 16, 16);
         vkUnmapMemory(device, readback_memory);
         near(right_normal[2], 0, "second grass normal rotates independently");
         fill(memory, input[0], {.7f, .3f, .2f, 0});
@@ -1849,6 +1853,101 @@ int main(int argc, char **argv)
         for (const auto &pixel : sprite_pixels)
             near(pixel[0], 0, "instanced cutout discards transparent grass texels");
         vkDestroyShaderModule(device, grass_cutout, nullptr);
+        // A real two-dimensional scene exposes vertical sampling errors and
+        // stale opaque snapshots that a 128x1 strip cannot detect. The red
+        // channel is X, green is Y, and blue marks transparent water.
+        const auto scene_image = image(memory, format, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_SAMPLED_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 1, 128, 1, 96);
+        check(vkMapMemory(device, scene_image.memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        VkImageSubresource scene_subresource{VK_IMAGE_ASPECT_COLOR_BIT, 0, 0};
+        VkSubresourceLayout scene_layout{};
+        vkGetImageSubresourceLayout(device, scene_image.image, &scene_subresource, &scene_layout);
+        for (unsigned y = 0; y < 96; ++y)
+            for (unsigned x = 0; x < 128; ++x)
+            {
+                const float rgba[]{float(x) / 127, float(y) / 95, .85f, 1};
+                std::memcpy(static_cast<uint8_t *>(mapped) + scene_layout.offset + y * scene_layout.rowPitch + x * 16,
+                            rgba, sizeof(rgba));
+            }
+        vkUnmapMemory(device, scene_image.memory);
+        check(vkResetCommandPool(device, commands, 0));
+        VkCommandBufferBeginInfo scene_begin{VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};
+        check(vkBeginCommandBuffer(cmd, &scene_begin));
+        VkImageMemoryBarrier scene_barrier{VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
+        scene_barrier.oldLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
+        scene_barrier.newLayout = VK_IMAGE_LAYOUT_GENERAL;
+        scene_barrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
+        scene_barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        scene_barrier.srcQueueFamilyIndex = scene_barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        scene_barrier.image = scene_image.image;
+        scene_barrier.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};
+        vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                             0, 0, nullptr, 0, nullptr, 1, &scene_barrier);
+        check(vkEndCommandBuffer(cmd));
+        VkSubmitInfo scene_submit{VK_STRUCTURE_TYPE_SUBMIT_INFO};
+        scene_submit.commandBufferCount = 1;
+        scene_submit.pCommandBuffers = &cmd;
+        check(vkQueueSubmit(queue, 1, &scene_submit, VK_NULL_HANDLE));
+        check(vkQueueWaitIdle(queue));
+        scene_test = true;
+        triangle = prepared_triangle;
+        for (auto &vertex : triangle)
+            vertex.position[2] = .5f;
+        check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        std::memcpy(mapped, triangle.data(), sizeof(triangle));
+        vkUnmapMemory(device, vertex_memory);
+        fill(memory, input[19], {1, 0, 0, 1});
+        fill(memory, input[0], {127.f / 255, 127.f / 255, .1f, 1});
+        Push scene_push = push;
+        scene_push.threshold = 0;
+        scene_push.scale = 1.f / 128;
+        scene_push.padding[0] = 1.f / 96;
+        scene_images[0].imageView = scene_image.view;
+        vkUpdateDescriptorSets(device, 1, &scene_writes[0], 0, nullptr);
+        execute(distort_ps, scene_push, false, distort_vs);
+        for (unsigned y = 1; y < 95; y += 7)
+            for (unsigned x = 1; x < 127; x += 9)
+            {
+                const auto &p = scene_pixels[y * 128 + x];
+                near(p[0], float(x) / 127, "2D neutral refraction preserves X");
+                near(p[1], float(y) / 95, "2D neutral refraction preserves Y");
+                near(p[2], .85f, "2D refraction retains transparent water");
+            }
+        // Both axes, both signs, and all four screen edges: a one-row
+        // fixture cannot expose a vertical inversion or a wrong Y pixel size.
+        for (const auto &field : std::array<std::array<float, 4>, 4>{{
+                 {1, 127.f / 255, 0, 1}, {0, 127.f / 255, 0, 1},
+                 {127.f / 255, 1, 0, 1}, {127.f / 255, 0, 0, 1}}})
+        {
+            fill(memory, input[0], field);
+            execute(distort_ps, scene_push, false, distort_vs);
+            for (unsigned y : {0u, 32u, 63u, 95u})
+                for (unsigned x : {0u, 42u, 85u, 127u})
+                {
+                    const float sx = std::clamp((x + .5f) / 128 + (field[0] - 127.f / 255) * .05f,
+                                                .5f / 128, 1 - .5f / 128);
+                    const float sy = std::clamp((y + .5f) / 96 + (field[1] - 127.f / 255) * .05f,
+                                                .5f / 96, 1 - .5f / 96);
+                    const auto &p = scene_pixels[y * 128 + x];
+                    near(p[0], (sx * 128 - .5f) / 127, "2D refraction X displacement and edge clamp");
+                    near(p[1], (sy * 96 - .5f) / 95, "2D refraction Y displacement and edge clamp");
+                }
+        }
+        // Foreground geometry must not be pulled into the particle.
+        fill(memory, input[19], {0, 0, 0, 1});
+        execute(distort_ps, scene_push, false, distort_vs);
+        near(scene_pixels[32 * 128 + 42][1], 32.f / 95, "2D foreground depth cancels displaced sampling");
+        fill(memory, input[19], {1, 0, 0, 1});
+        fill(memory, input[0], {127.f / 255, 127.f / 255, .1f, 1});
+        // Negative control: the old opaque-only snapshot contains no water.
+        scene_images[0].imageView = input[3].view;
+        vkUpdateDescriptorSets(device, 1, &scene_writes[0], 0, nullptr);
+        fill(memory, input[3], {.2f, .3f, .05f, 1});
+        execute(distort_ps, scene_push, false, distort_vs);
+        near(scene_pixels[48 * 128 + 64][2], .05f, "stale snapshot visibly replaces water with the opaque background");
+        vkDestroyImageView(device, scene_image.view, nullptr);
+        vkDestroyImage(device, scene_image.image, nullptr);
+        vkFreeMemory(device, scene_image.memory, nullptr);
         vkDestroyShaderModule(device, instanced_vertex, nullptr);
         vkDestroyBuffer(device, instance_buffer, nullptr);
         vkFreeMemory(device, instance_memory, nullptr);
@@ -1863,7 +1962,7 @@ int main(int argc, char **argv)
                      "sun+hemi/material/bump/aux/normal/detail/terrain/emission/environment2D/cube/particle OK\n";
         check(vkDeviceWaitIdle(device));
         for (auto module_handle : {vs, terrain, detail, flat, laemb, reflection, deferred_particle, additive_particle,
-                                   additive_world_set, distort_vs, distort_ps, ui_vs, ui_ps, weather_vs, weather_ps})
+                                   additive_world_set, distort_vs, distort_ps, ui_vs, ui_ps, weather_vs, weather_ps, lod_vertex, lod_fragment})
             vkDestroyShaderModule(device, module_handle, nullptr);
         vkDestroyCommandPool(device, commands, nullptr);
         vkDestroyBuffer(device, readback, nullptr);

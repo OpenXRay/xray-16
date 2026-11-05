@@ -155,6 +155,31 @@ void DeferredFrame::overlay(const FrameRecordingContext &frame, void *user_data)
             context.recorded_ &= context.level_->record(frame, *context.pass_, transform, GeometryPhase::Transparent);
         }
     }
+    if (!(context.distortion_ && context.water_ && context.render_world_))
+        foreground(frame, user_data);
+}
+
+void DeferredFrame::capture_distortion(VkCommandBuffer command, VkImage image, uint32_t index, void *user_data)
+{
+    auto &context = *static_cast<DeferredFrame *>(user_data);
+    context.recorded_ &= context.water_->capture_refraction(command, image, index);
+}
+
+void DeferredFrame::distortion_overlay(const FrameRecordingContext &frame, void *user_data)
+{
+    auto &context = *static_cast<DeferredFrame *>(user_data);
+    const float debug_mode = context.shadow_uniform_.options[1];
+    const bool isolated_gbuffer = debug_mode > .5f && (debug_mode < 1.5f || debug_mode > 2.5f);
+    if (!isolated_gbuffer)
+        context.distortion_(frame, context.distortion_data_);
+    foreground(frame, user_data);
+}
+
+void DeferredFrame::foreground(const FrameRecordingContext &frame, void *user_data)
+{
+    auto &context = *static_cast<DeferredFrame *>(user_data);
+    const float debug_mode = context.shadow_uniform_.options[1];
+    const bool isolated_gbuffer = debug_mode > .5f && (debug_mode < 1.5f || debug_mode > 2.5f);
     // The HUD uses its own depth hierarchy and is never hidden by world geometry.
     context.frame_->clear_depth(frame.command_buffer);
     if (context.hud_ && !isolated_gbuffer)
@@ -210,9 +235,12 @@ bool DeferredFrame::render(FrameContext &frame, GBufferTargets &targets, const G
     compositor_ = compositor;
     compositor_data_ = compositor_data;
     const VkClearColorValue clear{{0, 0, 0, 1}};
+    const bool refract_world = distortion_ && water_ && render_world_;
     if (!frame.render_frame(clear, status, error, lighting, this, readback, readback_data, geometry, this, clear_target,
                             compositor_, compositor_data_, water_ ? capture : nullptr, this, water_ ? overlay : nullptr,
-                            this, final_capture, final_capture_data, final_overlay, final_overlay_data))
+                            this, final_capture, final_capture_data, final_overlay, final_overlay_data,
+                            refract_world ? capture_distortion : nullptr, this,
+                            refract_world ? distortion_overlay : nullptr, this))
         return false;
     if (!recorded_)
     {

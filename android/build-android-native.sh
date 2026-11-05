@@ -127,6 +127,7 @@ cmake -S "$repo_dir" -B "$build_dir" -G "${CMAKE_GENERATOR:-Ninja}" \
     -DXRAY_USE_LUAJIT=ON \
     -DXRAY_ENABLE_TRACY=OFF \
     -DMEMORY_ALLOCATOR=standard \
+    "-DXRAY_ENABLE_LTO=${XRAY_ANDROID_ENABLE_LTO:-OFF}" \
     "$@"
 
 cmake --build "$build_dir" --target xr_3da

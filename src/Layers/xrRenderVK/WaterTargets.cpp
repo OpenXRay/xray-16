@@ -85,11 +85,23 @@ bool WaterTargets::write_uniform(uint32_t index, const WaterSceneUniform& value,
 
 bool WaterTargets::capture(VkCommandBuffer command, VkImage source, uint32_t index) const
 {
+    return capture_images(command, source, index, 2);
+}
+
+bool WaterTargets::capture_refraction(VkCommandBuffer command, VkImage source, uint32_t index) const
+{
+    // Refresh the completed transparent world for particles, without copying
+    // the reflection image again or allowing particles to sample the HUD.
+    return capture_images(command, source, index, 1);
+}
+
+bool WaterTargets::capture_images(VkCommandBuffer command, VkImage source, uint32_t index, uint32_t count) const
+{
     if (!command || !source || index >= targets_.size()) return false;
     const Target& target = targets_[index];
     VkImageMemoryBarrier transitions[2]{};
     const VkImage images[]{target.refraction.image, target.reflection.image};
-    for (uint32_t i = 0; i < 2; ++i)
+    for (uint32_t i = 0; i < count; ++i)
     {
         transitions[i].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         transitions[i].image = images[i];
@@ -102,23 +114,24 @@ bool WaterTargets::capture(VkCommandBuffer command, VkImage source, uint32_t ind
         transitions[i].dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     }
     vk_.cmd_pipeline_barrier(command, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-        VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 2, transitions);
+        VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, count, transitions);
     VkImageCopy region{};
     region.srcSubresource.aspectMask = region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     region.srcSubresource.layerCount = region.dstSubresource.layerCount = 1;
     region.extent = {extent_.width, extent_.height, 1};
-    for (VkImage image : images)
+    for (uint32_t i = 0; i < count; ++i)
         vk_.cmd_copy_image(command, source, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
-    for (auto& transition : transitions)
+            images[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+    for (uint32_t i = 0; i < count; ++i)
     {
+        auto &transition = transitions[i];
         transition.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
         transition.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         transition.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         transition.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
     }
     vk_.cmd_pipeline_barrier(command, VK_PIPELINE_STAGE_TRANSFER_BIT,
-        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 2, transitions);
+        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, count, transitions);
     return true;
 }
 

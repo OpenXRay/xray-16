@@ -932,7 +932,9 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     FrameInterpassRecorder interpass, void* interpass_data,
     FrameRecorder overlay, void* overlay_data,
     FrameInterpassRecorder final_capture, void* final_capture_data,
-    FrameRecorder final_overlay, void* final_overlay_data)
+    FrameRecorder final_overlay, void* final_overlay_data,
+    FrameInterpassRecorder refraction_capture, void* refraction_capture_data,
+    FrameRecorder refraction_overlay, void* refraction_overlay_data)
 {
     using Clock = std::chrono::steady_clock;
     const auto milliseconds = [](Clock::time_point begin) {
@@ -954,6 +956,9 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
     { error = "UI distortion requires capture and overlay recorders"; return false; }
     if ((interpass || overlay) && (!m_overlay_pass || !interpass || !overlay))
     { error = "water overlay pass requires capture and overlay recorders"; return false; }
+    if ((refraction_capture || refraction_overlay) &&
+        (!m_overlay_pass || !interpass || !refraction_capture || !refraction_overlay))
+    { error = "particle refraction requires completed world capture and overlay recorders"; return false; }
 
     crash_stage("vulkan frame: wait fence");
     const auto fence_begin = Clock::now();
@@ -1094,6 +1099,16 @@ bool FrameContext::render_frame(const VkClearColorValue& clear, FrameStatus& sta
         const FrameRecordingContext overlay_frame{command, m_overlay_pass,
             m_framebuffers[image_index], m_extent, image_index, m_current_frame};
         overlay(overlay_frame, overlay_data);
+        m_vk.cmd_end_render_pass(command);
+    }
+    if (refraction_capture)
+    {
+        refraction_capture(command, m_images[image_index], image_index, refraction_capture_data);
+        render_info.renderPass = m_overlay_pass;
+        m_vk.cmd_begin_render_pass(command, &render_info, VK_SUBPASS_CONTENTS_INLINE);
+        const FrameRecordingContext refraction_frame{command, m_overlay_pass,
+            m_framebuffers[image_index], m_extent, image_index, m_current_frame};
+        refraction_overlay(refraction_frame, refraction_overlay_data);
         m_vk.cmd_end_render_pass(command);
     }
     if (final_capture)

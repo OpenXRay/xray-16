@@ -167,6 +167,7 @@ class VulkanGameDevice
     static void record_shadow_models(const FrameRecordingContext &frame, const float (&vp)[16], void *user);
     static void record_models(const FrameRecordingContext &frame, void *user);
     static void record_transparent(const FrameRecordingContext &frame, void *user);
+    static void record_distortion(const FrameRecordingContext &frame, void *user);
     static void prepare_light_grid(const FrameRecordingContext &frame, void *user);
     static void record_local_lights(const FrameRecordingContext &frame, void *user);
     static void record_level_visuals(const FrameRecordingContext &frame, void *user);

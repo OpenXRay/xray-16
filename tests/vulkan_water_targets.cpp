@@ -35,8 +35,9 @@ void VKAPI_PTR barrier(VkCommandBuffer, VkPipelineStageFlags, VkPipelineStageFla
     VkDependencyFlags, uint32_t, const VkMemoryBarrier*, uint32_t,
     const VkBufferMemoryBarrier*, uint32_t count, const VkImageMemoryBarrier* images)
 {
-    assert(count == 2 && images[0].image && images[1].image);
-    if (barriers == 0)
+    assert((count == 1 || count == 2) && images[0].image);
+    if (count == 2) assert(images[1].image);
+    if (barriers % 2 == 0)
         assert(images[0].oldLayout == VK_IMAGE_LAYOUT_UNDEFINED &&
             images[0].newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
     else
@@ -78,6 +79,9 @@ int main()
     assert(targets.capture(vk_mock::handle<VkCommandBuffer>(2),
         vk_mock::handle<VkImage>(3), 1));
     assert(copies == 2 && barriers == 2);
+    assert(targets.capture_refraction(vk_mock::handle<VkCommandBuffer>(2),
+        vk_mock::handle<VkImage>(3), 1));
+    assert(copies == 3 && barriers == 4); // Reflection is not recopied.
     assert(!targets.capture(vk_mock::handle<VkCommandBuffer>(2),
         vk_mock::handle<VkImage>(3), 2));
     targets.destroy();

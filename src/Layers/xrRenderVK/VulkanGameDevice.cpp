@@ -797,6 +797,7 @@ bool VulkanGameDevice::render(const GpuLevel &level, const float (&mvp)[16], con
             particle_refraction = true;
             break;
         }
+    frame_.set_distortion_recorder(render_world && particle_refraction ? record_distortion : nullptr, this);
     // All gameplay texture requests for this frame have now been gathered.
     // The completed copy fences provide the Adreno transfer visibility before
     // any rendering command can sample a newly loaded image.

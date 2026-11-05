@@ -124,7 +124,9 @@ public:
         FrameInterpassRecorder interpass = nullptr, void* interpass_data = nullptr,
         FrameRecorder overlay = nullptr, void* overlay_data = nullptr,
         FrameInterpassRecorder final_capture = nullptr, void* final_capture_data = nullptr,
-        FrameRecorder final_overlay = nullptr, void* final_overlay_data = nullptr);
+        FrameRecorder final_overlay = nullptr, void* final_overlay_data = nullptr,
+        FrameInterpassRecorder refraction_capture = nullptr, void* refraction_capture_data = nullptr,
+        FrameRecorder refraction_overlay = nullptr, void* refraction_overlay_data = nullptr);
     void destroy();
 
     struct CpuTiming

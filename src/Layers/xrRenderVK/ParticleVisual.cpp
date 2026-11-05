@@ -245,8 +245,13 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
     GeometryPhase phase)
 {
     if (!material_ || !device_) return true;
+    // Refraction samples a snapshot of the completed transparent world.
+    // Ordinary geometry phases must not consume the earlier opaque snapshot.
+    if (distortion_ ? (hud ? phase != GeometryPhase::Transparent && phase != GeometryPhase::Hud
+                          : phase != GeometryPhase::Distortion)
+                    : phase == GeometryPhase::Distortion) return true;
     const bool deferred_set = !hud && !screen_set_ && blend_mode_ == 0;
-    if (!particle_records_in_phase(hud, screen_set_, blend_mode_, phase)) return true;
+    if (!distortion_ && !particle_records_in_phase(hud, screen_set_, blend_mode_, phase)) return true;
     PAPI::Particle* particles = nullptr;
     u32 count = 0;
     PAPI::ParticleManager()->GetParticles(effect_, particles, count);

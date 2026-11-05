@@ -24,6 +24,7 @@ public:
         const BufferResourceDispatch& buffers, std::string& error);
     bool write_uniform(uint32_t index, const WaterSceneUniform& value, std::string& error);
     bool capture(VkCommandBuffer command, VkImage source, uint32_t index) const;
+    bool capture_refraction(VkCommandBuffer command, VkImage source, uint32_t index) const;
     VkImageView refraction(uint32_t index) const;
     VkImageView reflection(uint32_t index) const;
     VkBuffer uniform(uint32_t index) const;
@@ -38,6 +39,7 @@ private:
     };
     struct Target { Image refraction, reflection; BufferResource constants; };
     bool make_image(Image& image, std::string& error);
+    bool capture_images(VkCommandBuffer command, VkImage source, uint32_t index, uint32_t count) const;
     VkDevice device_{};
     VkFormat format_{VK_FORMAT_UNDEFINED};
     VkExtent2D extent_{};

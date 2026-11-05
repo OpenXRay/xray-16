@@ -215,7 +215,11 @@ XRAY_ANDROID_ARM_MODE=thumb ./android/build-apk-armv7.sh
 XRAY_ANDROID_ENABLE_LTO=ON ./android/build-apk-armv7.sh
 ```
 
-The default is ARM mode with LTO disabled.
+The default is ARM mode with LTO disabled. This also applies to the standalone
+`build-armv7.sh` and `build-arm64.sh` native builds. Use
+`XRAY_ANDROID_ENABLE_LTO=ON` to enable LTO; setting only
+`CMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF` does not override the project's
+configuration-specific LTO setting.
 
 ## 5. Install and run
 
