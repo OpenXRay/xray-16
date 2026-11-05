@@ -381,7 +381,7 @@ void CRender::LoadSectors(IReader* fs)
         strconcat(file_name, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "portals.bin");
         FS.update_path(file_name, "$app_data_root$", file_name);
 
-        if (use_cache && FS.exist(file_name) && rmPortals->deserialize(file_name, skip_crc32_check))
+        if (use_cache && rmPortals->deserialize(file_name, skip_crc32_check))
         {
 #ifndef MASTER_GOLD
             Msg("* Loaded portals cache (%s)...", file_name);

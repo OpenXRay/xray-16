@@ -1,0 +1,22 @@
+-- Requires the existing benchmark-enabled physics DLL. No timed combat or
+-- physics step workload: probe the same static level geometry on each backend.
+local function wait(ms)
+    local finish = time_global() + ms
+    while time_global() < finish do coroutine.yield() end
+end
+function main()
+    local console = get_console()
+    console:execute("rs_always_active on")
+    console:execute("rs_v_sync off")
+    console:execute("rs_fps_limit 501")
+    console:execute("mt_physics off")
+    wait(10000)
+    local marsh = level.name() == "marsh"
+    -- Literal origins avoid backend-dependent actor/ground settling.
+    local origin = vector():set(marsh and 240 or 256, marsh and 3 or 16, marsh and 70 or 510)
+    log1(string.format("OPCODE_QUERY_BENCHMARK origin=%.3f,%.3f,%.3f level=%s",origin.x,origin.y,origin.z,level.name()))
+    level.physics_world():benchmark_queries(origin)
+    log1("GAMEPLAY_BENCHMARK DONE")
+    wait(1000)
+    console:execute("quit")
+end

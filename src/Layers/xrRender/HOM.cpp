@@ -131,7 +131,7 @@ void CHOM::Load()
     strconcat(fName, "cdb_cache" DELIMITER, FS.get_path("$level$")->m_Add, "hom.bin");
     FS.update_path(fName, "$app_data_root$", fName);
 
-    if (use_cache && FS.exist(fName) && m_pModel->deserialize(fName, skip_crc32_check))
+    if (use_cache && m_pModel->deserialize(fName, skip_crc32_check))
     {
 #ifndef MASTER_GOLD
         Msg("* Loaded HOM cache (%s)...", fName);
