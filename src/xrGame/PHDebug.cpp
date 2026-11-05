@@ -58,7 +58,8 @@ enum EDBGPHDrawMode
     dmCashed,
     dmCashedSecondary,
     dmSimple
-} dbg_ph_draw_mode = dmSecondaryThread;
+};
+static EDBGPHDrawMode dbg_ph_draw_mode = dmSecondaryThread;
 u32 cash_draw_remove_time = u32(-1);
 
 struct SPHObjDBGDraw : public SPHDBGDrawAbsract
@@ -73,43 +74,7 @@ struct SPHObjDBGDraw : public SPHDBGDrawAbsract
     Fvector AABB_center;
 };
 void DBG_DrawPHObject(const CPHObject* obj) { DBG_DrawPHAbstruct(xr_new<SPHObjDBGDraw>(obj)); }
-struct SPHContactDBGDraw : public SPHDBGDrawAbsract
-{
-    // int geomClass;
-    bool is_cyl;
-    Fvector norm;
-    Fvector pos;
-    float depth;
-    SPHContactDBGDraw(const dContact& c)
-    {
-        // if(dGeomGetBody(c.geom.g1))
-        //{
-        //	geomClass =dGeomGetClass(retrieveGeom(c.geom.g1));
-        //}
-        // else
-        //{
-        //	geomClass=dGeomGetClass(retrieveGeom(c.geom.g2));
-        //}
-
-        // is_cyl= (geomClass==dCylinderClassUser);
-        is_cyl = IsCyliderContact(c);
-        norm.set(cast_fv(c.geom.normal));
-        pos.set(cast_fv(c.geom.pos));
-        depth = c.geom.depth;
-    }
-    void render()
-    {
-        // bool is_cyl= (geomClass==dCylinderClassUser);
-        Level().debug_renderer().draw_aabb(pos, .01f, .01f, .01f, color_xrgb(255 * is_cyl, 0, 255 * !is_cyl));
-        Fvector dir;
-        dir.set(norm);
-        dir.mul(depth * 100.f);
-        dir.add(pos);
-        Level().debug_renderer().draw_line(Fidentity, pos, dir, color_xrgb(255 * is_cyl, 0, 255 * !is_cyl));
-    }
-};
-
-void DBG_DrawContact(const dContact& c) { DBG_DrawPHAbstruct(xr_new<SPHContactDBGDraw>(c)); }
+void DBG_DrawContact(const dContact& c) {}
 struct SPHDBGDrawTri : public SPHDBGDrawAbsract
 {
     Fvector v[3];
@@ -614,6 +579,9 @@ CFunctionGraph::CFunctionGraph()
 {
     m_stat_graph = NULL;
     m_function.clear();
+    x_min = 0.f;
+    x_max = 0.f;
+    s = 1.f;
 }
 CFunctionGraph::~CFunctionGraph()
 {

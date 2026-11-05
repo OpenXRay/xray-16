@@ -5,24 +5,28 @@
 #include "MathUtils.h"
 #include "PHWorld.h"
 #include "xrEngine/device.h"
+#include "xrPhysicsCore/IPhysicsCore.h" // Подключаем наше физическое ядро
+
 #ifdef DEBUG
 #include "xrEngine/StatGraph.h"
 #include "debug_output.h"
 #endif
+
 static const float getting_on_dist = 0.3f;
-//static const float getting_out_dist = 0.4f;
-//static const float start_climbing_dist = 0.f;
 static const float stop_climbing_dist = 0.1f;
 static const float out_dist = 1.5f;
 
 static const float look_angle_cosine = 0.9238795f; // 22.5
 static const float lookup_angle_sine = 0.34202014f; // 20
 extern class CPHWorld* ph_world;
+
 CElevatorState::CElevatorState()
 {
     m_state = clbNoLadder;
     m_ladder = NULL;
     m_character = NULL;
+    m_start_position.set(0, 0, 0);
+    m_start_time = 0;
 }
 
 float CElevatorState::ClimbDirection()
@@ -54,7 +58,10 @@ void CElevatorState::PhTune(float step)
 }
 
 void CElevatorState::PhDataUpdate(float step) {}
-void CElevatorState::InitContact(dContact* c, bool& do_collide, u16, u16) {}
+
+// Пустая заглушка под новую сигнатуру
+void CElevatorState::InitContact(bool& do_collide, bool bo1, float depth, CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom, u16 material_idx_1, u16 material_2) {}
+
 void CElevatorState::SetElevator(IClimableObject* climable)
 {
     Fvector d;
@@ -66,16 +73,20 @@ void CElevatorState::SetElevator(IClimableObject* climable)
     SwitchState(clbNone);
     m_ladder = climable;
 }
+
 void CElevatorState::SetCharacter(CPHCharacter* character)
 {
     m_character = character;
     SwitchState(clbNoLadder);
 }
+
 void CElevatorState::EvaluateState() { VERIFY(m_ladder && m_character); }
+
 #ifdef DEBUG
 const char* dbg_state[] = {
     "clbNone", "clbNearUp", "clbNearDown", "clbClimbingUp", "clbClimbingDown", "clbDepart", "clbNoLadder"};
 #endif
+
 void CElevatorState::SwitchState(Estate new_state)
 {
     if (!StateSwitchInertion(new_state))
@@ -85,18 +96,15 @@ void CElevatorState::SwitchState(Estate new_state)
         Msg("%s", dbg_state[new_state]);
 #endif
     VERIFY(m_character);
-    if ((m_state != clbClimbingUp && m_state != clbClimbingDown) &&
-        (new_state == clbClimbingUp || new_state == clbClimbingDown))
-        dBodySetGravityMode(m_character->get_body(), 0);
 
-    if ((new_state != clbClimbingUp && new_state != clbClimbingDown) &&
-        (m_state == clbClimbingUp || m_state == clbClimbingDown))
-        dBodySetGravityMode(m_character->get_body(), 1);
-
-    // if(new_state==clbDepart) InitDepart();
+    const bool wasClimbing = m_state == clbClimbingUp || m_state == clbClimbingDown;
+    const bool climbing = new_state == clbClimbingUp || new_state == clbClimbingDown;
+    if (wasClimbing != climbing)
+        GetPhysicsCore()->SetCharacterVirtualGravityFactor(m_character->get_body(), climbing ? 0.f : 1.f);
     NewState();
     m_state = new_state;
 }
+
 void CElevatorState::UpdateStNone()
 {
     VERIFY(m_ladder && m_character);
@@ -106,13 +114,9 @@ void CElevatorState::UpdateStNone()
         dXZDotNormalized(d, m_character->CamDir()) > look_angle_cosine)
     {
         if (ClimbDirection() > 0.f)
-        {
             SwitchState(clbClimbingUp);
-        }
         else
-        {
             SwitchState(clbClimbingDown);
-        }
     }
     else
     {
@@ -137,11 +141,10 @@ void CElevatorState::UpdateStNearUp()
     Fvector d;
 
     if (m_ladder->InTouch(m_character) && m_character->CamDir().y < -M_PI / 20.f &&
-        // d.dotproduct(m_character->ControlAccel())<0.f&&
-        // ClimbDirection()<0.f&&
         m_ladder->DDToPlain(m_character, d) > m_character->FootRadius() / 3.f &&
         m_ladder->BeforeLadder(m_character, 0.1f))
         SwitchState(clbClimbingDown);
+
     float dist = m_ladder->DDUpperP(m_character, d);
     if (dist - m_character->FootRadius() > out_dist)
         SwitchState((clbNoLadder));
@@ -156,6 +159,7 @@ void CElevatorState::UpdateStNearDown()
         d.dotproduct(m_character->ControlAccel()) > 0.f && ClimbDirection() > 0.f &&
         m_ladder->BeforeLadder(m_character))
         SwitchState(clbClimbingUp);
+
     if (dist - m_character->FootRadius() > out_dist)
         SwitchState((clbNoLadder));
 }
@@ -167,15 +171,19 @@ void CElevatorState::UpdateStClimbingDown()
 
     if (ClimbDirection() > 0.f && m_ladder->BeforeLadder(m_character))
         SwitchState(clbClimbingUp);
+
     float to_ax = m_ladder->DDToAxis(m_character, d);
     Fvector ca;
     ca.set(m_character->ControlAccel());
     float control_a = to_mag_and_dir(ca);
+
     if (!fis_zero(to_ax) && !fis_zero(control_a) &&
         abs(-ca.dotproduct(Fvector(m_ladder->Norm()).normalize())) < M_SQRT1_2)
         SwitchState(clbDepart);
+
     if (m_ladder->AxDistToLowerP(m_character) - m_character->FootRadius() < stop_climbing_dist)
         SwitchState(clbNearDown);
+
     UpdateClimbingCommon(d, to_ax, ca, control_a);
 
     if (m_ladder->AxDistToUpperP(m_character) < -m_character->FootRadius())
@@ -187,10 +195,6 @@ void CElevatorState::UpdateStClimbingDown()
     {
         m_character->ApplyForce(0.f, -m_character->Mass() * ph_world->Gravity(), 0.f);
     }
-    // if(to_ax-m_character->FootRadius()>out_dist)
-    //														SwitchState((clbNone));
-    // if(fis_zero(control_a))
-    //	m_character->ApplyForce(d,m_character->Mass());
 }
 
 void CElevatorState::UpdateStClimbingUp()
@@ -200,38 +204,34 @@ void CElevatorState::UpdateStClimbingUp()
 
     if (ClimbDirection() < 0.f && m_ladder->BeforeLadder(m_character))
         SwitchState(clbClimbingDown);
+
     float to_ax = m_ladder->DDToAxis(m_character, d);
     Fvector ca;
     ca.set(m_character->ControlAccel());
     float control_a = to_mag_and_dir(ca);
+
     if (!fis_zero(to_ax) && !fis_zero(control_a) &&
         abs(-ca.dotproduct(Fvector(m_ladder->Norm()).normalize())) < M_SQRT1_2)
         SwitchState(clbDepart);
+
     if (m_ladder->AxDistToUpperP(m_character) + m_character->FootRadius() < stop_climbing_dist)
         SwitchState(clbNearUp);
 
     UpdateClimbingCommon(d, to_ax, ca, control_a);
-    // if(to_ax-m_character->FootRadius()>out_dist)
-    //										SwitchState((clbNone));
-    // if(fis_zero(control_a))
-    //	m_character->ApplyForce(d,m_character->Mass());
 }
+
 void CElevatorState::UpdateClimbingCommon(const Fvector& d_to_ax, float to_ax, const Fvector& control_accel, float ca)
 {
     VERIFY(m_ladder && m_character);
     if (to_ax - m_character->FootRadius() > out_dist)
         SwitchState((clbNoLadder));
+
     if (fis_zero(ca) && d_to_ax.dotproduct(m_ladder->Norm()) < 0.f)
     {
-#ifdef DEBUG
-        if (debug_output().ph_dbg_draw_mask().test(phDbgLadder))
-        {
-            //.			Msg("force applied");
-        }
-#endif
-        m_character->ApplyForce(d_to_ax, m_character->Mass() * ph_world->Gravity()); //
+        m_character->ApplyForce(d_to_ax, m_character->Mass() * ph_world->Gravity());
     }
 }
+
 bool CElevatorState::GetControlDir(Fvector& dir)
 {
     bool ret = true;
@@ -272,20 +272,16 @@ bool CElevatorState::GetControlDir(Fvector& dir)
         }
         else
         {
-#ifdef DEBUG
-            if (debug_output().ph_dbg_draw_mask().test(phDbgLadder))
-            {
-                Msg("no c dir");
-            }
-#endif
             ret = false;
         }
         break;
     }
     return ret;
 }
+
 static const float depart_dist = 2.f;
 static const u32 depart_time = 3000;
+
 void CElevatorState::UpdateDepart()
 {
     VERIFY(m_ladder && m_character);
@@ -301,11 +297,6 @@ void CElevatorState::UpdateDepart()
         if (getting_on_dist + m_character->FootRadius() > d_to_upper)
             SwitchState(clbNearUp);
     }
-
-    // Fvector p;m_character->GetFootCenter(p);
-    // p.sub(m_start_position);
-    // if(	p.magnitude()>depart_dist ||
-    //	Device.dwTimeGlobal-m_start_time>depart_time)
     SwitchState(clbNoLadder);
 }
 
@@ -322,15 +313,13 @@ void CElevatorState::Depart()
     if (m_ladder && ClimbingState())
         SwitchState(clbDepart);
 }
+
 void CElevatorState::GetLeaderNormal(Fvector& dir)
 {
     if (!m_ladder)
         return;
     VERIFY(m_ladder && m_character);
     m_ladder->DDNorm(dir);
-    // Fvector d;
-    // m_ladder->DToAxis(m_character,d);
-    // if(dir.dotproduct(d)>0.f) dir.invert();
 }
 
 void CElevatorState::GetJumpDir(const Fvector& accel, Fvector& dir)
@@ -363,13 +352,13 @@ void CElevatorState::Deactivate()
 CElevatorState::SEnertionState CElevatorState::m_etable[clbNoState][clbNoState] =
 {
     //                     clbNone      clbNearUp    clbNearDown  clbClimbingUp  clbClimbingDown clbDepart    clbNoLadder
-    /*clbNone         */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } }, // clbNone
-    /*clbNearUp       */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } }, // clbNearUp
-    /*clbNearDown     */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } }, // clbNearDown
-    /*clbClimbingUp   */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } }, // clbClimbingUp
-    /*clbClimbingDown */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } }, // clbClimbingDown
-    /*clbDepart       */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { depart_dist, depart_time } }, // clbDepart
-    /*clbNoLadder     */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } } // clbNoLadder
+    /*clbNone         */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } },
+    /*clbNearUp       */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } },
+    /*clbNearDown     */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } },
+    /*clbClimbingUp   */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } },
+    /*clbClimbingDown */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } },
+    /*clbDepart       */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { depart_dist, depart_time } },
+    /*clbNoLadder     */ { { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 }, { 0.0f, 0 },   { 0.0f, 0 },    { 0.0f, 0 }, { 0.0f, 0 } }
 };
 
 bool CElevatorState::StateSwitchInertion(Estate new_state)
