@@ -82,7 +82,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                         n = _GetItemCount(V);
                         if (n > 0)
                         {
-                            string64 tmp;
+                            xr_string tmp;
                             spawnCount = atoi(_GetItem(V, 0, tmp)); //count
                         }
 
@@ -114,7 +114,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                         {
                             pcstr ammo_class = pSettings->r_string(itmSection, "ammo_class");
                             pcstr ammoSec = "";
-                            string128 tmp;
+                            xr_string tmp;
                             for (int i = 0, n = _GetItemCount(ammo_class); i < n; ++i)
                             {
                                 ammoSec = _GetItem(ammo_class, i, tmp);
@@ -164,7 +164,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
 
                 if (V && xr_strlen(V))
                 {
-                    string64 buf;
+                    xr_string buf;
                     j = atoi(_GetItem(V, 0, buf));
                     if (!j)
                         j = 1;
