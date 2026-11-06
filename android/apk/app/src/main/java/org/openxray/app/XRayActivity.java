@@ -175,8 +175,6 @@ public final class XRayActivity extends SDLActivity {
         String[] additionalArgs = getIntent().getStringArrayExtra(LauncherActivity.EXTRA_ADDITIONAL_ARGS);
         int rendererMode = getIntent().getIntExtra(
                 LauncherActivity.EXTRA_RENDERER_MODE, LauncherActivity.RENDERER_AUTO);
-        int graphicsPreset = getIntent().getIntExtra(
-                LauncherActivity.EXTRA_GRAPHICS_PRESET, LauncherActivity.GRAPHICS_AUTO);
         DisplayMetrics screen = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getRealMetrics(screen);
         if (screen.widthPixels <= 0 || screen.heightPixels <= 0)
@@ -219,30 +217,6 @@ public final class XRayActivity extends SDLActivity {
             args.add(Integer.toString(Math.max(320, renderWidth)));
             args.add("-android-render-height");
             args.add(Integer.toString(Math.max(320, renderHeight)));
-            args.add("-android-mobile-preset");
-            args.add(OptionCatalog.value(OptionCatalog.GRAPHICS_PRESETS, graphicsPreset, 0));
-            if (rendererMode == LauncherActivity.RENDERER_VULKAN) {
-                if (!getIntent().getBooleanExtra(LauncherActivity.EXTRA_SUN_SHADOWS, true))
-                    args.add("-vk-no-sun-shadows");
-                if (!getIntent().getBooleanExtra(LauncherActivity.EXTRA_TONEMAP, true))
-                    args.add("-vk-no-tonemap");
-                args.add("-vk-ambient-scale");
-                args.add(Float.toString(getIntent().getFloatExtra(LauncherActivity.EXTRA_AMBIENT_SCALE, 1.f)));
-                args.add("-vk-hemi-scale");
-                args.add(Float.toString(getIntent().getFloatExtra(LauncherActivity.EXTRA_HEMI_SCALE, 1.f)));
-                args.add("-vk-sun-scale");
-                args.add(Float.toString(getIntent().getFloatExtra(LauncherActivity.EXTRA_SUN_SCALE, 1.f)));
-                int detailDistance = getIntent().getIntExtra(LauncherActivity.EXTRA_DETAIL_DISTANCE, -1);
-                int anisotropy = getIntent().getIntExtra(LauncherActivity.EXTRA_ANISOTROPY, -1);
-                if (detailDistance >= 0) {
-                    args.add("-vk-detail-distance");
-                    args.add(Integer.toString(detailDistance));
-                }
-                if (anisotropy >= 0) {
-                    args.add("-vk-anisotropy");
-                    args.add(Integer.toString(anisotropy));
-                }
-            }
             if (showFps)
                 args.add("-android-show-fps");
         }

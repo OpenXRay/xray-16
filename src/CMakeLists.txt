@@ -49,6 +49,7 @@ if (XRAY_BUILD_VULKAN_TESTS)
 
     xray_add_vulkan_state_test(vulkan_device_resource_state_test tests/vulkan_device_resource_state.cpp)
     xray_add_vulkan_state_test(vulkan_frame_phase_test tests/vulkan_frame_phase.cpp)
+    xray_add_vulkan_state_test(legacy_filename_test tests/legacy_filename.cpp)
     xray_add_vulkan_state_test(vulkan_render_regressions_test tests/vulkan_render_regressions.cpp)
     xray_add_vulkan_state_test(vulkan_texture_upload_test tests/vulkan_texture_upload.cpp)
     target_sources(vulkan_texture_upload_test PRIVATE "${XRAY_SOURCE_DIR}/src/Layers/xrRenderVK/TextureUpload.cpp"

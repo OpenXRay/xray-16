@@ -30,11 +30,8 @@ class VulkanPreset final : public CCC_Token
     void Execute(pcstr args) override
     {
         CCC_Token::Execute(args);
-        const auto &quality = render_quality(quality_preset);
-        detail_radius = quality.detail_distance;
-        detail_update_cells = quality.detail_updates;
-        point_shadow_budget = quality.point_shadows;
-        spot_shadow_budget = quality.spot_shadows;
+        if (get_token_id(quality_tokens, args) >= 0)
+            set_vulkan_quality(quality_preset);
     }
 };
 
@@ -53,6 +50,7 @@ void register_vulkan_options()
     static CCC_Float light_scale("r2_dhemi_light_scale", &hemi_light_scale, 0.f, 100.f);
     static CCC_Float light_flow("r2_dhemi_light_flow", &hemi_light_flow, 0.f, 1.f);
     static CCC_Float smooth("r2_dhemi_smooth", &hemi_smooth, 0.f, 10.f);
+    static CCC_Integer anisotropy("r__tf_aniso", &texture_anisotropy, 1, 16);
     static CCC_Integer details("r__detail_radius", &detail_radius, 0, 80);
     static CCC_Float ambient("r2_sun_lumscale_amb", &ambient_scale, 0.f, 3.f);
     static CCC_Float hemisphere("r2_sun_lumscale_hemi", &hemisphere_scale, 0.f, 3.f);
@@ -68,6 +66,7 @@ void register_vulkan_options()
         Console->AddCommand(option);
     Console->AddCommand(&preset);
     Console->AddCommand(&details);
+    Console->AddCommand(&anisotropy);
     Console->AddCommand(&detail_updates);
     Console->AddCommand(&ambient);
     Console->AddCommand(&hemisphere);

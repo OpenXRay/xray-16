@@ -26,16 +26,25 @@ void main()
     if (glass) ripple = (a.rg - 0.5) * 0.002;
     float behind = texture(opaque_depth, screen).r;
     float shore = clamp((behind - gl_FragCoord.z) * 48.0, 0.0, 1.0);
-    vec3 normal = normalize(world_normal + vec3(ripple * 12.0, 0.0));
-    float fresnel = clamp(0.12 + pow(1.0 - abs(normal.y), 3.0) * 0.65, 0.1, 0.85);
     vec3 refracted = texture(refraction_scene, clamp(screen + ripple * shore, 0.001, 0.999)).rgb;
-    // March the reflected view ray against the opaque depth buffer.
+    vec3 base_normal = normalize(world_normal);
+    vec3 axis = abs(base_normal.y) > 0.9 ? vec3(0, 0, 1) : vec3(0, 1, 0);
+    vec3 tangent = normalize(cross(base_normal, axis));
+    vec3 bitangent = cross(tangent, base_normal);
+    vec3 normal = glass ? normalize(world_normal + vec3(ripple * 12.0, 0.0)) :
+        normalize(base_normal + 12.0 * (tangent * ripple.x + bitangent * ripple.y));
     vec4 surface_clip = scene.inverse_view_projection *
         vec4(screen.x * 2.0 - 1.0, 1.0 - screen.y * 2.0, gl_FragCoord.z, 1.0);
     vec3 surface = surface_clip.xyz / max(abs(surface_clip.w), 1e-5) * sign(surface_clip.w);
     vec3 view_ray = normalize(surface - scene.camera_position.xyz);
-    vec3 reflected_ray = normalize(reflect(view_ray, normal));
-    vec2 reflection_uv = clamp(vec2(screen.x, 1.0 - screen.y) + ripple * 2.0, 0.001, 0.999);
+    vec3 reflected_ray = reflect(view_ray, normal);
+    float fresnel = glass ? 0.12 + pow(1.0 - abs(normal.y), 3.0) * 0.65 :
+        0.12 + pow(1.0 - abs(dot(view_ray, normal)), 5.0) * 0.65;
+
+    // There is no screen-space reflection on a water ray miss. Mirroring the
+    // frame around its center pulls unrelated upright objects into water.
+    vec3 water_color = refracted;
+    bool reflected = false;
     for (int step_index = 1; step_index <= 16; ++step_index)
     {
         float step_length = 0.7 * float(step_index) * float(step_index);
@@ -47,10 +56,17 @@ void main()
             projected.z <= 0.0 || projected.z >= 1.0) break;
         float blocker = texture(opaque_depth, candidate).r;
         if (blocker < 0.99999 && projected.z > blocker + 0.0008)
-        { reflection_uv = candidate; break; }
+        {
+            water_color = mix(refracted, texture(refraction_scene, candidate).rgb, fresnel);
+            reflected = true;
+            break;
+        }
     }
-    vec3 reflected = texture(refraction_scene, reflection_uv).rgb;
-    vec3 water_color = mix(refracted, reflected, fresnel);
+    if (glass && !reflected)
+    {
+        vec2 mirrored = clamp(vec2(screen.x, 1.0 - screen.y) + ripple * 2.0, 0.001, 0.999);
+        water_color = mix(refracted, texture(refraction_scene, mirrored).rgb, fresnel);
+    }
     if (!glass) water_color = mix(water_color, vec3(0.04, 0.16, 0.20), 0.18 * shore);
     float alpha = glass ? clamp(-water.params.w, 0.08, 0.65) :
         clamp(water.params.w * (0.25 + 0.75 * shore), 0.06, 0.88);

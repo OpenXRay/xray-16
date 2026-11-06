@@ -1351,7 +1351,14 @@ size_t CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags /*= FS_Lis
 
     xr_vector<xr_string> masks;
     _SequenceToList(masks, mask);
-    bool b_mask = !masks.empty();
+#if defined(XR_PLATFORM_ANDROID)
+    const bool game_saves = path_exist("$game_saves$") && 0 == xr_strcmp(N, get_path("$game_saves$")->m_Path);
+    // The Lua load dialog feeds the displayed name back as an exact mask.
+    // Compare it in the same encoding as the entries in the file index.
+    if (game_saves)
+        xray::text::encode_save_file_masks(masks);
+#endif
+    const bool b_mask = !masks.empty();
 
     size_t base_len = xr_strlen(N);
     for (++I; I != m_files.end(); ++I)
@@ -1389,7 +1396,7 @@ size_t CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags /*= FS_Lis
             else
                 file.name = entry_begin;
 #if defined(XR_PLATFORM_ANDROID)
-            if (path_exist("$game_saves$") && 0 == xr_strcmp(N, get_path("$game_saves$")->m_Path))
+            if (game_saves)
                 file.name = xray::text::filename_from_utf8(file.name.c_str()).c_str();
 #endif
             u32 fl = entry.vfs != VFS_STANDARD_FILE ? FS_File::flVFS : 0;

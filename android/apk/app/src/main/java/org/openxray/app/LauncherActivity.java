@@ -70,19 +70,11 @@ public final class LauncherActivity extends Activity {
     public static final String EXTRA_IMMERSIVE = "org.openxray.extra.IMMERSIVE";
     public static final String EXTRA_TOUCH_CONTROLS = "org.openxray.extra.TOUCH_CONTROLS";
     public static final String EXTRA_RENDERER_MODE = "org.openxray.extra.RENDERER_MODE";
-    public static final String EXTRA_GRAPHICS_PRESET = "org.openxray.extra.GRAPHICS_PRESET";
     public static final String EXTRA_ENGINE_LOG = "org.openxray.extra.ENGINE_LOG";
     public static final String EXTRA_ACTIVITY_LOG = "org.openxray.extra.ACTIVITY_LOG";
     public static final String EXTRA_RENDER_WIDTH = "org.openxray.extra.RENDER_WIDTH";
     public static final String EXTRA_RENDER_HEIGHT = "org.openxray.extra.RENDER_HEIGHT";
     public static final String EXTRA_SHOW_FPS = "org.openxray.extra.SHOW_FPS";
-    public static final String EXTRA_DETAIL_DISTANCE = "org.openxray.extra.DETAIL_DISTANCE";
-    public static final String EXTRA_ANISOTROPY = "org.openxray.extra.ANISOTROPY";
-    public static final String EXTRA_SUN_SHADOWS = "org.openxray.extra.SUN_SHADOWS";
-    public static final String EXTRA_TONEMAP = "org.openxray.extra.TONEMAP";
-    public static final String EXTRA_AMBIENT_SCALE = "org.openxray.extra.AMBIENT_SCALE";
-    public static final String EXTRA_HEMI_SCALE = "org.openxray.extra.HEMI_SCALE";
-    public static final String EXTRA_SUN_SCALE = "org.openxray.extra.SUN_SCALE";
 
     private static final String PREFS = "openxray_launcher";
     private static final String PREF_GAME_PATH = "game_path";
@@ -98,31 +90,14 @@ public final class LauncherActivity extends Activity {
     private static final String PREF_TOUCH_CONTROLS = "touch_controls";
     private static final String PREF_ACTIVE_PAGE = "active_page";
     private static final String PREF_RENDERER_MODE = "renderer_mode";
-    private static final String PREF_GRAPHICS_PRESET = "graphics_preset";
     private static final String PREF_RENDER_RESOLUTION = "render_resolution";
     private static final String PREF_SHOW_FPS = "show_fps";
-    private static final String PREF_DETAIL_DISTANCE = "detail_distance";
-    private static final String PREF_ANISOTROPY = "anisotropy";
-    private static final String PREF_SUN_SHADOWS = "sun_shadows";
-    private static final String PREF_TONEMAP = "tonemap";
-    private static final String PREF_AMBIENT_SCALE = "ambient_scale";
-    private static final String PREF_HEMI_SCALE = "hemi_scale";
-    private static final String PREF_SUN_SCALE = "sun_scale";
-    private static final float[] LIGHT_SCALES = {0.5f, 0.75f, 1.f, 1.25f, 1.5f};
-    private static final int[] DETAIL_DISTANCE_VALUES = {-1, 0, 20, 40, 60, 80};
-    private static final int[] ANISOTROPY_VALUES = {-1, 2, 4, 8, 16};
     private static final String PREF_ANDROID_CRASH_REPORTS = "android_crash_reports";
 
     public static final int RENDERER_AUTO = 0;
     public static final int RENDERER_GLES = 1;
     public static final int RENDERER_VULKAN = 2;
 
-    public static final int GRAPHICS_AUTO = 0;
-    public static final int GRAPHICS_MINIMUM = 1;
-    public static final int GRAPHICS_LOW = 2;
-    public static final int GRAPHICS_DEFAULT = 3;
-    public static final int GRAPHICS_HIGH = 4;
-    public static final int GRAPHICS_EXTREME = 5;
 
     private static final int PAGE_GAME = 0;
     private static final int PAGE_SETTINGS = 1;
@@ -139,15 +114,7 @@ public final class LauncherActivity extends Activity {
     private EditText customArgs;
     private Spinner gameVariant;
     private Spinner rendererMode;
-    private Spinner graphicsPreset;
     private Spinner renderResolution;
-    private Spinner detailDistance;
-    private Spinner anisotropy;
-    private CheckBox sunShadows;
-    private CheckBox toneMap;
-    private Spinner ambientScale;
-    private Spinner hemiScale;
-    private Spinner sunScale;
     private CheckBox gamepadEnabled;
     private CheckBox splashEnabled;
     private CheckBox keepScreenOn;
@@ -348,7 +315,6 @@ public final class LauncherActivity extends Activity {
     private View buildGamePage() {
         LinearLayout content = pageContent();
         addSectionTitle(content, "Профиль игры");
-        content.addView(bodyText("Выберите профиль игры."), matchWrap());
 
         gameVariant = new Spinner(this);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
@@ -370,8 +336,6 @@ public final class LauncherActivity extends Activity {
 
         addSectionTitle(content, "Установка игры");
 
-        content.addView(bodyText("Выберите папку установки с fsgame.ltx."), matchWrap());
-
         gamePath = new EditText(this);
         gamePath.setSingleLine(true);
         gamePath.setHint("/storage/emulated/0/STALKER");
@@ -383,7 +347,6 @@ public final class LauncherActivity extends Activity {
 
         LinearLayout pathActions = horizontalRow();
         pathActions.addView(actionButton("Выбрать папку", view -> chooseGameFolder()), weightedButton());
-        pathActions.addView(actionButton("Проверить", view -> refreshGameInspection()), weightedButton());
         content.addView(pathActions, matchWrap());
 
         gameInspection = bodyText("");
@@ -409,9 +372,6 @@ public final class LauncherActivity extends Activity {
         stopParams.setMarginStart(dp(6));
         launchActions.addView(stopButton, stopParams);
         content.addView(launchActions, matchWrap());
-        content.addView(actionButton("Проверка Vulkan", view -> launchVulkanSmoke()),
-                new LinearLayout.LayoutParams(-1, dp(52)));
-
         status = bodyText("Готово к настройке.");
         status.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         status.setPadding(dp(2), dp(10), dp(2), dp(14));
@@ -419,20 +379,9 @@ public final class LauncherActivity extends Activity {
         return scrollPage(content);
     }
 
-    private Spinner settingsSpinner(String[] labels) {
-        Spinner spinner = new Spinner(this);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, labels);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        return spinner;
-    }
-
     private View buildSettingsPage() {
         LinearLayout content = pageContent();
         addSectionTitle(content, OptionCatalog.SETTINGS_SECTIONS[0]);
-        content.addView(bodyText("Выберите рендерер для игры. Проверка Vulkan доступна на экране запуска."),
-                matchWrap());
         rendererMode = new Spinner(this);
         ArrayAdapter<String> rendererAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, OptionCatalog.RENDERER_LABELS);
@@ -440,38 +389,7 @@ public final class LauncherActivity extends Activity {
         rendererMode.setAdapter(rendererAdapter);
         content.addView(rendererMode, matchWrap());
 
-        addSectionTitle(content, OptionCatalog.SETTINGS_SECTIONS[1]);
-        content.addView(bodyText("Автоматический профиль: Low."),
-                matchWrap());
-        graphicsPreset = new Spinner(this);
-        ArrayAdapter<String> graphicsAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, OptionCatalog.GRAPHICS_LABELS);
-        graphicsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        graphicsPreset.setAdapter(graphicsAdapter);
-        content.addView(graphicsPreset, matchWrap());
-
-        addSectionTitle(content, "Настройки Vulkan");
-        detailDistance = settingsSpinner(new String[]{"Трава: по пресету", "Трава: выключена", "Трава: 20 м",
-                "Трава: 40 м", "Трава: 60 м", "Трава: 80 м"});
-        anisotropy = settingsSpinner(new String[]{"Анизотропия: по пресету", "Анизотропия: 2×", "Анизотропия: 4×",
-                "Анизотропия: 8×", "Анизотропия: 16×"});
-        sunShadows = makeCheckBox("Солнечные динамические тени",
-                "В дождливую погоду солнце может иметь нулевую яркость.");
-        toneMap = makeCheckBox("Автоматическая экспозиция Vulkan",
-                "Оценивает яркость кадра перед выводом.");
-        content.addView(sunShadows, matchWrap());
-        content.addView(toneMap, matchWrap());
-        content.addView(detailDistance, matchWrap());
-        content.addView(anisotropy, matchWrap());
-        ambientScale = lightScaleSpinner("Фоновый свет");
-        hemiScale = lightScaleSpinner("Свет неба");
-        sunScale = lightScaleSpinner("Солнечный свет");
-        content.addView(ambientScale, matchWrap());
-        content.addView(hemiScale, matchWrap());
-        content.addView(sunScale, matchWrap());
-
         addSectionTitle(content, OptionCatalog.SETTINGS_SECTIONS[2]);
-        content.addView(bodyText("Снижение разрешения ускоряет рендеринг, но уменьшает чёткость."), matchWrap());
         buildRenderResolutionList();
         renderResolution = new Spinner(this);
         ArrayAdapter<RenderResolution> resolutionAdapter = new ArrayAdapter<>(this,
@@ -504,7 +422,6 @@ public final class LauncherActivity extends Activity {
         content.addView(androidCrashReports, matchWrap());
 
         addSectionTitle(content, OptionCatalog.SETTINGS_SECTIONS[4]);
-        content.addView(bodyText("Необязательные параметры движка."), matchWrap());
         customArgs = new EditText(this);
         customArgs.setHint("Например: -novtf");
         customArgs.setMinLines(2);
@@ -512,7 +429,6 @@ public final class LauncherActivity extends Activity {
         content.addView(customArgs, matchWrap());
 
         content.addView(actionButton("Сохранить параметры", view -> {
-            savePreferences();
             setStatus("Параметры сохранены.");
             showPage(PAGE_GAME);
         }), new LinearLayout.LayoutParams(-1, dp(52)));
@@ -667,7 +583,6 @@ public final class LauncherActivity extends Activity {
 
         TextView help = bodyText(
                 "Логи движка, Activity и отчёты Android сохраняются в _appdata_/logs игры. "
-                        + "Подробная трассировка Vulkan и отчёты Android включаются в параметрах. "
                         + "Отчёт о вылете сохраняется после возврата в лаунчер.");
         help.setPadding(0, dp(8), 0, dp(8));
         content.addView(help, matchWrap());
@@ -749,24 +664,10 @@ public final class LauncherActivity extends Activity {
         keepScreenOn.setChecked(preferences.getBoolean(PREF_KEEP_SCREEN_ON, true));
         immersiveMode.setChecked(preferences.getBoolean(PREF_IMMERSIVE, true));
         rendererMode.setSelection(clampRendererMode(preferences.getInt(PREF_RENDERER_MODE, RENDERER_AUTO)));
-        graphicsPreset.setSelection(clampGraphicsPreset(
-                preferences.getInt(PREF_GRAPHICS_PRESET, GRAPHICS_AUTO)));
         selectStoredResolution(preferences.getString(PREF_RENDER_RESOLUTION, "auto"));
         showFps.setChecked(preferences.getBoolean(PREF_SHOW_FPS, true));
-        detailDistance.setSelection(Math.max(0, Math.min(5, preferences.getInt(PREF_DETAIL_DISTANCE, 0))));
-        anisotropy.setSelection(Math.max(0, Math.min(4, preferences.getInt(PREF_ANISOTROPY, 0))));
-        sunShadows.setChecked(preferences.getBoolean(PREF_SUN_SHADOWS, true));
-        toneMap.setChecked(preferences.getBoolean(PREF_TONEMAP, true));
-        ambientScale.setSelection(Math.max(0, Math.min(4, preferences.getInt(PREF_AMBIENT_SCALE, 2))));
-        hemiScale.setSelection(Math.max(0, Math.min(4, preferences.getInt(PREF_HEMI_SCALE, 2))));
-        sunScale.setSelection(Math.max(0, Math.min(4, preferences.getInt(PREF_SUN_SCALE, 2))));
         androidCrashReports.setChecked(preferences.getBoolean(PREF_ANDROID_CRASH_REPORTS, true));
         showPage(preferences.getInt(PREF_ACTIVE_PAGE, PAGE_GAME));
-    }
-
-    private Spinner lightScaleSpinner(String name) {
-        return settingsSpinner(new String[]{name + ": 50%", name + ": 75%",
-                name + ": 100%", name + ": 125%", name + ": 150%"});
     }
 
     private void savePreferences() {
@@ -784,16 +685,8 @@ public final class LauncherActivity extends Activity {
                 .putBoolean(PREF_KEEP_SCREEN_ON, keepScreenOn.isChecked())
                 .putBoolean(PREF_IMMERSIVE, immersiveMode.isChecked())
                 .putInt(PREF_RENDERER_MODE, rendererMode.getSelectedItemPosition())
-                .putInt(PREF_GRAPHICS_PRESET, graphicsPreset.getSelectedItemPosition())
                 .putString(PREF_RENDER_RESOLUTION, selectedRenderResolution().id)
                 .putBoolean(PREF_SHOW_FPS, showFps.isChecked())
-                .putInt(PREF_DETAIL_DISTANCE, detailDistance.getSelectedItemPosition())
-                .putInt(PREF_ANISOTROPY, anisotropy.getSelectedItemPosition())
-                .putBoolean(PREF_SUN_SHADOWS, sunShadows.isChecked())
-                .putBoolean(PREF_TONEMAP, toneMap.isChecked())
-                .putInt(PREF_AMBIENT_SCALE, ambientScale.getSelectedItemPosition())
-                .putInt(PREF_HEMI_SCALE, hemiScale.getSelectedItemPosition())
-                .putInt(PREF_SUN_SCALE, sunScale.getSelectedItemPosition())
                 .putBoolean(PREF_ANDROID_CRASH_REPORTS, androidCrashReports.isChecked())
                 .putInt(PREF_ACTIVE_PAGE, activePage)
                 .apply();
@@ -805,10 +698,6 @@ public final class LauncherActivity extends Activity {
 
     private int clampRendererMode(int value) {
         return value >= 0 && value < OptionCatalog.RENDERER_LABELS.length ? value : RENDERER_AUTO;
-    }
-
-    private int clampGraphicsPreset(int value) {
-        return value >= 0 && value < OptionCatalog.GRAPHICS_LABELS.length ? value : GRAPHICS_AUTO;
     }
 
     private void buildRenderResolutionList() {
@@ -911,7 +800,10 @@ public final class LauncherActivity extends Activity {
     private void showPage(int requestedPage) {
         int page = requestedPage >= PAGE_GAME && requestedPage <= PAGE_DIAGNOSTICS
                 ? requestedPage : PAGE_GAME;
+        boolean leavingSettings = activePage == PAGE_SETTINGS && page != PAGE_SETTINGS;
         activePage = page;
+        if (leavingSettings)
+            savePreferences();
         if (pages == null)
             return;
         for (int index = 0; index < pages.length; ++index) {
@@ -1079,8 +971,6 @@ public final class LauncherActivity extends Activity {
         writeLauncherLog("[launcher] environment renderer="
                 + OptionCatalog.value(OptionCatalog.RENDERER_LABELS,
                         clampRendererMode(rendererMode.getSelectedItemPosition()), 0)
-                + " quality=" + OptionCatalog.value(OptionCatalog.GRAPHICS_LABELS,
-                        clampGraphicsPreset(graphicsPreset.getSelectedItemPosition()), 0)
                 + " resolution=" + diagnosticsResolution.width + "x" + diagnosticsResolution.height
                 + " android=" + android.os.Build.VERSION.RELEASE
                 + " sdk=" + android.os.Build.VERSION.SDK_INT
@@ -1100,10 +990,7 @@ public final class LauncherActivity extends Activity {
         } else {
             launchStatus = "Запускаю OpenXRay: "
                     + OptionCatalog.value(OptionCatalog.RENDERER_LABELS,
-                            clampRendererMode(rendererMode.getSelectedItemPosition()), 0)
-                    + ", качество: "
-                    + OptionCatalog.value(OptionCatalog.GRAPHICS_LABELS,
-                            clampGraphicsPreset(graphicsPreset.getSelectedItemPosition()), 0);
+                            clampRendererMode(rendererMode.getSelectedItemPosition()), 0);
         }
         setStatus(launchStatus);
         Toast.makeText(this, "OpenXRay: запуск движка…", Toast.LENGTH_SHORT).show();
@@ -1126,19 +1013,10 @@ public final class LauncherActivity extends Activity {
         intent.putExtra(EXTRA_IMMERSIVE, immersiveMode.isChecked());
         intent.putExtra(EXTRA_RENDERER_MODE,
                 clampRendererMode(rendererMode.getSelectedItemPosition()));
-        intent.putExtra(EXTRA_GRAPHICS_PRESET,
-                clampGraphicsPreset(graphicsPreset.getSelectedItemPosition()));
         RenderResolution resolution = selectedRenderResolution();
         intent.putExtra(EXTRA_RENDER_WIDTH, resolution.width);
         intent.putExtra(EXTRA_RENDER_HEIGHT, resolution.height);
         intent.putExtra(EXTRA_SHOW_FPS, showFps.isChecked());
-        intent.putExtra(EXTRA_DETAIL_DISTANCE, DETAIL_DISTANCE_VALUES[detailDistance.getSelectedItemPosition()]);
-        intent.putExtra(EXTRA_ANISOTROPY, ANISOTROPY_VALUES[anisotropy.getSelectedItemPosition()]);
-        intent.putExtra(EXTRA_SUN_SHADOWS, sunShadows.isChecked());
-        intent.putExtra(EXTRA_TONEMAP, toneMap.isChecked());
-        intent.putExtra(EXTRA_AMBIENT_SCALE, LIGHT_SCALES[ambientScale.getSelectedItemPosition()]);
-        intent.putExtra(EXTRA_HEMI_SCALE, LIGHT_SCALES[hemiScale.getSelectedItemPosition()]);
-        intent.putExtra(EXTRA_SUN_SCALE, LIGHT_SCALES[sunScale.getSelectedItemPosition()]);
         if (!vulkanSmoke) {
             intent.putExtra(EXTRA_GAME_PATH, gamePath.getText().toString().trim());
             intent.putExtra(EXTRA_GAME_VARIANT, activeGameVariant);
@@ -1471,34 +1349,13 @@ public final class LauncherActivity extends Activity {
             return;
         }
 
-        boolean fsgame = new File(root, "fsgame.ltx").isFile();
-        boolean gamedata = new File(root, "gamedata").isDirectory();
-        boolean resources = new File(root, "resources").isDirectory();
         File appData = new File(root, "_appdata_");
-        boolean appDataWritable = appData.isDirectory() ? appData.canWrite() : root.canWrite();
-        boolean socExecutable = new File(root, "bin/XR_3DA.exe").isFile()
-                || new File(root, "bin/xr_3da.exe").isFile();
-        boolean laterExecutable = new File(root, "bin/xrEngine.exe").isFile()
-                || new File(root, "bin/xrengine.exe").isFile();
-        String hint = socExecutable ? "похоже на Shadow of Chernobyl"
-                : laterExecutable ? "обнаружена установка CS/CoP"
-                : "точная игра будет определена выбранным профилем";
-        String mismatch = socExecutable && activeGameVariant > 1
-                ? " · профиль не совпадает с найденным XR_3DA.exe"
-                : laterExecutable && activeGameVariant == 1
-                ? " · профиль SoC не совпадает с найденным xrEngine.exe" : "";
-        gameInspection.setText("Профиль: " + profileName(activeGameVariant)
-                + " · папка читается · fsgame.ltx: " + yesNo(fsgame)
-                + " · gamedata: " + yesNo(gamedata)
-                + " · resources: " + yesNo(resources)
-                + " · _appdata_ доступна для записи: " + yesNo(appDataWritable) + "\n" + hint
-                + mismatch + ". Проверка информационная и не изменяет файлы.");
-        gameInspection.setTextColor(fsgame && appDataWritable && mismatch.isEmpty()
-                ? Color.rgb(25, 115, 55) : Color.rgb(150, 95, 25));
-    }
-
-    private String yesNo(boolean value) {
-        return value ? "есть" : "нет";
+        if (!(appData.isDirectory() ? appData.canWrite() : root.canWrite())) {
+            gameInspection.setText("Папка сохранений недоступна для записи.");
+            gameInspection.setTextColor(Color.rgb(190, 70, 35));
+        } else {
+            gameInspection.setText("");
+        }
     }
 
     private void refreshRunningState() {

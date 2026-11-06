@@ -66,7 +66,8 @@ void VulkanGameDevice::render_lights(const float (&mvp)[16], bool render_world, 
         Fmatrix camera, inverse;
         std::memcpy(&camera, mvp, sizeof(camera));
         inverse.invert_44(camera);
-        uint32_t shadow_slot = 0, point_slots = 0, spot_slots = 0;
+        LocalShadowBudget shadows{LocalShadowSlots, unsigned(std::max(point_shadow_budget, 0)),
+                                  unsigned(std::max(spot_shadow_budget, 0))};
         light_candidates_.clear();
         const VkExtent2D extent = window_.frame().extent();
         for (const auto &snapshot : light_snapshots_)
@@ -77,20 +78,20 @@ void VulkanGameDevice::render_lights(const float (&mvp)[16], bool render_world, 
                 !std::all_of(snapshot.position.begin(), snapshot.position.end(),
                              [](float value) { return std::isfinite(value); }))
                 continue;
-            const VkRect2D scissor = light_scissor(camera, snapshot, extent);
-            if (!scissor.extent.width || !scissor.extent.height)
-                continue;
             const float dx = snapshot.position[0] - Device.vCameraPosition.x;
             const float dy = snapshot.position[1] - Device.vCameraPosition.y;
             const float dz = snapshot.position[2] - Device.vCameraPosition.z;
-            light_candidates_.push_back({&snapshot, dx * dx + dy * dy + dz * dz, scissor});
+            light_candidates_.push_back({&snapshot, dx * dx + dy * dy + dz * dz});
         }
-        std::stable_sort(light_candidates_.begin(), light_candidates_.end(),
-                         [](const LightCandidate &a, const LightCandidate &b) { return a.distance < b.distance; });
+        std::sort(light_candidates_.begin(), light_candidates_.end(), [](const LightCandidate &a, const LightCandidate &b) {
+            return a.distance == b.distance ? a.light->id < b.light->id : a.distance < b.distance;
+        });
         for (const auto &candidate : light_candidates_)
         {
             const auto &light_snapshot = *candidate.light;
-            const VkRect2D scissor = candidate.scissor;
+            const bool spot = light_snapshot.type == VulkanLightType::Spot;
+            const int slot = shadows.reserve(light_snapshot.shadow, spot, candidate.distance, light_snapshot.range);
+            const VkRect2D scissor = light_scissor(camera, light_snapshot, extent);
             if (!scissor.extent.width || !scissor.extent.height)
                 continue;
             LocalLightUniform local{};
@@ -107,17 +108,11 @@ void VulkanGameDevice::render_lights(const float (&mvp)[16], bool render_world, 
                 local.color_type[axis] =
                     std::isfinite(light_snapshot.color[axis]) ? std::max(0.f, light_snapshot.color[axis]) : 0.f;
             }
-            const bool spot = light_snapshot.type == VulkanLightType::Spot;
             local.color_type[3] = spot ? 1.f : 0.f;
             const float cone = std::clamp(light_snapshot.cone, .15f, 3.f);
             local.direction_cone[3] = std::cos(cone * .5f);
-            const uint64_t pixels = uint64_t(scissor.extent.width) * scissor.extent.height;
-            const uint64_t screen_pixels = uint64_t(extent.width) * extent.height;
-            const bool cast = light_snapshot.shadow && shadow_slot < LocalShadowSlots &&
-                              (spot ? spot_slots < uint32_t(std::max(spot_shadow_budget, 0))
-                                    : point_slots < uint32_t(std::max(point_shadow_budget, 0))) &&
-                              pixels * 20 >= screen_pixels;
-            local.shadow_params[0] = float(shadow_slot * LocalShadowFaces);
+            const bool cast = slot >= 0;
+            local.shadow_params[0] = cast ? float(slot * LocalShadowFaces) : 0.f;
             local.shadow_params[1] = LocalShadowReceiverOffset;
             local.shadow_params[2] = cast ? 1.f : 0.f;
             const bool cookie = spot && !light_snapshot.texture.empty();
@@ -150,11 +145,6 @@ void VulkanGameDevice::render_lights(const float (&mvp)[16], bool render_world, 
                     vp.mul(projection, view);
                     std::memcpy(local.shadow_matrices[face], &vp, sizeof(vp));
                 }
-                ++shadow_slot;
-                if (spot)
-                    ++spot_slots;
-                else
-                    ++point_slots;
             }
             local_uniforms_.push_back(local);
             local_scissors_.push_back(scissor);

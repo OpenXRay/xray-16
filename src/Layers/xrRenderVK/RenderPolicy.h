@@ -20,6 +20,24 @@ inline const RenderQuality &render_quality(unsigned preset)
 {
     return RenderQualities[std::min<unsigned>(preset, RenderQualities.size() - 1)];
 }
+// Assign slots before viewport clipping. An offscreen lamp keeps its place
+// in the budget without recording a shadow pass for that frame.
+struct LocalShadowBudget
+{
+    unsigned total_limit, point_limit, spot_limit;
+    unsigned used{}, points{}, spots{};
+
+    int reserve(bool casts_shadow, bool spot, float distance_squared, float range)
+    {
+        auto& type_count = spot ? spots : points;
+        if (!casts_shadow || used >= total_limit || type_count >= (spot ? spot_limit : point_limit) ||
+            distance_squared > 25.f * range * range)
+            return -1;
+        ++type_count;
+        return static_cast<int>(used++);
+    }
+};
+
 inline float glow_facing(const std::array<float, 3> &position, const std::array<float, 3> &direction,
                          const std::array<float, 3> &eye, float radius)
 {

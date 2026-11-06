@@ -145,6 +145,20 @@ int main()
     assert(quality_preset == 4 && detail_radius == 20);
     apply_vulkan_launch_settings("-vk-hemi-scale nan -vk-detail-distance invalid");
     assert(hemisphere_scale == 1 && detail_radius == 20);
+    assert(texture_anisotropy == 16);
+    apply_vulkan_launch_settings("-vk-anisotropy 3");
+    assert(texture_anisotropy == 3);
+    // Commands loaded from user.ltx can override the preset independently.
+    detail_radius = 37;
+    apply_vulkan_launch_settings("-cop -renderer-vulkan -android-render-width 640");
+    assert(quality_preset == 4 && detail_radius == 37 && texture_anisotropy == 3);
+
+    LocalShadowBudget slots{2, 1, 1};
+    assert(slots.reserve(true, false, 400.f, 2.f) == -1); // distant point
+    assert(slots.reserve(true, true, 4.f, 5.f) == 0);
+    assert(slots.reserve(true, true, 9.f, 5.f) == -1);
+    assert(slots.reserve(true, false, 9.f, 5.f) == 1);
+    assert(slots.reserve(true, false, 16.f, 5.f) == -1);
     ShaderPairCache<int> pair_cache;
     int first = 11, replacement = 22;
     assert(!pair_cache.find("model.vs", "flat.ps"));

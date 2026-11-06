@@ -1,4 +1,5 @@
 #include "src/xrCore/Text/LegacyFilename.h"
+#include <array>
 #include <cassert>
 #include <filesystem>
 #include <fstream>
@@ -20,6 +21,16 @@ int main()
     auto file = dir / filename_to_utf8(cp);
     { std::ofstream out(file); out << "save"; }
     std::string listed = filename_from_utf8(file.filename().string());
+    // ui_load_dialog uses a wildcard for the list and an exact filename
+    // mask after selection. Both must match the UTF-8 filesystem index.
+    assert(file.filename().string() != listed);
+    const std::string guillemets = u8"u0_a694 - прибытие на «скадовск».scop";
+    std::array masks{listed, filename_from_utf8(guillemets), std::string("*.scop"), std::string("quicksave.sav")};
+    encode_save_file_masks(masks);
+    assert(masks[0] == file.filename().string());
+    assert(masks[1] == guillemets);
+    assert(masks[2] == "*.scop");
+    assert(masks[3] == "quicksave.sav");
     std::ifstream in(dir / filename_to_utf8(listed));
     std::string contents;
     in >> contents;

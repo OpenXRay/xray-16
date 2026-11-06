@@ -226,7 +226,6 @@ class VulkanGameDevice
     {
         const VulkanLightSnapshot *light;
         float distance;
-        VkRect2D scissor;
     };
     std::vector<LightCandidate> light_candidates_;
     ResourceRetirement retired_{FrameContext::FramesInFlight};
@@ -254,7 +253,6 @@ class VulkanGameDevice
     std::string active_map_names_[2];
     VkImageView color_map_views_[2]{};
     bool ui_recorded_{true};
-    bool launch_settings_applied_{};
     std::string ui_error_;
     LightGrid light_grid_;
     PipelineCache pipeline_cache_;

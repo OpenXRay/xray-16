@@ -199,7 +199,7 @@
             <text r="170" g="170" b="170" font="letterica16" align="r" vert_align="c">ui_mm_anisotropic</text>
         </cap_aniso>
         <track_aniso x="144" y="6" width="188" height="16" step="1" is_integer="1">
-            <options_item entry="r__tf_aniso" group="mm_opt_video_adv"/>
+            <options_item entry="r__tf_aniso" group="mm_opt_video_adv" depend="restart"/>
         </track_aniso>
 
         <cap_ssample x="16" y="3" width="108" height="24">

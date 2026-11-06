@@ -12,13 +12,20 @@ namespace xray::render::vulkan
 {
 // Values exposed through the game's renderer console. The Vulkan renderer
 // reads these every frame, so the UI and saved user config share one state.
-inline uint32_t quality_preset = 2;
-inline int detail_radius = 40;
-inline int detail_update_cells = 16;
+#if defined(XR_PLATFORM_ANDROID)
+inline constexpr unsigned DefaultVulkanQuality = 1;
+#else
+inline constexpr unsigned DefaultVulkanQuality = 2;
+#endif
+inline constexpr int PresetAnisotropy[]{2, 4, 8, 16, 16};
+inline uint32_t quality_preset = DefaultVulkanQuality;
+inline int detail_radius = RenderQualities[DefaultVulkanQuality].detail_distance;
+inline int detail_update_cells = RenderQualities[DefaultVulkanQuality].detail_updates;
+inline int texture_anisotropy = PresetAnisotropy[DefaultVulkanQuality];
 inline float detail_prepare_ms = 2.f;
 inline int use_light_grid = 1;
-inline int point_shadow_budget = 1;
-inline int spot_shadow_budget = 1;
+inline int point_shadow_budget = RenderQualities[DefaultVulkanQuality].point_shadows;
+inline int spot_shadow_budget = RenderQualities[DefaultVulkanQuality].spot_shadows;
 inline int ros_ray_budget = 128;
 inline float hemi_sky_scale = .08f;
 inline float hemi_light_scale = .2f, hemi_light_flow = .1f, hemi_smooth = 1.f;
@@ -30,8 +37,19 @@ inline int tonemap_enabled = 1;
 inline float tonemap_middlegray = 1.f;
 inline float tonemap_amount = .7f;
 
-// Apply explicit launcher choices after user.ltx has loaded. Do this once per
-// device: later in-game console changes remain effective for the session.
+inline void set_vulkan_quality(unsigned preset)
+{
+    quality_preset = preset;
+    const auto& quality = render_quality(preset);
+    detail_radius = quality.detail_distance;
+    detail_update_cells = quality.detail_updates;
+    point_shadow_budget = quality.point_shadows;
+    spot_shadow_budget = quality.spot_shadows;
+    texture_anisotropy = PresetAnisotropy[preset];
+}
+
+// Interpret explicit command-line overrides as defaults. The saved user
+// config and subsequent changes in the game own these settings.
 inline void apply_vulkan_launch_settings(const char *parameters)
 {
     if (!parameters)
@@ -46,21 +64,21 @@ inline void apply_vulkan_launch_settings(const char *parameters)
             for (uint32_t i = 0; i < 5; ++i)
                 if (value == names[i])
                 {
-                    quality_preset = i;
-                    const auto &quality = render_quality(i);
-                    detail_radius = quality.detail_distance;
-                    detail_update_cells = quality.detail_updates;
-                    point_shadow_budget = quality.point_shadows;
-                    spot_shadow_budget = quality.spot_shadows;
+                    set_vulkan_quality(i);
                     break;
                 }
         }
-        else if (token == "-vk-detail-distance" && input >> value)
+        else if ((token == "-vk-detail-distance" || token == "-vk-anisotropy") && input >> value)
         {
             char *end = nullptr;
             const long distance = std::strtol(value.c_str(), &end, 10);
             if (end != value.c_str() && !*end)
-                detail_radius = int(std::clamp(distance, 0L, 80L));
+            {
+                if (token == "-vk-detail-distance")
+                    detail_radius = int(std::clamp(distance, 0L, 80L));
+                else
+                    texture_anisotropy = int(std::clamp(distance, 1L, 16L));
+            }
         }
         else if (token == "-vk-ambient-scale" || token == "-vk-hemi-scale" || token == "-vk-sun-scale")
         {

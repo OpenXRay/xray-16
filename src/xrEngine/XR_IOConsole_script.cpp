@@ -45,6 +45,14 @@ void CConsole::script_register(lua_State* luaState)
                 Engine.Event.Defer("KERNEL:console", size_t(xr_strdup(string_to_execute)));
             }),
 
+        def("android_launcher_controls_display", +[]()
+        {
+#if defined(XR_PLATFORM_ANDROID)
+            return strstr(Core.Params, "-android-render-width ") != nullptr;
+#else
+            return false;
+#endif
+        }),
         def("renderer_allow_override", +[]()
         {
             return renderer_allow_override;

@@ -100,7 +100,7 @@ CUIListBoxItem* CUIComboBox::AddItem_(LPCSTR str, int _data)
 {
     R_ASSERT2(m_bInited, "Can't add item to ComboBox before Initialization");
     CUIListBoxItem* itm = m_list_box.AddTextItem(str);
-    itm->SetData((void*)(__int64)_data);
+    itm->SetTAG(_data);
     return itm;
 }
 
@@ -109,9 +109,12 @@ void CUIComboBox::OnListItemSelect()
     m_text.SetText(m_list_box.GetSelectedText());
     CUIListBoxItem* itm = m_list_box.GetSelectedItem();
 
+    if (!itm)
+        return;
+
     const int bk_itoken_id = m_itoken_id;
 
-    m_itoken_id = (int)(__int64)itm->GetData();
+    m_itoken_id = static_cast<int>(itm->GetTAG());
     ShowList(false);
 
     if (bk_itoken_id != m_itoken_id)
@@ -143,32 +146,26 @@ void CUIComboBox::enable_id(int id)
 void CUIComboBox::SetCurrentOptValue()
 {
     m_list_box.Clear();
-    const xr_token* tok = GetOptToken();
+    const xr_token* tokens = GetOptToken();
 
-    if (!tok)
+    if (!tokens || !tokens->name)
     {
-        Msg("! UI option '%s': console token is unavailable for this renderer", m_entry.c_str());
+        m_itoken_id = -1;
         m_text.SetText("");
         return;
     }
 
-	while (tok->name)
+    const pcstr current = GetOptTokenValue();
+    m_itoken_id = current ? get_token_id(tokens, current) : -1;
+    for (const auto* token = tokens; token->name; ++token)
     {
-        if (m_disabled.end() == std::find(m_disabled.begin(), m_disabled.end(), tok->id))
-        {
-            AddItem_(tok->name, tok->id);
-        }
-        tok++;
+        if (m_disabled.end() == std::find(m_disabled.begin(), m_disabled.end(), token->id))
+            AddItem_(token->name, token->id);
     }
-
-    cpcstr cur_val = StringTable().translate(GetOptTokenValue()).c_str();
-    m_text.SetText(cur_val);
-    m_list_box.SetSelectedText(cur_val);
-
-    if (CUIListBoxItem* itm = m_list_box.GetSelectedItem())
-        m_itoken_id = (int)(__int64)itm->GetData();
-    else
-        m_itoken_id = 1; // first
+    const int index = m_list_box.GetIdxByTAG(m_itoken_id);
+    if (index >= 0)
+        m_list_box.SetSelectedIDX(index);
+    m_text.SetText(current ? StringTable().translate(current).c_str() : "");
 }
 
 void CUIComboBox::SaveBackUpOptValue()
@@ -208,9 +205,11 @@ LPCSTR CUIComboBox::GetTextOf(int index)
 
 void CUIComboBox::SetItemIDX(int idx)
 {
+    if (idx < 0 || static_cast<u32>(idx) >= m_list_box.GetSize())
+        return;
     m_list_box.SetSelectedIDX(idx);
     CUIListBoxItem* itm = m_list_box.GetSelectedItem();
-    m_itoken_id = (int)(__int64)itm->GetData();
+    m_itoken_id = static_cast<int>(itm->GetTAG());
 
     m_text.SetText(m_list_box.GetSelectedText());
 
@@ -254,6 +253,8 @@ bool CUIComboBox::SetNextItemSelected(bool next, bool loop)
 void CUIComboBox::OnBtnClicked() { ShowList(!m_list_frame.IsShown()); }
 void CUIComboBox::ShowList(bool bShow)
 {
+    if (bShow && m_list_box.GetSize() == 0)
+        return;
     if (bShow)
     {
         SetHeight(m_text.GetHeight() + m_list_box.GetHeight());

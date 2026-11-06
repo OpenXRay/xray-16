@@ -24,11 +24,12 @@ function opt_video:InitControls(x, y, xml, handler)
 	xml:InitStatic					("tab_video:cap_gamma",				self)
 	xml:InitTrackBar				("tab_video:track_gamma",			self)
 
-	xml:InitStatic					("tab_video:cap_window_mode",		self)
-	xml:InitComboBox				("tab_video:list_window_mode",		self)
-
-	xml:InitStatic					("tab_video:cap_resolution",		self)
-	xml:InitComboBox				("tab_video:list_resolution",		self)
+	if not (android_launcher_controls_display and android_launcher_controls_display()) then
+		xml:InitStatic("tab_video:cap_window_mode", self)
+		xml:InitComboBox("tab_video:list_window_mode", self)
+		xml:InitStatic("tab_video:cap_resolution", self)
+		xml:InitComboBox("tab_video:list_resolution", self)
+	end
 
 	xml:InitStatic					("tab_video:cap_preset",			self)
 	handler.combo_preset			= xml:InitComboBox("tab_video:list_presets",	self)

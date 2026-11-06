@@ -73,6 +73,13 @@ inline std::string filename_to_utf8(const std::string& value)
     return result;
 }
 
+template <class Masks>
+void encode_save_file_masks(Masks& masks)
+{
+    for (auto& mask : masks)
+        mask = filename_to_utf8(mask.c_str()).c_str();
+}
+
 inline std::string filename_from_utf8(const std::string& value)
 {
     std::string result;

@@ -243,15 +243,7 @@ bool VulkanGameDevice::initialize(SDL_Window *window, VkExtent2D extent, std::st
                                  scene_dispatch, error, true) ||
             !textures_.initialize(device, window_.queue(), frame.command_pool(), physical.memory, physical.features.textureCompressionBC,
                 physical.features, physical.properties,
-                strstr(Core.Params, "-vk-anisotropy ") ? [&]() {
-                    unsigned value = 4;
-                    sscanf(strstr(Core.Params, "-vk-anisotropy ") +
-                        sizeof("-vk-anisotropy ") - 1, "%u", &value);
-                    return float(std::clamp(value, 1u, 16u));
-                }() : strstr(Core.Params, "-android-mobile-preset Minimum") ? 2.f :
-                strstr(Core.Params, "-android-mobile-preset Low") ? 4.f :
-                strstr(Core.Params, "-android-mobile-preset Extreme") ||
-                strstr(Core.Params, "-android-mobile-preset High") ? 16.f : 8.f,
+                float(texture_anisotropy),
                 texture_dispatch_,
                                   create_sampler, destroy_sampler, frame_dispatch_.device_wait_idle, error) ||
             !create_postprocess(error))
@@ -530,13 +522,6 @@ void VulkanGameDevice::queue_level_visual(uint32_t index, const float (&mvp)[16]
 
 void VulkanGameDevice::begin_frame()
 {
-    if (!launch_settings_applied_)
-    {
-        apply_vulkan_launch_settings(Core.Params);
-        launch_settings_applied_ = true;
-        Msg("[renderer-vulkan] launcher.settings preset=%u detail=%d ambient=%.3f hemi=%.3f sun=%.3f", quality_preset,
-            detail_radius, ambient_scale, hemisphere_scale, sun_scale);
-    }
     discard_scene_draws();
     light_snapshots_.clear();
     ui_.reset_frame();
@@ -1023,7 +1008,6 @@ void VulkanGameDevice::save_pipeline_cache()
 
 void VulkanGameDevice::destroy()
 {
-    launch_settings_applied_ = false;
     Msg("[renderer-vulkan] teardown game device begin");
     if (window_.device())
         R_ASSERT2(wait_idle(), "Vulkan shutdown requires completed frames");

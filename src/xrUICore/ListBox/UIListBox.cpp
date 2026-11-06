@@ -206,23 +206,17 @@ void CUIListBox::SetSelectedTAG(u32 tag_val) { SetSelected(GetItemByTAG(tag_val)
 void CUIListBox::SetSelectedText(LPCSTR txt) { SetSelected(GetItemByText(txt)); }
 int CUIListBox::GetIdxByTAG(u32 tag_val)
 {
-    int result = -1;
-
-    for (auto it = m_pad->GetChildWndList().begin(); m_pad->GetChildWndList().end() != it; ++it)
+    int index = 0;
+    for (auto* child : m_pad->GetChildWndList())
     {
-        CUIListBoxItem* item = smart_cast<CUIListBoxItem*>(*it);
-        if (item)
+        if (auto* item = smart_cast<CUIListBoxItem*>(child))
         {
-            if (result == -1)
-                result = 0;
-            else
-                ++result;
-
             if (item->GetTAG() == tag_val)
-                break;
+                return index;
+            ++index;
         }
     }
-    return result;
+    return -1;
 }
 
 CUIListBoxItem* CUIListBox::GetItemByTAG(u32 tag_val)

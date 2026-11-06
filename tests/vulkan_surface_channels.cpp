@@ -8,6 +8,8 @@
 #include "../src/Layers/xrRenderVK/GeometryDepth.h"
 #include "../src/Layers/xrRenderVK/SceneShaders.h"
 #include "../src/Layers/xrRenderVK/WeatherShaders.h"
+#include "../src/Layers/xrRenderVK/WaterShaders.h"
+#include "../src/Layers/xrRenderVK/RenderPolicy.h"
 #include "../src/Layers/xrRenderVK/DeferredShaders.h"
 #include "../src/Layers/xrRenderVK/LocalLightShaders.h"
 #include "../src/Layers/xrRenderVK/LocalShadowTargets.h"
@@ -823,6 +825,8 @@ int main(int argc, char **argv)
         VkPipelineLayout composite_pipeline_layout{};
         check(vkCreatePipelineLayout(device, &composite_pipeline_info, nullptr, &composite_pipeline_layout));
         const auto composite_ps = embedded(distortion_shaders::Composite, sizeof(distortion_shaders::Composite));
+        const auto water_ps = embedded(water_shaders::Fragment, sizeof(water_shaders::Fragment));
+        const auto water_vs = embedded(deferred_shaders::GBufferVertex, sizeof(deferred_shaders::GBufferVertex));
         bool cube_initialized = false;
         bool material_mips_initialized = false;
         auto execute = [&](VkShaderModule fragment, const Push &push, bool use_cube = false,
@@ -854,7 +858,7 @@ int main(int argc, char **argv)
             scissor.extent.width = wide ? 128 : sprite ? 2 : 1;
             viewport.height = scene_test ? 96.f : sprite ? 2.f : 1.f;
             scissor.extent.height = scene_test ? 96 : sprite ? 2 : 1;
-            pipeline_info.layout = fragment == composite_ps ? composite_pipeline_layout
+            pipeline_info.layout = (fragment == composite_ps || fragment == water_ps) ? composite_pipeline_layout
                                    : forward   ? forward_pipeline_layout
                                    : local   ? local_pipeline_layout
                                    : weather ? weather_pipeline_layout
@@ -972,7 +976,7 @@ int main(int argc, char **argv)
             const VkDescriptorSet draw_sets[]{weather ? weather_set : set, local     ? local_set
                                                                            : weather ? weather_environment_set
                                                                            : skinned ? pose_set
-                                                                           : fragment == composite_ps ? composite_set
+                                                                           : (fragment == composite_ps || fragment == water_ps) ? composite_set
                                                                                      : scene_set};
             const VkDescriptorSet forward_sets[]{set, forward_set, weather_environment_set};
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_info.layout, 0, forward ? 3 : 2,
@@ -1791,6 +1795,22 @@ int main(int argc, char **argv)
         write_local();
         fill(memory, cube, {.25f, 0, 0, 1}, 6);
         near(execute(local_fragment, push, false, weather_vs)[0][0], .1f, "local shadow blocks receiver");
+        // A fixed eye sees the same receiver at the center and at the
+        // clipped edge of the viewport. The old 5% scissor threshold
+        // illuminated the shadowed receiver after turning the camera.
+        for (unsigned coverage : {8u, 3u})
+        {
+            LocalShadowBudget slots{2, 0, 1};
+            const auto slot = slots.reserve(true, true, 4.f, 10.f);
+            local_uniform.shadow_params[2] = coverage >= 5;
+            write_local();
+            near(execute(local_fragment, push, false, weather_vs)[0][0],
+                 coverage >= 5 ? .1f : lamp_value, "old camera coverage reproduces light popping");
+            local_uniform.shadow_params[2] = slot >= 0;
+            write_local();
+            near(execute(local_fragment, push, false, weather_vs)[0][0], .1f,
+                 "fixed camera position retains the lamp shadow on a turn");
+        }
         fill(memory, cube, {.75f, 0, 0, 1}, 6);
         near(execute(local_fragment, push, false, weather_vs)[0][0], lamp_value, "local shadow keeps visible receiver");
         // At 50 m, a one-metre caster/receiver gap is only 0.00004 in
@@ -2017,6 +2037,34 @@ int main(int argc, char **argv)
         near(composited[0], (64.f + (1.f - 127.f / 255) * .05f * 128) / 127, "field displaces complete scene once");
         near(composited[1], 48.f / 95, "neutral vertical component");
         near(composited[2], .85f, "composite preserves water in scene snapshot");
+        // A ray that exits the screen above a flat water surface must not
+        // import a landmark from the vertically mirrored opaque frame.
+        for (unsigned i = 0; i < 16; i += 5)
+            scene_constants[i] = 1.f;
+        scene_constants[33] = 1.5f;
+        check(vkMapMemory(device, weather_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        std::memcpy(mapped, scene_constants, sizeof(scene_constants));
+        vkUnmapMemory(device, weather_memory);
+        for (auto& vertex : triangle)
+        {
+            vertex.normal[0] = vertex.normal[2] = 0.f;
+            vertex.normal[1] = 1.f;
+        }
+        check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+        std::memcpy(mapped, triangle.data(), sizeof(triangle));
+        vkUnmapMemory(device, vertex_memory);
+        fill(memory, input[0], {.5f, .5f, .5f, 1});
+        scene_push.padding[1] = .5f;
+        for (float time : {0.f, .12f, .24f})
+        {
+            scene_push.threshold = time;
+            execute(water_ps, scene_push, false, water_vs);
+            near(scene_pixels[80 * 128 + 64][1], .82f * (80.f / 95.f) + .18f * .16f,
+                 "moving water ray miss samples only the submerged scene");
+        }
+        scene_push.threshold = 0.f;
+        vkDestroyShaderModule(device, water_ps, nullptr);
+        vkDestroyShaderModule(device, water_vs, nullptr);
         vkDestroyImageView(device, field.view, nullptr);
         vkDestroyImage(device, field.image, nullptr);
         vkFreeMemory(device, field.memory, nullptr);
