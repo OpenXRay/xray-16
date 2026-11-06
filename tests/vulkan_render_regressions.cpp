@@ -10,6 +10,7 @@
 #include "src/Layers/xrRenderVK/TangentBasis.h"
 #include "src/Layers/xrRenderVK/TextureQuality.h"
 #include "src/Layers/xrRenderVK/VulkanSettings.h"
+#include "src/Include/xrRender/WaterContactEffect.h"
 #include <array>
 #include <cassert>
 #include <cmath>
@@ -108,6 +109,12 @@ int main()
     prepare_tangent_basis(frame_vertices, {0, 1, 2});
     assert(std::memcmp(frame_vertices.data(), valid_frames.data(), frame_vertices.size() * sizeof(LevelVertex)) ==
            0);
+    assert(detail_grid_size(.25f) == 8 && detail_grid_size(.5f) == 4 && detail_grid_size(1.f) == 2);
+    assert(!tessellation_enabled && !legacy_level_lights);
+    assert(is_water_contact_effect("hit_fx\\effects\\hit_water_hit_distort_big"));
+    assert(!is_water_contact_effect("hit_fx\\effects\\hit_water_hit_splash"));
+    const auto anchored = project_particle_to_water({1, 12, 2}, {0, 4, 0}, {0, -2, 0});
+    assert(std::abs(anchored[1] - 4.015f) < .0001f && anchored[0] == 1 && anchored[2] == 2);
     assert(render_quality(0).texture_limit < render_quality(2).texture_limit);
     assert(render_quality(4).point_shadows == 2 && render_quality(0).point_shadows == 0);
 
@@ -231,5 +238,9 @@ int main()
         assert(world_texture_limit(name, minimum) == 0);
     assert(world_texture_limit("act\\stalker", minimum) == 512);
     assert(world_texture_limit("act\\stalker", "-android-mobile-preset Low") == 1024);
+    assert(world_texture_mip_skip(1, false) == 0 && world_texture_mip_skip(2, false) == 1);
+    assert(world_texture_mip_skip(3, false) == 1 && world_texture_mip_skip(4, false) == 2);
+    assert(world_texture_mip_skip(1, true) == 1 && world_texture_mip_skip(3, true) == 2);
+    assert(!world_texture_uses_quality("ui\\ui_hud") && !world_texture_uses_quality("lmap#4_2"));
     assert(world_texture_limit("act\\stalker", "-android-mobile-preset High") == 0);
 }

@@ -15,7 +15,10 @@
 #include "../src/Layers/xrRenderVK/LocalShadowTargets.h"
 #include "../src/Layers/xrRenderVK/DetailInstance.h"
 #include "../src/Layers/xrRenderVK/ForwardLighting.h"
+#include "vulkan_motion_scene.h"
+#include "../src/Include/xrRender/WaterContactEffect.h"
 #include <array>
+#include <cstdlib>
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -561,6 +564,7 @@ int main(int argc, char **argv)
         std::array<std::array<float, 4>, 128> last_ui_pixels{};
         std::array<std::array<float, 4>, 128 * 96> scene_pixels{};
         bool scene_test = false;
+        bool distortion_mask = false;
         std::array<std::array<float, 4>, 4> sprite_pixels{};
         const auto weather_ps = embedded(weather_shaders::Fragment, sizeof(weather_shaders::Fragment));
         const auto weather_vs = embedded(deferred_shaders::LightVertex, sizeof(deferred_shaders::LightVertex));
@@ -878,12 +882,17 @@ int main(int argc, char **argv)
             raster.depthBiasEnable = bias.enabled;
             raster.depthBiasConstantFactor = bias.constant;
             raster.depthBiasSlopeFactor = bias.slope;
-            color_blends[0].blendEnable = multiply_decal || local;
+            color_blends[0].blendEnable = multiply_decal || local || distortion_mask;
             color_blends[0].colorWriteMask = multiply_decal ? 7 : 15;
             color_blends[0].srcColorBlendFactor = VK_BLEND_FACTOR_DST_COLOR;
             color_blends[0].dstColorBlendFactor = local ? VK_BLEND_FACTOR_ONE : VK_BLEND_FACTOR_SRC_COLOR;
             if (local)
                 color_blends[0].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+            if (distortion_mask)
+            {
+                color_blends[0].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+                color_blends[0].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+            }
             VkPipeline pipeline{};
             check(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &pipeline));
             check(vkResetCommandPool(device, commands, 0));
@@ -963,6 +972,8 @@ int main(int argc, char **argv)
                 clear[0].color = {{.2f, .3f, .4f, 1.f}};
             if (local)
                 clear[0].color = {{.1f, .1f, .1f, 1.f}};
+            if (distortion_mask)
+                clear[0].color = {{127.f / 255.f, 127.f / 255.f, 0.f, 127.f / 255.f}};
             VkRenderPassBeginInfo rp{VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
             rp.renderPass = render_pass;
             rp.framebuffer = framebuffer;
@@ -2063,6 +2074,264 @@ int main(int argc, char **argv)
                  "moving water ray miss samples only the submerged scene");
         }
         scene_push.threshold = 0.f;
+        {
+            using namespace motion_scene;
+            constexpr auto HostImage = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+            const auto atlas = image(memory, format, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_SAMPLED_BIT, HostImage,
+                                     1, Width, 1, Height);
+            const auto wall_depth = image(memory, format, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_SAMPLED_BIT, HostImage,
+                                          1, Width, 1, Height);
+            auto upload_pixels = [&](const Image& target, const Frame& pixels,
+                                     VkImageLayout old_layout = VK_IMAGE_LAYOUT_GENERAL) {
+                VkSubresourceLayout layout{};
+                vkGetImageSubresourceLayout(device, target.image, &scene_subresource, &layout);
+                check(vkMapMemory(device, target.memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+                for (unsigned y = 0; y < Height; ++y)
+                    std::memcpy(static_cast<uint8_t*>(mapped) + layout.offset + y * layout.rowPitch,
+                                pixels.data() + y * Width, Width * sizeof(Pixel));
+                vkUnmapMemory(device, target.memory);
+                check(vkResetCommandPool(device, commands, 0));
+                check(vkBeginCommandBuffer(cmd, &scene_begin));
+                scene_barrier.image = target.image;
+                scene_barrier.oldLayout = old_layout;
+                vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                                     0, 0, nullptr, 0, nullptr, 1, &scene_barrier);
+                check(vkEndCommandBuffer(cmd));
+                check(vkQueueSubmit(queue, 1, &scene_submit, VK_NULL_HANDLE));
+                check(vkQueueWaitIdle(queue));
+            };
+            const auto update_texture = [&](VkWriteDescriptorSet write, const Image& target) {
+                const VkDescriptorImageInfo info{sampler, target.view, VK_IMAGE_LAYOUT_GENERAL};
+                write.pImageInfo = &info;
+                vkUpdateDescriptorSets(device, 1, &write, 0, nullptr);
+            };
+            // Set XRAY_VK_MOTION_FRAMES to an existing directory to export
+            // the paired 48-frame reproductions along with the pixel checks.
+            const char* output = std::getenv("XRAY_VK_MOTION_FRAMES");
+            const unsigned frame_count = output ? 48 : 3;
+            auto save_frame = [&](const char* scene, unsigned number, const Frame& left, const Frame& right) {
+                if (output)
+                    write_pair(std::string(output) + "/" + scene + "-" + std::to_string(100 + number) + ".ppm",
+                               left, right);
+            };
+            const auto lake_camera = Camera({0, 1.55f, 0}, 0, .21f, .48f);
+            const auto lake_projection = lake_camera.projection();
+            const auto lake_inverse = lake_camera.inverse_projection();
+            std::copy(lake_projection.begin(), lake_projection.end(), scene_constants);
+            std::copy(lake_inverse.begin(), lake_inverse.end(), scene_constants + 16);
+            std::copy(lake_camera.eye.begin(), lake_camera.eye.end(), scene_constants + 32);
+            check(vkMapMemory(device, weather_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+            std::memcpy(mapped, scene_constants, sizeof(scene_constants));
+            vkUnmapMemory(device, weather_memory);
+
+            Frame lake{}, ring{};
+            std::array<bool, Width * Height> above_water{};
+            for (unsigned y = 0; y < Height; ++y)
+                for (unsigned x = 0; x < Width; ++x)
+                {
+                    const auto ray = lake_camera.ray(x, y);
+                    const auto index = y * Width + x;
+                    above_water[index] = ray[1] >= 0.f || -lake_camera.eye[1] * ray[2] / ray[1] > 11.f;
+                    if (above_water[index])
+                    {
+                        const float post_x = 11.f * ray[0] / ray[2];
+                        const bool post = std::abs(post_x - .28f * std::round(post_x / .28f)) < .04f;
+                        lake[index] = post ? Pixel{.24f, .19f, .11f, 1.f} : Pixel{.61f, .72f, .74f, 1.f};
+                    }
+                    else
+                    {
+                        const float t = -lake_camera.eye[1] / ray[1];
+                        const float pattern = .05f * std::sin(t * ray[0] * 15.f + t * ray[2] * 7.f);
+                        lake[index] = {.20f + pattern, .36f + pattern, .42f + pattern, 1.f};
+                    }
+                    const float u = (2.f * (x + .5f) / Width - 1.f);
+                    const float v = (2.f * (y + .5f) / Height - 1.f);
+                    const float r = std::hypot(u, v);
+                    const float weight = std::max(0.f, 1.f - std::abs(r - .72f) * 15.f);
+                    ring[index] = {127.f / 255.f + .44f * u, 127.f / 255.f + .44f * v, 0.f, weight};
+                }
+            upload_pixels(scene_image, lake);
+            upload_pixels(atlas, ring, VK_IMAGE_LAYOUT_PREINITIALIZED);
+            update_texture(writes[0], atlas);
+            Push ripple = scene_push;
+            std::copy(lake_projection.begin(), lake_projection.end(), ripple.mvp);
+            ripple.threshold = 0;
+            ripple.padding[1] = 1;
+            unsigned upright_above = 0, flat_above = 0, flat_below = 0;
+            for (unsigned frame = 0; frame < frame_count; ++frame)
+            {
+                const float progress = float(frame) / (frame_count - 1);
+                const unsigned step = std::min(2u, unsigned(progress * 3));
+                const float age = progress * 3.f - step;
+                const Point contact{(float(step) - 1.f) * .58f, 0.f, 8.8f - step * .75f};
+                const Point simulated{contact[0], .25f + age * .35f, contact[2]};
+                const Point normal{0.f, 1.f, 0.f};
+                const bool water_effect = is_water_contact_effect(step == 1 ?
+                    "hit_fx\\effects\\hit_water_hit_distort" : "hit_fx\\effects\\hit_water_hit_distort_big");
+                const float radius = .82f + .55f * age;
+                Frame upright{}, upright_difference{};
+                for (bool horizontal : {false, true})
+                {
+                    const bool anchored = horizontal && water_effect;
+                    const auto impact = anchored ? project_particle_to_water(simulated, contact, normal) : simulated;
+                    const auto axes = anchored ? particle_face_basis(normal) :
+                        ParticleSpriteBasis{{1, 0, 0}, {0, 1, 0}};
+                    std::array<Vertex, 6> quad{};
+                    constexpr unsigned corners[]{0, 1, 2, 0, 2, 3};
+                    for (unsigned i = 0; i < quad.size(); ++i)
+                    {
+                        const auto corner = particle_sprite_corner(corners[i], radius, radius, 0.f);
+                        auto& vertex = quad[i];
+                        for (unsigned axis = 0; axis < 3; ++axis)
+                        {
+                            vertex.position[axis] = impact[axis] + axes.right[axis] * corner.right +
+                                                    axes.up[axis] * corner.up;
+                            vertex.baked[axis] = 1.f - .35f * age;
+                        }
+                        vertex.baked[3] = 1.f;
+                        vertex.uv[0] = corner.u;
+                        vertex.uv[1] = corner.v;
+                    }
+                    check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+                    std::memcpy(mapped, quad.data(), sizeof(quad));
+                    vkUnmapMemory(device, vertex_memory);
+                    distortion_mask = true;
+                    execute(distort_ps, ripple, false, distort_vs, true);
+                    distortion_mask = false;
+                    upload_pixels(field, scene_pixels);
+                    execute(composite_ps, ripple, false, weather_vs);
+                    Frame changed{};
+                    for (unsigned i = 0; i < scene_pixels.size(); ++i)
+                    {
+                        if (output)
+                            changed[i] = above_water[i] ? Pixel{.15f, .15f, .16f, 1.f} : Pixel{.07f, .11f, .14f, 1.f};
+                        const float difference = std::abs(scene_pixels[i][0] - lake[i][0]) +
+                                                 std::abs(scene_pixels[i][1] - lake[i][1]);
+                        if (difference < .045f)
+                            continue;
+                        if (above_water[i])
+                            ++(horizontal ? flat_above : upright_above);
+                        else if (horizontal)
+                            ++flat_below;
+                        if (output)
+                            changed[i] = above_water[i] ? Pixel{1.f, .57f, .10f, 1.f} : Pixel{.22f, .81f, 1.f, 1.f};
+                    }
+                    if (!horizontal)
+                    {
+                        upright = scene_pixels;
+                        upright_difference = changed;
+                    }
+                    else
+                    {
+                        save_frame("water", frame, upright, scene_pixels);
+                        save_frame("water-diff", frame, upright_difference, changed);
+                    }
+                }
+            }
+            if (upright_above < frame_count * 5 || flat_above != 0 || flat_below < frame_count)
+                throw std::runtime_error("moving particle scene did not isolate above-water distortion");
+            std::cout << "Water, changed pixels over " << frame_count << " frames: upright above water "
+                      << upright_above << ", flat above water " << flat_above
+                      << ", flat below water " << flat_below << '\n';
+
+            update_texture(writes[0], scene_image);
+            update_texture(writes[2], wall_depth);
+            fill(memory, input[1], {.5f, .5f, 0, 1});
+            fill(memory, input[5], {0, 0, 0, 0});
+            fill(memory, cube, {.25f, 0, 0, 1}, 6);
+            local_uniform = {};
+            constexpr Point Lamp{-.75f, 0.f, 7.75f};
+            constexpr float Range = 1.65f;
+            std::copy(Lamp.begin(), Lamp.end(), local_uniform.position_range);
+            local_uniform.position_range[3] = Range;
+            local_uniform.direction_cone[0] = .9486833f;
+            local_uniform.direction_cone[2] = .3162278f;
+            local_uniform.direction_cone[3] = std::cos(.65f);
+            local_uniform.color_type[0] = 2.6f;
+            local_uniform.color_type[1] = 2.0f;
+            local_uniform.color_type[2] = 1.2f;
+            local_uniform.color_type[3] = 1.f;
+            local_uniform.shadow_matrices[0][0] = .65f;
+            local_uniform.shadow_matrices[0][5] = .65f;
+            local_uniform.shadow_matrices[0][14] = .5f;
+            local_uniform.shadow_matrices[0][15] = 1.f;
+            float legacy_min = 1.f, legacy_max = 0.f, fixed_min = 1.f, fixed_max = 0.f;
+            for (unsigned frame = 0; frame < frame_count; ++frame)
+            {
+                const float phase = float(frame) / (frame_count - 1);
+                const float yaw = .8f * std::sin(phase * 3.14159265f);
+                const Camera camera({0, 0, 0}, yaw, 0, 1.2f);
+                const auto inverse = camera.inverse_projection();
+                std::copy(inverse.begin(), inverse.end(), local_uniform.inverse_view_projection);
+                Frame wall{}, depth_pixels{};
+                for (unsigned y = 0; y < Height; ++y)
+                    for (unsigned x = 0; x < Width; ++x)
+                    {
+                        const auto ray = camera.ray(x, y);
+                        const auto i = y * Width + x;
+                        if (ray[2] <= 0.f)
+                        {
+                            depth_pixels[i][0] = 1.f;
+                            continue;
+                        }
+                        const float t = 8.f / ray[2];
+                        const float wx = t * ray[0], wy = t * ray[1];
+                        const bool panel = std::abs(wx) < .55f && std::abs(wy) < .45f;
+                        const bool border = panel && (std::abs(wx) > .46f || std::abs(wy) > .37f);
+                        const bool grille = panel && std::abs(wx) < .30f && wy < .08f && wy > -.29f &&
+                                            std::cos(wx * 100.f) * std::cos(wy * 85.f) > .12f;
+                        const float grain = .07f * std::cos(wx * 11.f + std::sin(wy * 18.f)) * std::sin(wy * 22.f);
+                        wall[i] = border || grille ? Pixel{.29f, .25f, .18f, 1.f}
+                                : panel ? Pixel{.79f, .70f, .50f, 1.f}
+                                        : Pixel{.45f + grain, .36f + grain, .24f + grain, 1.f};
+                        depth_pixels[i][0] = Camera::A + Camera::B / t;
+                    }
+                upload_pixels(scene_image, wall);
+                upload_pixels(wall_depth, depth_pixels, frame ? VK_IMAGE_LAYOUT_GENERAL : VK_IMAGE_LAYOUT_PREINITIALIZED);
+                const auto sample = camera.screen({0, .15f, 8.f});
+                const unsigned pixel = unsigned(sample[1]) * Width + unsigned(sample[0]);
+                const unsigned area = camera.clipped_light_area(Lamp, Range);
+                Frame legacy{};
+                for (bool fixed : {false, true})
+                {
+                    LocalShadowBudget budget{2, 0, 1};
+                    local_uniform.shadow_params[2] = fixed ? budget.reserve(true, true, dot(Lamp, Lamp), Range) >= 0
+                                                           : area * 20 >= Width * Height;
+                    write_local();
+                    execute(local_fragment, push, false, weather_vs);
+                    const float value = scene_pixels[pixel][0];
+                    auto& minimum = fixed ? fixed_min : legacy_min;
+                    auto& maximum = fixed ? fixed_max : legacy_max;
+                    minimum = std::min(minimum, value);
+                    maximum = std::max(maximum, value);
+                    // Add the same neutral ambient background to both panels
+                    // so the fixture's wall and switch stay visible in shadow.
+                    for (unsigned i = 0; i < scene_pixels.size(); ++i)
+                        for (unsigned channel = 0; channel < 3; ++channel)
+                            scene_pixels[i][channel] += .32f * wall[i][channel] - .10f;
+                    if (!fixed)
+                        legacy = scene_pixels;
+                    else
+                        save_frame("light", frame, legacy, scene_pixels);
+                }
+            }
+            if (legacy_max - legacy_min < .15f || fixed_max - fixed_min > .01f)
+                throw std::runtime_error("camera turn did not reproduce shadow coverage flicker");
+            std::cout << "Light, same wall panel during yaw: old " << legacy_min << ".." << legacy_max
+                      << ", 0.9.191 " << fixed_min << ".." << fixed_max << '\n';
+
+            check(vkMapMemory(device, vertex_memory, 0, VK_WHOLE_SIZE, 0, &mapped));
+            std::memcpy(mapped, triangle.data(), sizeof(triangle));
+            vkUnmapMemory(device, vertex_memory);
+            update_texture(writes[0], input[0]);
+            update_texture(writes[2], input[2]);
+            for (const auto& asset : {atlas, wall_depth})
+            {
+                vkDestroyImageView(device, asset.view, nullptr);
+                vkDestroyImage(device, asset.image, nullptr);
+                vkFreeMemory(device, asset.memory, nullptr);
+            }
+        }
         vkDestroyShaderModule(device, water_ps, nullptr);
         vkDestroyShaderModule(device, water_vs, nullptr);
         vkDestroyImageView(device, field.view, nullptr);

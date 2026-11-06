@@ -3,6 +3,7 @@
 #include "TangentBasis.h"
 #include "ModelPoseConstants.h"
 #include "ModelTessellation.h"
+#include "VulkanSettings.h"
 #include "Include/xrRender/Kinematics.h"
 #include "xrCore/Animation/Bone.hpp"
 #if defined(XR_PLATFORM_ANDROID)
@@ -71,7 +72,7 @@ bool GpuModel::add_meshes(ModelGeometry &&geometry, const std::string &inherited
             error = "OGF texture='" + texture + "': " + error;
             return false;
         }
-        if (definition.tessellation)
+        if (tessellation_enabled && definition.tessellation)
         {
             const HeightField *height = nullptr;
             if (definition.tessellation & 2)

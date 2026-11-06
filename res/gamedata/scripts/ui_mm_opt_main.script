@@ -137,7 +137,7 @@ function options_dialog:UpdateDependControls()
 	local max_texture_lod = 4
 	local min_texture_lod = 0
 
-	if _current_id ~= 0 then
+	if _current_id ~= 0 and _current_id ~= 7 then
 		if not is_enough_address_space_available()	then
 			min_texture_lod = 1
 		end
@@ -214,6 +214,7 @@ function options_dialog:OnBtnKeybDefault()
 end
 
 function options_dialog:OnPresetChanged()
+	if self.combo_renderer:CurrentID() == 7 then return end
 	local opt					= COptionsManager()
 	opt:SetCurrentValues		("mm_opt_video_adv")
 end

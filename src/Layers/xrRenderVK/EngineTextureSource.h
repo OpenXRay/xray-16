@@ -11,5 +11,5 @@ bool upload_engine_texture(VkDevice device, VkQueue queue, VkCommandPool pool,
     const void* bytes, size_t size, bool bc_supported, UploadedTexture& result,
     std::vector<PendingTextureUpload>& pending, ImageStateTracker& states, std::string& error,
     VkExtent3D* decoded_extent = nullptr, bool* decoded_cube = nullptr,
-    uint32_t maximum_dimension = 0);
+    uint32_t maximum_dimension = 0, uint32_t mip_skip = 0);
 }

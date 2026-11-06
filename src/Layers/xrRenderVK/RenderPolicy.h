@@ -20,6 +20,11 @@ inline const RenderQuality &render_quality(unsigned preset)
 {
     return RenderQualities[std::min<unsigned>(preset, RenderQualities.size() - 1)];
 }
+inline unsigned detail_grid_size(float spacing)
+{
+    return static_cast<unsigned>(std::ceil(2.f / std::clamp(spacing, .25f, 1.f)));
+}
+
 // Assign slots before viewport clipping. An offscreen lamp keeps its place
 // in the budget without recording a shadow pass for that frame.
 struct LocalShadowBudget

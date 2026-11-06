@@ -90,7 +90,7 @@ bool contiguous(uint32_t mask)
 
 bool decode_legacy_pixels(const uint8_t* bytes, size_t size, uint32_t width,
     uint32_t height, uint32_t mip_count, uint32_t faces, DdsTexture& result,
-    std::string& error, uint32_t maximum_dimension)
+    std::string& error, uint32_t maximum_dimension, uint32_t mip_skip)
 {
     const uint32_t flags = read32(bytes, 80);
     const uint32_t bits = read32(bytes, 88);
@@ -140,7 +140,7 @@ bool decode_legacy_pixels(const uint8_t* bytes, size_t size, uint32_t width,
         return false;
     }
 
-    uint32_t first_mip=0;
+    uint32_t first_mip = faces == 1 ? std::min(mip_skip, mip_count - 1) : 0;
     while(maximum_dimension && faces==1 && first_mip+1<mip_count &&
         std::max(width>>first_mip,height>>first_mip)>maximum_dimension) ++first_mip;
     DdsTexture decoded;
@@ -184,7 +184,7 @@ bool decode_legacy_pixels(const uint8_t* bytes, size_t size, uint32_t width,
 }
 }
 
-bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& result, std::string& error, uint32_t maximum_dimension) try
+bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& result, std::string& error, uint32_t maximum_dimension, uint32_t mip_skip) try
 {
     result = {};
     const auto* bytes = static_cast<const std::uint8_t*>(data);
@@ -240,7 +240,7 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
         !(read32(bytes, 92) == 0x00ff0000u && read32(bytes, 96) == 0x0000ff00u &&
           read32(bytes, 100) == 0x000000ffu && read32(bytes, 104) == 0xff000000u)))
     {
-        return decode_legacy_pixels(bytes, size, width, height, mip_count, faces, result, error, maximum_dimension);
+        return decode_legacy_pixels(bytes, size, width, height, mip_count, faces, result, error, maximum_dimension, mip_skip);
     }
 
     size_t expected = header_size;
@@ -272,7 +272,7 @@ bool decode_dds(const void* data, size_t size, bool bc_supported, DdsTexture& re
         return false;
     }
 
-    uint32_t first_mip = 0;
+    uint32_t first_mip = cube ? 0 : std::min(mip_skip, mip_count - 1);
     while (maximum_dimension && !cube && first_mip + 1 < mip_count &&
         std::max(width >> first_mip, height >> first_mip) > maximum_dimension) ++first_mip;
     if (first_mip)

@@ -79,6 +79,17 @@ inline bool decode_level_lights(LevelBytes bytes, bool hemi, std::vector<VulkanL
     return true;
 }
 
+// Match CLight_DB::add_light in the desktop dynamic renderer. The
+// level-chunk lights are the legacy R1 set; they are opt-in for R2/GL.
+inline void collect_scene_lights(std::vector<VulkanLightSnapshot>& scene,
+    const std::vector<VulkanLightSnapshot>& runtime, const std::vector<VulkanLightSnapshot>& legacy,
+    bool allow_legacy)
+{
+    scene.assign(runtime.begin(), runtime.end());
+    if (allow_legacy)
+        scene.insert(scene.end(), legacy.begin(), legacy.end());
+}
+
 // Static hemi sources can number in the thousands. Query the object's cell,
 // then its exact sphere, instead of scanning all sources for every ROS.
 class VulkanHemiLightGrid

@@ -7,10 +7,10 @@ bool upload_engine_texture(VkDevice device, VkQueue queue, VkCommandPool pool,
     const void* bytes, size_t size, bool bc_supported, UploadedTexture& result,
     std::vector<PendingTextureUpload>& pending, ImageStateTracker& states, std::string& error,
     VkExtent3D* decoded_extent, bool* decoded_cube,
-    uint32_t maximum_dimension)
+    uint32_t maximum_dimension, uint32_t mip_skip)
 {
     DdsTexture decoded;
-    if (!decode_dds(bytes, size, bc_supported, decoded, error, maximum_dimension))
+    if (!decode_dds(bytes, size, bc_supported, decoded, error, maximum_dimension, mip_skip))
         return false;
     if (!upload_texture(device, queue, pool, memory_types, vk, decoded, result, pending, states, error))
         return false;

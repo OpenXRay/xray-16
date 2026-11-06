@@ -159,6 +159,7 @@ class GameTextureFactory
         bool cube{};
         uint64_t bytes{};
         uint32_t maximum_dimension{};
+        uint32_t mip_skip{};
         size_t material_refs{};
         size_t clamp_material_refs{};
         size_t lightmap_refs{};

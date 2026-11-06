@@ -50,6 +50,7 @@ public:
     IParticleCustom* dcast_ParticleCustom() override { return this; }
     void OnDeviceCreate() override {}
     void OnDeviceDestroy() override { release_gpu(); }
+    void set_water_plane(const Fmatrix& plane) { water_plane_.set(plane); }
     void UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL transform) override;
     void OnFrame(u32 dt) override;
     void Play() override;
@@ -70,7 +71,9 @@ private:
     std::shared_ptr<const ParticleCatalog> catalog_;
     const ParticleEffectDef* def_{};
     vis_data visibility_;
-    Fmatrix parent_;
+    Fmatrix water_plane_;
+    bool water_contact_{};
+    void project_water_center(Fvector& center) const;
     Fvector initial_position_;
     Fmatrix transform_;
     bool playing_{}, deferred_{}, hud_{};

@@ -499,7 +499,7 @@
         </cap_r4_tessellation>
         <check_r4_tessellation x="133" y="0" width="35" stretch="1" height="29">
 	        <texture>ui_inGame2_checkbox</texture>
-            <options_item entry="r4_enable_tessellation" group="mm_opt_video_adv" depend="vid"/>
+            <options_item entry="r4_enable_tessellation" group="mm_opt_video_adv" depend="restart"/>
         </check_r4_tessellation>
 
         <btn_to_simply x="270" y="322" width="86" height="24" stretch="1" accel="ui_action_1">

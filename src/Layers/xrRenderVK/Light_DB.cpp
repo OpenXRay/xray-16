@@ -1,5 +1,6 @@
 #include "xrEngine/stdafx.h"
 #include "Light_DB.h"
+#include "VulkanSettings.h"
 #include "Common/LevelStructure.hpp"
 namespace xray::render::vulkan
 {
@@ -39,7 +40,6 @@ void CLight_DB::Update(const std::vector<VulkanLight*>& dynamic)
     dynamic_.clear();
     for (const VulkanLight* light : dynamic)
         if (light && light->snapshot().active) dynamic_.push_back(light->snapshot());
-    scene_.assign(dynamic_.begin(), dynamic_.end());
-    scene_.insert(scene_.end(), static_.begin(), static_.end());
+    collect_scene_lights(scene_, dynamic_, static_, legacy_level_lights != 0);
 }
 }

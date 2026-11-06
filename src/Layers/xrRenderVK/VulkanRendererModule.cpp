@@ -35,6 +35,22 @@ class VulkanPreset final : public CCC_Token
     }
 };
 
+class VulkanSwitch final : public CCC_Integer
+{
+public:
+    VulkanSwitch(pcstr name, int* state) : CCC_Integer(name, state, 0, 1) {}
+
+    void Execute(pcstr args) override
+    {
+        if (!xr_stricmp(args, "on") || !xr_strcmp(args, "1"))
+            *value = 1;
+        else if (!xr_stricmp(args, "off") || !xr_strcmp(args, "0"))
+            *value = 0;
+        else
+            InvalidSyntax();
+    }
+};
+
 void register_vulkan_options()
 {
     static VulkanPreset preset;
@@ -50,13 +66,16 @@ void register_vulkan_options()
     static CCC_Float light_scale("r2_dhemi_light_scale", &hemi_light_scale, 0.f, 100.f);
     static CCC_Float light_flow("r2_dhemi_light_flow", &hemi_light_flow, 0.f, 1.f);
     static CCC_Float smooth("r2_dhemi_smooth", &hemi_smooth, 0.f, 10.f);
+    static CCC_Float detail_density("r__detail_density", &detail_spacing, .25f, 1.f);
+    static VulkanSwitch tessellation("r4_enable_tessellation", &tessellation_enabled);
+    static VulkanSwitch legacy_lights("r2_allow_r1_lights", &legacy_level_lights);
     static CCC_Integer anisotropy("r__tf_aniso", &texture_anisotropy, 1, 16);
     static CCC_Integer details("r__detail_radius", &detail_radius, 0, 80);
     static CCC_Float ambient("r2_sun_lumscale_amb", &ambient_scale, 0.f, 3.f);
     static CCC_Float hemisphere("r2_sun_lumscale_hemi", &hemisphere_scale, 0.f, 3.f);
     static CCC_Float sun("r2_sun_lumscale", &sun_scale, 0.f, 3.f);
-    static CCC_Integer sun_switch("r2_sun", &sun_enabled, 0, 1);
-    static CCC_Integer tone_switch("r2_tonemap", &tonemap_enabled, 0, 1);
+    static VulkanSwitch sun_switch("r2_sun", &sun_enabled);
+    static VulkanSwitch tone_switch("r2_tonemap", &tonemap_enabled);
     static CCC_Float tone_gray("r2_tonemap_middlegray", &tonemap_middlegray, 0.f, 2.f);
     static CCC_Float tone_amount("r2_tonemap_amount", &tonemap_amount, 0.f, 1.f);
     apply_vulkan_launch_settings(Core.Params);
@@ -66,6 +85,9 @@ void register_vulkan_options()
         Console->AddCommand(option);
     Console->AddCommand(&preset);
     Console->AddCommand(&details);
+    Console->AddCommand(&detail_density);
+    Console->AddCommand(&tessellation);
+    Console->AddCommand(&legacy_lights);
     Console->AddCommand(&anisotropy);
     Console->AddCommand(&detail_updates);
     Console->AddCommand(&ambient);

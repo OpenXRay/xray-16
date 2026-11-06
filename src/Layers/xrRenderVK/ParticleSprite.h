@@ -36,6 +36,26 @@ inline ParticleSpriteBasis particle_face_basis(std::array<float, 3> direction)
             {direction[1] * r[2] - direction[2] * r[1], direction[2] * r[0] - direction[0] * r[2],
              direction[0] * r[1] - direction[1] * r[0]}};
 }
+inline std::array<float, 3> project_particle_to_water(std::array<float, 3> position,
+    const std::array<float, 3>& origin, std::array<float, 3> normal)
+{
+    const float length = std::sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
+    if (!std::isfinite(length) || length < 1e-6f)
+        normal = {0.f, 1.f, 0.f};
+    else
+        for (float& axis : normal)
+            axis /= length;
+    if (normal[1] < 0.f)
+        for (float& axis : normal)
+            axis = -axis;
+    const float height = (position[0] - origin[0]) * normal[0] +
+                         (position[1] - origin[1]) * normal[1] +
+                         (position[2] - origin[2]) * normal[2];
+    for (unsigned axis = 0; axis < 3; ++axis)
+        position[axis] -= (height - .015f) * normal[axis];
+    return position;
+}
+
 inline ParticleSpriteCorner particle_sprite_corner(unsigned corner, float sx, float sy, float angle)
 {
     const float x = corner == 0 || corner == 3 ? -sx : sx;

@@ -93,6 +93,9 @@ int main()
         }
         DdsTexture reduced;
         assert(decode_dds(bytes.data(),bytes.size(),true,reduced,error,2));
+        DdsTexture menu_lod;
+        assert(decode_dds(bytes.data(),bytes.size(),true,menu_lod,error,0,1));
+        assert(menu_lod.extent.width == (cube ? 8u : 4u) && menu_lod.mip_levels == (cube ? 4u : 3u));
         assert(reduced.extent.width==(cube?8u:2u) && reduced.mip_levels==(cube?4u:2u));
         for(const auto& copy:reduced.copies) {
             const unsigned mip=copy.imageSubresource.mipLevel+(cube?0:2);

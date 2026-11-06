@@ -174,6 +174,7 @@ class GpuLevel
     DetailAssets details_;
     std::vector<Mesh> detail_meshes_;
     std::unordered_map<size_t, std::vector<DetailPlacement>> detail_cache_;
+    float detail_spacing_{};
     std::vector<DetailPlacement> visible_details_;
     // Each frame slot is reused only after FrameContext has waited on its fence.
     mutable std::array<std::vector<DetailBatch>, FrameContext::FramesInFlight> detail_batches_;

@@ -409,7 +409,7 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
         mesh.environment_constant = definition.has_environment_constant;
         mesh.constant_waveforms = definition.constant_waveforms;
         mesh.matrices = definition.matrices;
-        mesh.tessellation = definition.tessellation;
+        mesh.tessellation = tessellation_enabled ? definition.tessellation : 0;
         mesh.bump_texture = metadata.bump_texture;
         mesh.bump_mode = metadata.bump_mode;
         mesh.bump_height = metadata.bump_height;
@@ -905,6 +905,15 @@ void GpuLevel::prepare_details(const Fvector &camera, float max_distance)
     max_distance = std::clamp(max_distance, 0.f, 80.f);
     if (max_distance < 1.f)
         return;
+    const float spacing = std::isfinite(detail_spacing) ? std::clamp(detail_spacing, .25f, 1.f) : .5f;
+    const unsigned grid_size = detail_grid_size(spacing);
+    const float sample_spacing = 2.f / grid_size;
+    const float density = sample_spacing * sample_spacing / (spacing * spacing);
+    if (detail_spacing_ != spacing)
+    {
+        detail_cache_.clear();
+        detail_spacing_ = spacing;
+    }
     const int cx = static_cast<int>(std::floor(camera.x / 2.f)) + details_.offset_x;
     const int cz = static_cast<int>(std::floor(camera.z / 2.f)) + details_.offset_z;
     const int radius = static_cast<int>(max_distance / 2.f) + 1;
@@ -957,12 +966,12 @@ void GpuLevel::prepare_details(const Fvector &camera, float max_distance)
             collider.box_query(CDB::OPT_FULL_TEST, g_pGameLevel->ObjectSpace.GetStaticModel(), box_center, box_half);
             const auto *tris = g_pGameLevel->ObjectSpace.GetStaticTris();
             const auto *verts = g_pGameLevel->ObjectSpace.GetStaticVerts();
-            for (unsigned rz = 0; rz < 4; ++rz)
-                for (unsigned rx = 0; rx < 4; ++rx)
+            for (unsigned rz = 0; rz < grid_size; ++rz)
+                for (unsigned rx = 0; rx < grid_size; ++rx)
                 {
-                    const uint32_t seed = detail_random(uint32_t(index) ^ (uint32_t(rx + rz * 4) * 0x9e3779b9u));
-                    const float u = (float(rx) + .5f) / 4.f;
-                    const float v = (float(rz) + .5f) / 4.f;
+                    const uint32_t seed = detail_random(uint32_t(index) ^ (uint32_t(rx + rz * grid_size) * 0x9e3779b9u));
+                    const float u = (float(rx) + .5f) / grid_size;
+                    const float v = (float(rz) + .5f) / grid_size;
                     float weights[4]{};
                     float sum = 0.f;
                     for (unsigned n = 0; n < 4; ++n)
@@ -973,7 +982,7 @@ void GpuLevel::prepare_details(const Fvector &camera, float max_distance)
                         weights[n] = (p[0] * (1 - u) + p[1] * u) * (1 - v) + (p[2] * (1 - u) + p[3] * u) * v;
                         sum += weights[n];
                     }
-                    if (sum <= 0.f || float(seed & 255u) / 255.f > std::min(1.f, sum / 15.f))
+                    if (sum <= 0.f || float(seed & 255u) / 255.f > density * std::min(1.f, sum / 15.f))
                         continue;
                     float choice = float((seed >> 8) & 65535u) / 65536.f * sum;
                     unsigned model = 0;
@@ -984,8 +993,8 @@ void GpuLevel::prepare_details(const Fvector &camera, float max_distance)
                     const float jx = float((seed >> 16) & 15u) / 16.f - .5f;
                     const float jz = float((seed >> 20) & 15u) / 16.f - .5f;
                     Fvector origin, down;
-                    origin.set(slot_x + (float(rx) + .5f + jx * .5f) * .5f, cell.ground + cell.height + 5.f,
-                               slot_z + (float(rz) + .5f + jz * .5f) * .5f);
+                    origin.set(slot_x + (float(rx) + .5f + jx * .5f) * sample_spacing, cell.ground + cell.height + 5.f,
+                               slot_z + (float(rz) + .5f + jz * .5f) * sample_spacing);
                     down.set(0.f, -1.f, 0.f);
                     // Match the GLES decompressor: ignore passable faces
                     // and intersect only triangles belonging to this slot.

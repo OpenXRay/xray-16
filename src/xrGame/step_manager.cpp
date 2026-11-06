@@ -2,6 +2,7 @@
 #include "step_manager.h"
 #include "entity_alive.h"
 #include "Include/xrRender/Kinematics.h"
+#include "Include/xrRender/WaterContactEffect.h"
 #include "Level.h"
 #include "GamePersistent.h"
 #include "material_manager.h"
@@ -12,6 +13,36 @@
 BOOL debug_step_info = FALSE;
 BOOL debug_step_info_load = FALSE;
 #endif
+
+namespace
+{
+void snap_water_step_to_surface(Fvector& position, u16 material)
+{
+    const auto* water = GMLib.GetMaterialByIdx(material);
+    if (!water || !water->Flags.test(SGameMtl::flLiquid))
+        return;
+    Fvector start = position;
+    start.y += 1.f;
+    const Fvector down{0.f, -1.f, 0.f};
+    collide::rq_results hits;
+    const collide::ray_defs ray(start, down, 2.f, 0, collide::rqtStatic);
+    auto& space = Level().ObjectSpace;
+    if (!space.RayQuery(hits, ray, nullptr, nullptr, nullptr, nullptr))
+        return;
+    float nearest = 1.01f;
+    for (const auto& hit : *hits.r_get())
+    {
+        if (space.GetStaticTris()[hit.element].material != material)
+            continue;
+        const float distance = std::abs(1.f - hit.range);
+        if (distance < nearest)
+        {
+            nearest = distance;
+            position.y = start.y - hit.range;
+        }
+    }
+}
+}
 
 extern float psHUDStepSoundVolume;
 
@@ -217,6 +248,8 @@ void CStepManager::update(bool b_hud_view)
 
                 // установить позицию
                 pos.c.set(get_foot_position(ELegType(i)));
+                if (is_water_contact_effect(ps_name) && xr_strcmp(GEnv.Render->getShaderPath(), "vk\\") == 0)
+                    snap_water_step_to_surface(pos.c, m_object->material().last_material_idx());
 
                 ps->UpdateParent(pos, Fvector().set(0.f, 0.f, 0.f));
                 GamePersistent().ps_needtoplay.push_back(ps);

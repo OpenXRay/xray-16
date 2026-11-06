@@ -1,6 +1,7 @@
 #include "xrEngine/stdafx.h"
 #include "ParticleVisual.h"
 #include "ParticleSprite.h"
+#include "Include/xrRender/WaterContactEffect.h"
 #include "LevelPassGraph.h"
 
 #include "xrParticles/psystem.h"
@@ -54,7 +55,7 @@ void VulkanParticleEffect::set_events(std::function<void(bool, PAPI::Particle&)>
 VulkanParticleEffect::VulkanParticleEffect(std::shared_ptr<const ParticleCatalog> catalog,
     const ParticleEffectDef& def) : catalog_(std::move(catalog)), def_(&def)
 {
-    parent_.identity();
+    water_plane_.identity();
     transform_.identity();
     initial_position_.set(0, 0, 0);
     bounds(visibility_, initial_position_);
@@ -110,6 +111,7 @@ bool VulkanParticleEffect::initialize(VkDevice device, const VkPhysicalDeviceMem
     // This game's Lua special pass overrides its serialized S_SET additive
     // state (gl/particles_xdistort.s). Keep its offset map out of color ADD.
     distortion_ = def_->shader == "particles\\xdistort";
+    water_contact_ = distortion_ && is_water_contact_effect(def_->name);
     if (distortion_)
         Msg("[renderer-vulkan] particle.distortion definition='%s' route=scene-refraction", def_->name.c_str());
     for (bool hud : {false, true})
@@ -158,7 +160,7 @@ void VulkanParticleEffect::release_gpu()
 
 void VulkanParticleEffect::UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL transform)
 {
-    parent_.set(m);
+    set_water_plane(m);
     initial_position_.set(m.c);
     if (transform) transform_.set(m);
     else
@@ -166,6 +168,15 @@ void VulkanParticleEffect::UpdateParent(const Fmatrix& m, const Fvector& velocit
         transform_.identity();
         if (actions_ >= 0) PAPI::ParticleManager()->Transform(actions_, m, velocity);
     }
+}
+
+void VulkanParticleEffect::project_water_center(Fvector& center) const
+{
+    const auto& origin = water_plane_.c;
+    const auto& normal = water_plane_.k;
+    const auto projected = project_particle_to_water({center.x, center.y, center.z},
+        {origin.x, origin.y, origin.z}, {normal.x, normal.y, normal.z});
+    center.set(projected[0], projected[1], projected[2]);
 }
 
 void VulkanParticleEffect::Play()
@@ -233,6 +244,8 @@ void VulkanParticleEffect::OnFrame(u32 dt)
     {
         Fvector position;
         transform_.transform_tiny(position, particles[i].pos);
+        if (water_contact_)
+            project_water_center(position);
         visibility_.box.modify(position);
         radius = std::max(radius, std::max(particles[i].size.x, particles[i].size.y));
     }
@@ -295,7 +308,15 @@ bool VulkanParticleEffect::record(const FrameRecordingContext& frame, const Defe
         const float speed=velocity.magnitude();
         if(def_->flags & (1u<<18))
         { sx+=speed*def_->velocity_scale[0];sy+=speed*def_->velocity_scale[1]; }
-        if (def_->flags & (1u << 15))
+        if (water_contact_ && !hud)
+        {
+            project_water_center(center);
+            const auto& normal = water_plane_.k;
+            const auto basis = particle_face_basis({normal.x, normal.y, normal.z});
+            sprite_right.set(basis.right[0], basis.right[1], basis.right[2]);
+            sprite_up.set(basis.up[0], basis.up[1], basis.up[2]);
+        }
+        else if (def_->flags & (1u << 15))
         {
             if (speed < EPS_S && (def_->flags & (1u << 20)))
             {
@@ -608,6 +629,7 @@ void VulkanParticleGroup::spawn(const std::string& name, const Fvector& position
     parent.c.set(position);
     effect->SetHudMode(hud_);
     effect->UpdateParent(parent, velocity, FALSE);
+    effect->set_water_plane(parent_);
     effect->Play();
 }
 } // namespace xray::render::vulkan

@@ -17,6 +17,15 @@ int main()
     std::vector<VulkanLightSnapshot> decoded;std::string error;
     assert(decode_level_lights({flight.data(),flight.size()},false,decoded,error));
     assert(decoded.size()==1 && decoded[0].active && decoded[0].position[0]==10 && decoded[0].range==20 && decoded[0].color[1]==.4f);
+    std::vector<VulkanLightSnapshot> runtime(1), scene;
+    runtime[0].id = 17;
+    runtime[0].shadow = true;
+    collect_scene_lights(scene, runtime, decoded, false);
+    assert(scene.size() == 1 && scene[0].id == 17 && scene[0].shadow);
+    collect_scene_lights(scene, runtime, decoded, true);
+    assert(scene.size() == 2 && scene[1].id == decoded[0].id);
+    collect_scene_lights(scene, runtime, decoded, false);
+    assert(scene.size() == 1);
     assert(!decode_level_lights({flight.data(),flight.size()-1},false,decoded,error) && decoded.size()==1);
     real(flight,8,std::numeric_limits<float>::quiet_NaN());
     assert(!decode_level_lights({flight.data(),flight.size()},false,decoded,error) && decoded[0].color[0]==.5f);

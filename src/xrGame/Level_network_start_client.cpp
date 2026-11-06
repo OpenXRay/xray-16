@@ -321,17 +321,13 @@ bool CLevel::net_start_client6()
 #if defined(XR_PLATFORM_ANDROID)
         if (strstr(Core.Params, "-android-lazy-textures"))
         {
-            // Keep the loading screen over the normal rotating-camera
-            // pre-cache. This touches only resources visible in the level,
-            // unlike ResourcesDeferredUpload(), and prevents hundreds of DDS
-            // decodes from blocking the first interactive gameplay frames.
-            Msg("[load-trace] client6 Android visible-set precache begin frames=120 mem=%uK",
+            // Vulkan loads textures as draws reference them. A 24-step
+            // sweep still overlaps views and avoids 96 extra warm-up frames.
+            const u32 frames = xr_strcmp(GEnv.Render->getShaderPath(), "vk\\") == 0 ? 24 : 120;
+            Msg("[load-trace] client6 Android visible-set precache begin frames=%u mem=%uK", frames,
                 Memory.mem_usage() / 1024);
             android_set_load_context("client6 visible-set precache scheduled");
-            // Sweep the camera in smaller steps while the loading screen is
-            // still present. First-bound DDS textures and OGF models otherwise
-            // hitch when the player first walks into those view directions.
-            Device.PreCache(120, true);
+            Device.PreCache(frames, true);
         }
         else
 #endif

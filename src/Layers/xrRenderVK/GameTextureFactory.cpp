@@ -142,10 +142,24 @@ bool GameTextureFactory::load(const std::string &name, Asset *&asset, std::strin
     bool cube = false;
     // An atlas limit applies to the entire sheet, not one tree facet. Keep
     // authored LOD texel density while still selecting mip levels on the GPU.
-    const uint32_t maximum_dimension = preserve_resolution ? 0 : world_texture_limit(normalized, quality_preset);
+    const bool use_world_quality = !preserve_resolution && world_texture_uses_quality(normalized);
+    const uint32_t maximum_dimension = use_world_quality ? render_quality(quality_preset).texture_limit : 0;
+    unsigned mip_skip = 0;
+    if (use_world_quality)
+    {
+        bool reduce_first = false;
+        if (pSettings && pSettings->section_exist("reduce_lod_texture_list"))
+            for (const auto& entry : pSettings->r_section("reduce_lod_texture_list").Data)
+                if (normalized.find(entry.first.c_str()) != std::string::npos)
+                {
+                    reduce_first = true;
+                    break;
+                }
+        mip_skip = world_texture_mip_skip(psTextureLOD, reduce_first);
+    }
     const bool uploaded =
         upload_engine_texture(device_, queue_, pool_, memory_, dispatch_, reader->pointer(), reader->length(),
-                              bc_supported_, texture, pending_, states_, error, &extent, &cube, maximum_dimension);
+                              bc_supported_, texture, pending_, states_, error, &extent, &cube, maximum_dimension, mip_skip);
     FS.r_close(reader);
     const auto elapsed =
         std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - load_begin).count();
@@ -164,6 +178,7 @@ bool GameTextureFactory::load(const std::string &name, Asset *&asset, std::strin
     inserted->second.extent = {extent.width, extent.height};
     inserted->second.cube = cube;
     inserted->second.maximum_dimension = maximum_dimension;
+    inserted->second.mip_skip = mip_skip;
     // Conservative RGBA-equivalent residency estimate for DDS mip chains.
     inserted->second.bytes = uint64_t(extent.width) * extent.height * 4;
     asset = &inserted->second;
@@ -1128,7 +1143,7 @@ bool GameTextureFactory::reload_assets(std::string &error, const std::function<v
         VkExtent3D extent{};
         const bool loaded = upload_engine_texture(device_, queue_, pool_, memory_, dispatch_, source->pointer(),
                                                   source->length(), bc_supported_, replacement, pending_, states_,
-                                                  error, &extent, nullptr, asset.maximum_dimension);
+                                                  error, &extent, nullptr, asset.maximum_dimension, asset.mip_skip);
         FS.r_close(source);
         if (!loaded)
         {
