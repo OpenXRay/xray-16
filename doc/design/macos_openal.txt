@@ -1,0 +1,22 @@
+TITLE: OpenAL Soft on macOS
+
+  macOS builds require OpenAL Soft's CMake package. CMake's FindOpenAL module prefers Apple's system
+  framework, even when OpenAL Soft is installed. Config mode selects OpenAL Soft's imported target
+  and its matching headers without changing framework discovery for other dependencies.
+
+  Install OpenAL Soft and configure the engine with its installation prefix:
+
+    brew install openal-soft
+    cmake -S . -B build -DOpenAL_ROOT="$(brew --prefix openal-soft)"
+
+  OpenAL_DIR or CMAKE_PREFIX_PATH can also locate OpenALConfig.cmake. Both Apple Silicon and Intel
+  Homebrew installations are supported without hard-coded paths. Other platforms retain FindOpenAL.
+
+  Existing build directories may retain OPENAL_LIBRARY and OPENAL_INCLUDE_DIR cache entries pointing
+  to Apple's framework. Config mode does not use those entries; inspect the linked library instead:
+
+    otool -L bin/arm64/Debug/xrSound.dylib
+
+  Substitute the architecture and configuration used for the build. The output should reference
+  libopenal rather than OpenAL.framework. Redistributed builds must bundle the selected OpenAL Soft
+  library and its required dependencies. Verify device selection, positional audio and effects in game.
