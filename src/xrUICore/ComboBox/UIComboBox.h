@@ -54,6 +54,8 @@ public:
     void disable_id(int id);
     void enable_id(int id);
 
+    void SetCapture(CUIWindow* pChildWindow, bool capture_status) override;
+
     pcstr GetDebugType() override { return "CUIComboBox"; }
 
 protected:
