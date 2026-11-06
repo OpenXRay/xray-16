@@ -269,7 +269,9 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
             prepare_tangent_basis(model.vertices, model.indices);
             return true;
         };
-        if (const auto cached = material_cache.find(model.material); cached != material_cache.end())
+        const uint32_t material_key = uint32_t(model.material) |
+            (uint32_t(model.lod_pairs) << 16) | (uint32_t(model.tree) << 17);
+        if (const auto cached = material_cache.find(material_key); cached != material_cache.end())
         {
             const Mesh &source = *cached->second;
             if (source.lightmapped && !model.lightmap_uv)
@@ -521,10 +523,7 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
                                           definition.class_name == "S_SET   " && definition.pass.clamp);
         }
         if (model.lod_pairs && textures.lightmapped_material(diffuse, diffuse + "_nm", pass, mesh.material, error, true))
-        {
-            mesh.lightmapped = true;
             mesh.lod_atlas = true;
-        }
         const bool material_ready = mesh.lod_atlas ||
             (surface_roles        ? surface_ready
             : mesh.terrain       ? textures.terrain_material(diffuse, lightmap, terrain, pass, mesh.material, error)
@@ -542,6 +541,7 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
                     "' textures='" + material.textures + "': " + error;
             return false;
         }
+        mesh.owns_material = true;
         if (!tessellate())
             return false;
         if (packing.would_flush(model) && !flush_geometry())
@@ -557,7 +557,7 @@ bool GpuLevel::load(IReader &level, VkDevice device, VkQueue queue, VkCommandPoo
         mesh.index_count = static_cast<uint32_t>(model.indices.size());
         mesh.windows = model.windows;
         mesh.mode = mode;
-        material_cache.emplace(model.material, &mesh);
+        material_cache.emplace(material_key, &mesh);
         return true;
     };
     size_t released_cpu_bytes = 0;
@@ -1515,15 +1515,14 @@ void GpuLevel::destroy()
         wait_for_buffer_uploads(device_, pool_, upload_, pending_);
     visual_indices_.clear();
     visual_objects_.clear();
-    std::unordered_set<uint32_t> released_level_materials;
     if (textures_ && pass_)
         for (const Mesh &mesh : meshes_)
         {
-            if (!released_level_materials.insert(mesh.material_id).second)
+            if (!mesh.owns_material || !mesh.material)
                 continue;
-            if (!mesh.material)
-                continue;
-            if (mesh.surface || mesh.terrain || mesh.single_detail || mesh.environment)
+            if (mesh.lod_atlas)
+                textures_->release_lightmapped_material(mesh.material, *pass_);
+            else if (mesh.surface || mesh.terrain || mesh.single_detail || mesh.environment)
                 textures_->release_terrain_material(mesh.material, *pass_);
             else if (mesh.lightmapped)
                 textures_->release_lightmapped_material(mesh.material, *pass_);

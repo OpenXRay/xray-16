@@ -115,6 +115,7 @@ class GpuLevel
         uint32_t index_count{};
         std::vector<SlideWindow> windows;
         VkDescriptorSet material{};
+        bool owns_material{};
         uint32_t material_id{};
         std::string shader;
         SurfaceMode mode{SurfaceMode::Opaque};
