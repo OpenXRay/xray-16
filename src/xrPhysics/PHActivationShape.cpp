@@ -214,6 +214,7 @@ void CPHActivationShape::Destroy()
     dGeomDestroyUserData(m_geom);
     dGeomDestroy(m_geom);
     m_geom = nullptr;
+    CPHContactBodyEffector::InvalidateBody(m_body);
     dBodyDestroy(m_body);
     m_body = nullptr;
 }

@@ -166,7 +166,7 @@ void CPHObject::reinit_single()
     result.clear();
     dJointGroupEmpty(ContactGroup);
     ContactFeedBacks.empty();
-    ContactEffectors.empty();
+    ClearContactBodyEffectors();
 }
 
 void CPHObject::step_prediction(float time)

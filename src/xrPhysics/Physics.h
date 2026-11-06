@@ -33,6 +33,7 @@ const dReal* dJointGetPositionContact(dJointID joint);
 
 extern class CBlockAllocator<dJointFeedback, 128> ContactFeedBacks;
 extern CBlockAllocator<CPHContactBodyEffector, 128> ContactEffectors;
+void ClearContactBodyEffectors();
 // void NearCallback(void* /*data*/, dGeomID o1, dGeomID o2);
 void NearCallback(CPHObject* obj1, CPHObject* obj2, dGeomID o1, dGeomID o2);
 void CollideStatic(dGeomID o2, CPHObject* obj2);
