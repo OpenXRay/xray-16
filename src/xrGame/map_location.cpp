@@ -873,8 +873,8 @@ bool CRelationMapLocation::Update()
         {
             const CGameObject* pObj = smart_cast<const CGameObject*>(_object_);
             CActor* pAct = smart_cast<CActor*>(Level().Objects.net_Find(m_pInvOwnerActorID));
-            if (/*pAct->Position().distance_to_sqr(pObj->Position()) < 100.0F && */ abs(
-                    pObj->Position().y - pAct->Position().y) < 3.0f)
+            if (/*pAct->Position().distance_to_sqr(pObj->Position()) < 100.0F && */
+                abs(pObj->Position().y - pAct->Position().y) < 3.0f || pAct->memory().visual().visible_now(pObj))
                 vis_res = true;
             else
                 vis_res = false;

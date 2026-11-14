@@ -2627,5 +2627,7 @@ void CCC_RegisterCommands()
     CMD2(CCC_UI_Time_Dilation_Mode, "time_dilation_inventory", UITimeDilator::Inventory);
     CMD2(CCC_UI_Time_Dilation_Mode, "time_dilation_pda", UITimeDilator::Pda);
 
+    extern float gMinimapCorpseHeight;
+    CMD4(CCC_Float, "g_minimap_corpse_height", &gMinimapCorpseHeight, 0.5f, 50.0f);
     register_mp_console_commands();
 }
