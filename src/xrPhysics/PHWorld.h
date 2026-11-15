@@ -13,6 +13,12 @@
 // refs
 struct SGameMtlPair;
 class CPHCommander;
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+class GameplayBenchmark;
+#endif
+#ifdef XRAY_USE_JOLT_PHYSICS
+class JoltDynamicsWorld;
+#endif
 class CPHCondition;
 class CPHAction;
 struct SPHNetState;
@@ -44,7 +50,14 @@ class CPHWorld final : public IPHWorld,
 #endif
 {
 private:
+#ifdef XRAY_USE_JOLT_PHYSICS
+    JoltDynamicsWorld* m_dynamics = nullptr;
+    JoltDynamicsWorld* m_isolated_dynamics = nullptr;
+#endif
     PHWorldStatistics stats;
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    GameplayBenchmark* m_benchmark = nullptr;
+#endif
     double m_start_time;
     u32 m_delay;
     u32 m_previous_delay;
@@ -112,6 +125,15 @@ public:
     void FrameStep(dReal step = 0.025f);
     void Step();
     void StepTouch();
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    void BenchmarkBegin(pcstr phase);
+    void BenchmarkEnd();
+    void BenchmarkForceShell(CPhysicsShell* shell);
+    void BenchmarkQueries(const Fvector& origin);
+#endif
+#ifdef XRAY_USE_JOLT_PHYSICS
+    void StepIsland(CPHIsland& island, float step);
+#endif
     void CutVelocity(float l_limit, float a_limit);
     void GetState(V_PH_WORLD_STATE& state);
     void Freeze();
