@@ -4,6 +4,7 @@
 
 #include "xrCore/xrCore.h"
 
-#include "OPCODE/Opcode.h"
+#include "xrCDB.h"
+#include "ModelTree.h"
 
 #include "xrEngine/Engine.h"
