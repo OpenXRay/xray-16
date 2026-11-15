@@ -859,6 +859,12 @@ bool CRelationMapLocation::Update()
         if (go && actor)
         {
             // Show enemies only if they're visible to the actor or within the helmet's sensor range.
+            //
+            // Note: visible_now() has noticeable latency, causing enemies to remain displayed
+            // for some time after the actor loses sight of them.
+            // We allow this latency on lower single-player difficulties or when the helmet is sensor-capable.
+            //
+            // Note 2: visible_right_now() also has latency, but it's much shorter.
             const auto* helm = smart_cast<const CHelmet*>(actor->inventory().ItemFromSlot(HELMET_SLOT));
             if (helm && helm->m_fShowNearestEnemiesDistance > 0.0f)
             {
@@ -867,6 +873,8 @@ bool CRelationMapLocation::Update()
                 else
                     vis_res = actor->memory().visual().visible_now(go);
             }
+            else if (!IsGameTypeSingle() || g_SingleGameDifficulty >= egdVeteran)
+                vis_res = actor->memory().visual().visible_right_now(go);
             else
                 vis_res = actor->memory().visual().visible_now(go);
         }
