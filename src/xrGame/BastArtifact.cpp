@@ -27,29 +27,32 @@ CBastArtefact::CBastArtefact(void) : m_pHitedEntity(nullptr)
 CBastArtefact::~CBastArtefact(void) {}
 //вызывается при столкновении мочалки с чем-то
 void CBastArtefact::ObjectContactCallback(
-    bool& /**do_colide**/, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
+    bool& do_colide, bool bo1,
+    CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+    const Fvector& contact_normal, const Fvector& contact_pos,
+    SGameMtl* material_1, SGameMtl* material_2)
 {
-    dxGeomUserData* l_pUD1 = NULL;
-    dxGeomUserData* l_pUD2 = NULL;
-    l_pUD1 = PHRetrieveGeomUserData(c.geom.g1);
-    l_pUD2 = PHRetrieveGeomUserData(c.geom.g2);
+    // Извлекаем IPhysicsShellHolder прямо из новой геометрии
+    IPhysicsShellHolder* ref_1 = my_geom ? (IPhysicsShellHolder*)my_geom->get_callback_data() : nullptr;
+    IPhysicsShellHolder* ref_2 = oposite_geom ? (IPhysicsShellHolder*)oposite_geom->get_callback_data() : nullptr;
 
-    if (!l_pUD1 || !l_pUD2)
+    if (!ref_1 && !ref_2)
         return;
 
-    //определить кто есть кто, из двух столкнувшихся предметов
-    CBastArtefact* pBastArtefact = l_pUD1 ? smart_cast<CBastArtefact*>(l_pUD1->ph_ref_object) : NULL;
+    // определить кто есть кто, из двух столкнувшихся предметов
+    CBastArtefact* pBastArtefact = ref_1 ? smart_cast<CBastArtefact*>(ref_1) : nullptr;
     if (!pBastArtefact)
-        pBastArtefact = l_pUD2 ? smart_cast<CBastArtefact*>(l_pUD2->ph_ref_object) : NULL;
+        pBastArtefact = ref_2 ? smart_cast<CBastArtefact*>(ref_2) : nullptr;
+
     if (!pBastArtefact)
         return;
+
     if (!pBastArtefact->IsAttacking())
         return;
 
-    CEntityAlive* pEntityAlive = NULL;
-    pEntityAlive = l_pUD1 ? smart_cast<CEntityAlive*>(l_pUD1->ph_ref_object) : NULL;
+    CEntityAlive* pEntityAlive = ref_1 ? smart_cast<CEntityAlive*>(ref_1) : nullptr;
     if (!pEntityAlive)
-        pEntityAlive = l_pUD2 ? smart_cast<CEntityAlive*>(l_pUD2->ph_ref_object) : NULL;
+        pEntityAlive = ref_2 ? smart_cast<CEntityAlive*>(ref_2) : nullptr;
 
     pBastArtefact->BastCollision(pEntityAlive);
 }
