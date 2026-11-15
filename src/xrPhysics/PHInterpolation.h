@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CycleConstStorage.h"
-#include <ode/common.h>
+#include "xrPhysicsCore/IPhysicsCore.h"
 #include "xrCore/_vector3d.h"
 #include "xrCore/_quaternion.h"
 
@@ -9,21 +9,29 @@ class CPHInterpolation
 {
 public:
     CPHInterpolation();
-    void SetBody(dBodyID body);
+
+    void SetBody(BodyHandle body);
+    void SetCharacter(CharacterVirtualHandle character);
+
     static const u16 PH_INTERPOLATION_POINTS = 2;
+
     void InterpolatePosition(Fvector& pos);
     void InterpolateRotation(Fmatrix& rot);
     void UpdatePositions();
     void UpdateRotations();
+    void UpdateBody(const Fmatrix& transform);
     void ResetPositions();
     void ResetRotations();
+
     void GetRotation(Fquaternion& q, u16 num);
     void GetPosition(Fvector& p, u16 num);
     void SetRotation(const Fquaternion& q, u16 num);
     void SetPosition(const Fvector& p, u16 num);
 
 private:
-    dBodyID m_body;
+    enum class HandleType { None, Body, Character };
+    HandleType m_handle_type;
+    uint32_t m_handle;
     CCycleConstStorage<Fvector, PH_INTERPOLATION_POINTS> qPositions;
     CCycleConstStorage<Fquaternion, PH_INTERPOLATION_POINTS> qRotations;
 };

@@ -4,7 +4,7 @@
 
 class CGameObject;
 class CBlend;
-struct dContact;
+class CPhysicsGeom;
 struct SGameMtl;
 
 class interactive_animation : public physics_shell_animated
@@ -23,5 +23,8 @@ private:
     virtual void create_shell(CPhysicsShellHolder* O);
     bool collide();
     static void contact_callback(
-        bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/);
+        bool& do_colide, bool bo1,
+        CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+        const Fvector& contact_normal, const Fvector& contact_pos,
+        SGameMtl* material_1, SGameMtl* material_2);
 };

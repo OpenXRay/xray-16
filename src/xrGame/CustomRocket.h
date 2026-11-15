@@ -9,7 +9,7 @@
 #include "xrPhysics/PHUpdateObject.h"
 
 class CRocketLauncher;
-struct dContact;
+class CPhysicsGeom;
 struct SGameMtl;
 struct SRoketContact
 {
@@ -110,7 +110,10 @@ protected:
     virtual void Contact(const Fvector& pos, const Fvector& normal);
     void PlayContact();
     static void ObjectContactCallback(
-        bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/);
+        bool& do_colide, bool bo1,
+        CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+        const Fvector& contact_normal, const Fvector& contact_pos,
+        SGameMtl* material_1, SGameMtl* material_2);
 
     //////////////////////////////////////////////////////////////////////////
     //	Lights

@@ -1,10 +1,14 @@
 #pragma once
 
 #include "PHShell.h"
+#include "xrPhysicsCore/IPhysicsCore.h"
 
-class CPhysicsShellAnimatorBoneData //Содержит информацию об целевой матрице анимации
+class CPHElement;
+
+class CPhysicsShellAnimatorBoneData
 {
     friend class CPhysicsShellAnimator;
-    dJointID m_anim_fixed_dJointID;
-    CPHElement* m_element;
+    JointHandle m_anim_fixed_joint = INVALID_JOINT_HANDLE;
+    BodyHandle m_anim_target = INVALID_BODY_HANDLE;
+    CPHElement* m_element = nullptr;
 };
