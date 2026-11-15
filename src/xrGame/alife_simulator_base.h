@@ -13,7 +13,7 @@
 #include "xrAICore/Navigation/game_graph_space.h"
 #include "Common/object_interfaces.h"
 
-class IPureServer;
+class xrServer;
 class CALifeSimulatorHeader;
 class CALifeTimeManager;
 class CALifeSpawnRegistry;
@@ -42,7 +42,7 @@ class Manager;
 class CALifeSimulatorBase : public IPureDestroyableObject
 {
 protected:
-    IPureServer* m_server;
+    xrServer* m_server;
     CALifeSimulatorHeader* m_header;
     CALifeTimeManager* m_time_manager;
     CALifeSpawnRegistry* m_spawns;
@@ -80,7 +80,7 @@ public:
     inventory::upgrade::Manager& inventory_upgrade_manager() const;
 
 public:
-    CALifeSimulatorBase(IPureServer* server, LPCSTR section);
+    CALifeSimulatorBase(xrServer* server, LPCSTR section);
     virtual ~CALifeSimulatorBase();
     virtual void destroy();
     bool initialized() const { return m_initialized; }
@@ -94,7 +94,7 @@ public:
     const CALifeSmartTerrainRegistry& smart_terrains() const;
     const CALifeGroupRegistry& groups() const;
     CRandom32& random();
-    IPureServer& server() const;
+    xrServer& server() const;
     const CALifeTimeManager& time_manager() const;
     shared_str* server_command_line() const;
     template <typename T>

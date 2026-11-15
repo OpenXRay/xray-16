@@ -154,7 +154,7 @@ void CLevel::net_Stop()
     game_configured = FALSE;
 
     IGame_Level::net_Stop();
-    IPureClient::Disconnect();
+    NET_CLIENT_CLASS::Disconnect();
 
     if (Server)
     {
@@ -305,7 +305,7 @@ void CLevel::Send(NET_Packet& P, u32 dwFlags, u32 dwTimeout)
         Server->OnMessageSync(P, Game().local_svdpnid);
     }
     else
-        IPureClient::Send(P, dwFlags, dwTimeout);
+        NET_CLIENT_CLASS::Send(P, dwFlags, dwTimeout);
 
     if (g_pGameLevel && Level().game && GameID() != eGameIDSingle && !g_SV_Disable_Auth_Check)
     {
@@ -591,27 +591,27 @@ void CLevel::ClearAllObjects()
 
 void CLevel::OnInvalidHost()
 {
-    IPureClient::OnInvalidHost();
+    NET_CLIENT_CLASS::OnInvalidHost();
     if (MainMenu()->GetErrorDialogType() == CMainMenu::ErrNoError)
         MainMenu()->SetErrorDialog(CMainMenu::ErrInvalidHost);
 };
 
 void CLevel::OnInvalidPassword()
 {
-    IPureClient::OnInvalidPassword();
+    NET_CLIENT_CLASS::OnInvalidPassword();
     MainMenu()->SetErrorDialog(CMainMenu::ErrInvalidPassword);
 };
 
 void CLevel::OnSessionFull()
 {
-    IPureClient::OnSessionFull();
+    NET_CLIENT_CLASS::OnSessionFull();
     if (MainMenu()->GetErrorDialogType() == CMainMenu::ErrNoError)
         MainMenu()->SetErrorDialog(CMainMenu::ErrSessionFull);
 }
 
 void CLevel::OnConnectRejected()
 {
-    IPureClient::OnConnectRejected();
+    NET_CLIENT_CLASS::OnConnectRejected();
 
     //	if (MainMenu()->GetErrorDialogType() != CMainMenu::ErrNoError)
     //		MainMenu()->SetErrorDialog(CMainMenu::ErrServerReject);

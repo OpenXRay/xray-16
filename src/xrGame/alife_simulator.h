@@ -21,7 +21,7 @@ protected:
     virtual void reload(LPCSTR section);
 
 public:
-    CALifeSimulator(IPureServer* server, shared_str* command_line);
+    CALifeSimulator(xrServer* server, shared_str* command_line);
     virtual ~CALifeSimulator();
     virtual void destroy();
     IReader const* get_config(shared_str config) const;
