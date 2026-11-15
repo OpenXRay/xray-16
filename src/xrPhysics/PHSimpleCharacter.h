@@ -5,6 +5,9 @@
 #include "ElevatorState.h"
 #include "IColisiondamageInfo.h"
 #include "xrCDB/xr_collide_defs.h"
+#include "xrPhysicsCore/IPhysicsCore.h"
+
+class CPhysicsGeom;
 
 namespace ALife
 {
@@ -34,9 +37,12 @@ public:
         void Construct();
         float ContactVelocity() const;
         void HitDir(Fvector& dir) const;
-        IC const Fvector& HitPos() const { return cast_fv(m_damege_contact.geom.pos); }
+        IC const Fvector& HitPos() const { return m_damage_pos; }
         void Reinit();
-        dContact m_damege_contact;
+
+        Fvector m_damage_pos;
+        Fvector m_damage_normal;
+
         ICollisionHitCallback* m_hit_callback;
         u16 m_obj_id;
         float m_dmc_signum;
@@ -56,47 +62,41 @@ protected:
     SCollisionDamageInfo m_collision_damage_info;
     /////////////////////////// callback
     ObjectContactCallbackFun* m_object_contact_callback;
+    xr_vector<ObjectContactCallbackFun*> m_native_callbacks;
+    void* m_native_callback_data = nullptr;
     ////////////////////////// geometry
     Fvector m_last_move;
-    dGeomID m_geom_shell;
-    dGeomID m_wheel;
-    dGeomID m_hat;
-    dGeomID m_cap;
 
-    dGeomID m_hat_transform;
-    dGeomID m_wheel_transform;
-    dGeomID m_shell_transform;
-    dGeomID m_cap_transform;
+    CPhysicsGeom* m_geom_shell;
+    CPhysicsGeom* m_wheel;
+    CPhysicsGeom* m_hat;
+    CPhysicsGeom* m_cap;
 
-    dSpaceID m_space;
-
-    dReal m_radius;
-    dReal m_cyl_hight;
-    ///////////////////////////////////
-    // dJointID m_capture_joint;
-    // dJointFeedback m_capture_joint_feedback;
+    float m_radius;
+    float m_cyl_hight;
     ////////////////////////// movement
-    dVector3 m_control_force;
+    Fvector m_control_force;
     Fvector m_acceleration;
     Fvector m_cam_dir;
-    dVector3 m_wall_contact_normal;
-    dVector3 m_ground_contact_normal;
-    dVector3 m_clamb_depart_position;
-    dVector3 m_depart_position;
-    dVector3 m_wall_contact_position;
-    dVector3 m_ground_contact_position;
-    dReal jump_up_velocity; //=6.0f;//5.6f;
-    dReal m_collision_damage_factor;
-    dReal m_max_velocity;
+    Fvector m_wall_contact_normal;
+    Fvector m_ground_contact_normal;
+    Fvector m_clamb_depart_position;
+    Fvector m_depart_position;
+    Fvector m_wall_contact_position;
+    Fvector m_ground_contact_position;
 
+    float jump_up_velocity;
+    float m_collision_damage_factor;
+    float m_max_velocity;
     float m_air_control_factor;
 
-    dVector3 m_jump_depart_position;
-    dVector3 m_death_position;
+    Fvector m_jump_depart_position;
+    Fvector m_death_position;
     Fvector m_jump_accel;
 
     Fvector m_last_environment_update;
     u16 m_last_picked_material;
+
     // movement state
     bool is_contact;
     bool was_contact;
@@ -114,6 +114,7 @@ protected:
     bool b_on_ground;
     bool b_lose_ground;
     bool b_collision_restrictor_touch;
+    u32 m_air_frames;
     u32 m_contact_count;
 
     bool is_control;
@@ -126,28 +127,27 @@ protected:
     bool b_jumping;
     bool b_clamb_jump;
     bool b_external_impulse;
+
     u64 m_ext_impuls_stop_step;
     Fvector m_ext_imulse;
     bool b_death_pos;
     bool b_foot_mtl_check;
-    dReal m_friction_factor;
+    float m_friction_factor;
     bool b_non_interactive;
+    bool m_is_active;
+    ObjectContactCallbackFun* m_static_contact_callback{ nullptr };
+    ObjectContactCallbackFun* m_wheel_contact_callback{ nullptr };
 
 public:
     CPHSimpleCharacter();
     virtual ~CPHSimpleCharacter() { Destroy(); }
     /////////////////CPHObject//////////////////////////////////////////////
-    virtual void PhDataUpdate(dReal step);
-    virtual void PhTune(dReal step);
-    virtual void InitContact(dContact* c, bool& do_collide, u16 /*material_idx_1*/, u16 /*material_idx_2*/);
-    virtual dSpaceID dSpace() { return m_space; }
-    virtual dGeomID dSpacedGeom() { return (dGeomID)m_space; }
+    virtual void PhDataUpdate(float step);
+    virtual void PhTune(float step);
+    virtual void InitContact(bool& do_collide, bool bo1, float depth, CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom, u16 material_idx_1, u16 material_idx_2);
     virtual void get_spatial_params();
     /////////////////CPHCharacter////////////////////////////////////////////
 public:
-    // update
-
-    // Check state
     virtual bool ContactWas()
     {
         if (b_meet_control)
@@ -176,15 +176,13 @@ private:
     virtual ICollisionHitCallback* HitCallback() const;
     virtual void Reinit() { m_collision_damage_info.Reinit(); };
 public:
-    // Creating
-    virtual void Create(dVector3 sizes);
+    virtual void Create(Fvector sizes);
     virtual void Destroy(void);
     virtual void Disable();
     virtual void EnableObject(CPHObject* obj);
     virtual void Enable();
-    virtual void SetBox(const dVector3& sizes);
+    virtual void SetBox(const Fvector& sizes);
     virtual bool UpdateRestrictionType(CPHCharacter* ach);
-    // get-set
     virtual void SetObjectContactCallback(ObjectContactCallbackFun* callback);
     virtual void SetObjectContactCallbackData(void* data);
     virtual void SetWheelContactCallback(ObjectContactCallbackFun* callback);
@@ -192,12 +190,15 @@ public:
 private:
     void RemoveObjectContactCallback(ObjectContactCallbackFun* callback);
     void AddObjectContactCallback(ObjectContactCallbackFun* callback);
-    static void TestRestrictorContactCallbackFun(
-        bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2);
+    static void TestRestrictorContactCallbackFun(bool& do_colide, bool bo1, CPhysicsGeom* geom1, CPhysicsGeom* geom2, const Fvector& contact_normal, const Fvector& contact_pos, SGameMtl* material_1, SGameMtl* material_2);
+    static void JoltCharacterContactCallback(void* char_user_data, const Fvector& contact_pos, const Fvector& contact_normal, const Fvector& contact_vel, u32 tri_user_data, BodyHandle other_body_handle, void* other_body_user_data, bool is_sensor);
 
 public:
     virtual ObjectContactCallbackFun* ObjectContactCallBack();
-    virtual void SetStaticContactCallBack(ContactCallbackFun* calback);
+    void DispatchNativeContacts(bool& collide, bool first, CPhysicsGeom* geometry1, CPhysicsGeom* geometry2,
+        const Fvector& normal, const Fvector& position, SGameMtl* material1, SGameMtl* material2) override;
+    void ProcessNativeContact(const NativePhysicsContact& contact) override;
+    virtual void SetStaticContactCallBack(ObjectContactCallbackFun* calback);
     virtual void SwitchOFFInitContact();
     virtual void SwitchInInitContact();
     virtual void SetAcceleration(Fvector accel);
@@ -219,19 +220,19 @@ public:
     virtual void DeathPosition(Fvector& deathPos);
     virtual void IPosition(Fvector& pos);
     virtual u16 ContactBone();
-    virtual void ApplyImpulse(const Fvector& dir, const dReal P);
+    virtual void ApplyImpulse(const Fvector& dir, const float P);
     virtual void ApplyForce(const Fvector& force);
     virtual void ApplyForce(const Fvector& dir, float force);
     virtual void ApplyForce(float x, float y, float z);
     virtual void AddControlVel(const Fvector& vel);
-    virtual void SetMaximumVelocity(dReal vel) { m_max_velocity = vel; }
-    virtual dReal GetMaximumVelocity() { return m_max_velocity; }
-    virtual void SetJupmUpVelocity(dReal velocity) { jump_up_velocity = velocity; }
+    virtual void SetMaximumVelocity(float vel) { m_max_velocity = vel; }
+    virtual float GetMaximumVelocity() { return m_max_velocity; }
+    virtual void SetJupmUpVelocity(float velocity) { jump_up_velocity = velocity; }
     virtual bool JumpState() { return b_jumping || b_jump; };
     virtual const Fvector& ControlAccel() const { return m_acceleration; }
     virtual bool TouchRestrictor(ERestrictionType rttype);
     virtual float& FrictionFactor() { return m_friction_factor; }
-    virtual void SetMas(dReal mass);
+    virtual void SetMas(float mass);
     virtual float Mass() { return m_mass; };
     virtual void SetPhysicsRefObject(IPhysicsShellHolder* ref_object);
     virtual void SetNonInteractive(bool v);
@@ -239,21 +240,20 @@ public:
     {
         if (!b_exist)
             return false;
-        return !!dBodyIsEnabled(m_body);
+        return m_is_active;
     }
     virtual void GetBodyPosition(Fvector& vpos)
     {
         VERIFY(b_exist);
-        vpos = cast_fv(dBodyGetPosition(m_body));
+        GetPhysicsCore()->GetCharacterVirtualPosition(m_char_handle, vpos);
     }
     const Fvector& BodyPosition() const
     {
-        VERIFY(b_exist && m_body);
-        return cast_fv(dBodyGetPosition(m_body));
+        VERIFY(b_exist && m_char_handle != INVALID_CHARACTER_VIRTUAL_HANDLE);
+        static Fvector temp;
+        GetPhysicsCore()->GetCharacterVirtualPosition(m_char_handle, temp);
+        return temp;
     }
-    // virtual		void		CaptureObject						(dBodyID body,const dReal* anchor);
-    // virtual		void		CapturedSetPosition					(const dReal* position);
-    // virtual		void		doCaptureExist						(bool&	do_exist);
 
     virtual void get_State(SPHNetState& state);
     virtual void set_State(const SPHNetState& state);
@@ -267,12 +267,11 @@ private:
 
     u16 RetriveContactBone();
     void SafeAndLimitVelocity();
-    virtual void UpdateStaticDamage(dContact* c, SGameMtl* tri_material, bool bo1);
-    void UpdateDynamicDamage(dContact* c, u16 obj_material_idx, dBodyID b, bool bo1);
-    IC void FootProcess(dContact* c, bool& do_collide, bool bo);
+    virtual void UpdateStaticDamage(const Fvector& normal, const Fvector& pos, SGameMtl* tri_material, bool bo1);
+    void UpdateDynamicDamage(const Fvector& normal, const Fvector& pos, CharacterVirtualHandle b2, u16 obj_material_idx, bool bo1);
+    IC void FootProcess(const Fvector& normal, const Fvector& pos, bool& do_collide, bool bo, CPhysicsGeom* g);
     IC void foot_material_update(u16 tri_material, u16 foot_material_idx);
-    static void TestPathCallback(
-        bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/);
+    static void TestPathCallback(bool& do_colide, bool bo1, CPhysicsGeom* geom1, CPhysicsGeom* geom2, const Fvector& contact_normal, const Fvector& contact_pos, SGameMtl* material_1, SGameMtl* material_2);
     virtual void Collide();
     void OnStartCollidePhase();
 
@@ -286,8 +285,6 @@ private:
 
 protected:
     virtual void get_Box(Fvector& sz, Fvector& c) const;
-
-protected:
     virtual void update_last_material();
 
 public:
@@ -296,8 +293,8 @@ public:
 #endif
 };
 
-const dReal def_spring_rate = 0.5f;
-const dReal def_dumping_rate = 20.1f;
+const float def_spring_rate = 0.5f;
+const float def_dumping_rate = 20.1f;
 
 IC bool ignore_material(u16 material_idx)
 {

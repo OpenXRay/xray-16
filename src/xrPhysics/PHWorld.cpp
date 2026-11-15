@@ -1,13 +1,13 @@
 #include "StdAfx.h"
-
 #include "PHWorld.h"
-#include "tri-colliderknoopc/dTriList.h"
+#include "PHActorCharacter.h"
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+#include "GameplayBenchmark.h"
+#endif
 #include "PhysicsCommon.h"
-
 #include "ExtendedGeom.h"
-#include "dRayMotions.h"
 #include "PHCollideValidator.h"
-
+#include "PHContactBodyEffector.h"
 #include "params.h"
 #ifdef DEBUG
 #include "debug_output.h"
@@ -19,39 +19,277 @@
 #include "console_vars.h"
 #include "PHCommander.h"
 #include "PHSimpleCalls.h"
-
 #include "xrCore/FS_internal.h"
-
 #include "xrCDB/xr_area.h"
 #include "xrEngine/defines.h"
 #include "xrEngine/device.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
+#include "IPhysicsShellHolder.h"
+#include "Include/xrRender/Kinematics.h"
+#include "xrCore/Animation/Bone.hpp"
+#include "PhysicsShell.h"
+#include "PHShell.h"
+#include "PHElement.h"
+#include "PHStaticGeomShell.h"
+#include "PHCharacter.h"
 
-#ifdef DEBUG
-//				void DBG_ObjAfterPhDataUpdate	( CPHObject *obj );
-//				void DBG_ObjBeforePhDataUpdate	( CPHObject *obj );
-//				void DBG_ObjAfterStep			( CPHObject *obj );
-//				void DBG_ObjBeforeStep			( CPHObject *obj );
-//				void DBG_ObjeAfterPhTune		( CPHObject *obj );
-//				void DBG_ObjBeforePhTune		( CPHObject *obj );
-//				void DBG_ObjAfterCollision		( CPHObject *obj );
-//				void DBG_ObjBeforeCollision		( CPHObject *obj );
-#endif
-//////////////////////////////////////////////////////////////
-//////////////CPHMesh///////////////////////////////////////////
-///////////////////////////////////////////////////////////
-// BOOL		g_bDebugDumpPhysicsStep				= 0;
 CPHWorld* ph_world = 0;
+static xr_map<BodyHandle, CPHContactBodyEffector> native_contact_effectors;
+static void ApplyNativeContactEffectors()
+{
+    for (auto& [body, effector] : native_contact_effectors)
+        if (GetPhysicsCore()->GetBodyMass(body) > 0.f) effector.Apply();
+    native_contact_effectors.clear();
+}
+
+static void OnJoltBodyActivation(BodyHandle body, void* user_data, bool activated)
+{
+    if (!user_data) return;
+    CPHElement* element = static_cast<CPHElement*>(user_data);
+    CPHShell* shell = element->ph_shell();
+    if (!shell || !shell->isActive()) return;
+
+    IPhysicsShellHolder* holder = element->PhysicsRefObject();
+    if (!holder || holder->ObjectGetDestroy() || holder->has_parent_object())
+        return;
+
+    if (activated)
+    {
+        if (!shell->isEnabled())
+        {
+            shell->EnableObject(nullptr);
+        }
+    }
+    else
+    {
+        bool sleeping = true;
+        for (u16 index = 0; index < shell->get_ElementsNumber(); ++index)
+            if (GetPhysicsCore()->IsBodyActive(static_cast<CPHElement*>(shell->get_ElementByStoreOrder(index))->get_body())) sleeping = false;
+        if (sleeping && shell->isEnabled())
+        {
+            shell->InterpolateGlobalTransform(&holder->ObjectXFORM());
+            shell->DisableObject();
+            holder->ObjectSpatialMove();
+        }
+    }
+}
+
+static u16 GetDefaultCreatureMaterial()
+{
+    static u16 s_creature_mtl = GAMEMTL_NONE_IDX;
+    if (s_creature_mtl == GAMEMTL_NONE_IDX)
+    {
+        s_creature_mtl = GMLib.GetMaterialIdx("objects\\dead_body");
+        if (s_creature_mtl == GAMEMTL_NONE_IDX)
+            s_creature_mtl = GMLib.GetMaterialIdx("objects\\monster_body");
+        if (s_creature_mtl == GAMEMTL_NONE_IDX)
+            s_creature_mtl = GMLib.GetMaterialIdx("objects\\clothes");
+        if (s_creature_mtl == GAMEMTL_NONE_IDX)
+            s_creature_mtl = GMLib.GetMaterialIdx("creatures\\human");
+        if (s_creature_mtl == GAMEMTL_NONE_IDX)
+            s_creature_mtl = GMLib.GetMaterialIdx("materials\\cloth");
+        if (s_creature_mtl == GAMEMTL_NONE_IDX)
+            s_creature_mtl = GMLib.GetMaterialIdx("default");
+    }
+    return s_creature_mtl;
+}
+
+static PhysicsShapeHandle NativeCharacterPairShape(void* character, void* other)
+{
+    if (!character || !other) return nullptr;
+    auto* actor = static_cast<CPHCharacter*>(character)->CastActorCharacter();
+    if (!actor) return nullptr;
+    auto* geometry = actor->NativeRestrictionGeometry(static_cast<CPHCharacter*>(other));
+    return geometry ? geometry->geometry() : nullptr;
+}
+
+static bool OnJoltRBContact(const NativePhysicsContact& contact)
+{
+    if (!ph_world) return false;
+    void* user_data_1 = contact.object1;
+    void* user_data_2 = contact.object2;
+    const auto layer_1 = contact.kind1, layer_2 = contact.kind2;
+    const auto& pos = contact.position;
+    const auto& norm = contact.normal;
+    u16 mtl_1 = contact.material1, mtl_2 = contact.material2;
+
+    IPhysicsShellHolder* holder_1 = nullptr;
+    IPhysicsShellHolder* holder_2 = nullptr;
+    CPhysicsGeom* geom_1 = nullptr;
+    CPhysicsGeom* geom_2 = nullptr;
+
+    if (user_data_1)
+    {
+        if (layer_1 == 0 || layer_1 == 1 || layer_1 == 3) // 1 = Layers::MOVING (Props / Boxes / Barrels)
+        {
+            CPHElement* elem1 = reinterpret_cast<CPHElement*>(user_data_1);
+            holder_1 = elem1->PhysicsRefObject();
+            if (contact.geometry1 < elem1->numberOfGeoms()) geom_1 = elem1->geometry(contact.geometry1);
+            if (mtl_1 == GAMEMTL_NONE_IDX) {
+                if (geom_1 && geom_1->material != GAMEMTL_NONE_IDX) mtl_1 = geom_1->material;
+                else if (elem1->Material() != GAMEMTL_NONE_IDX) mtl_1 = elem1->Material();
+            }
+        }
+        else if (layer_1 == 5) {
+            auto* owner = static_cast<CPHStaticGeomShell*>(user_data_1);
+            holder_1 = owner->PhysicsRefObject();
+            if (contact.geometry1 < owner->numberOfGeoms()) geom_1 = owner->Geom(contact.geometry1);
+            if (mtl_1 == GAMEMTL_NONE_IDX && geom_1) mtl_1 = geom_1->material;
+        }
+        else if (layer_1 == 6) {
+            auto* character = static_cast<CPHCharacter*>(user_data_1);
+            holder_1 = character->PhysicsRefObject();
+            mtl_1 = character->GetMaterial();
+        }
+        else if (layer_1 == 2) // 2 = Layers::RAGDOLL (Stalkers / Monsters)
+        {
+            holder_1 = reinterpret_cast<IPhysicsShellHolder*>(user_data_1);
+            mtl_1 = GetDefaultCreatureMaterial();
+        }
+    }
+
+    if (user_data_2)
+    {
+        if (layer_2 == 0 || layer_2 == 1 || layer_2 == 3) // 1 = Layers::MOVING (Props / Boxes / Barrels)
+        {
+            CPHElement* elem2 = reinterpret_cast<CPHElement*>(user_data_2);
+            holder_2 = elem2->PhysicsRefObject();
+            if (contact.geometry2 < elem2->numberOfGeoms()) geom_2 = elem2->geometry(contact.geometry2);
+            if (mtl_2 == GAMEMTL_NONE_IDX) {
+                if (geom_2 && geom_2->material != GAMEMTL_NONE_IDX) mtl_2 = geom_2->material;
+                else if (elem2->Material() != GAMEMTL_NONE_IDX) mtl_2 = elem2->Material();
+            }
+        }
+        else if (layer_2 == 5) {
+            auto* owner = static_cast<CPHStaticGeomShell*>(user_data_2);
+            holder_2 = owner->PhysicsRefObject();
+            if (contact.geometry2 < owner->numberOfGeoms()) geom_2 = owner->Geom(contact.geometry2);
+            if (mtl_2 == GAMEMTL_NONE_IDX && geom_2) mtl_2 = geom_2->material;
+        }
+        else if (layer_2 == 6) {
+            auto* character = static_cast<CPHCharacter*>(user_data_2);
+            holder_2 = character->PhysicsRefObject();
+            mtl_2 = character->GetMaterial();
+        }
+        else if (layer_2 == 2) // 2 = Layers::RAGDOLL (Stalkers / Monsters)
+        {
+            holder_2 = reinterpret_cast<IPhysicsShellHolder*>(user_data_2);
+            mtl_2 = GetDefaultCreatureMaterial();
+        }
+    }
+
+    if (holder_1 && holder_1->ObjectGetDestroy()) return false;
+    if (holder_2 && holder_2->ObjectGetDestroy()) return false;
+
+    Fsphere sph1, sph2;
+    sph1.set(pos, 0.2f);
+    sph2.set(pos, 0.2f);
+    CSphereGeom dummy_g1(sph1);
+    CSphereGeom dummy_g2(sph2);
+    dummy_g1.contact_triangle = contact.triangle1;
+    dummy_g2.contact_triangle = contact.triangle2;
+    if (layer_1 == 6 && layer_2 == 6 && user_data_1 && user_data_2) {
+        auto* first = static_cast<CPHCharacter*>(user_data_1);
+        auto* second = static_cast<CPHCharacter*>(user_data_2);
+        if (auto* actor = first->CastActorCharacter()) {
+            geom_1 = actor->NativeRestrictionGeometry(second);
+        }
+        if (auto* actor = second->CastActorCharacter()) {
+            geom_2 = actor->NativeRestrictionGeometry(first);
+        }
+    }
+
+    if (!geom_1) {
+        dummy_g1.ph_ref_object = holder_1;
+        if (layer_1 == 6) dummy_g1.ph_object = static_cast<CPHCharacter*>(user_data_1);
+        geom_1 = &dummy_g1;
+    }
+    if (!geom_2) {
+        dummy_g2.ph_ref_object = holder_2;
+        if (layer_2 == 6) dummy_g2.ph_object = static_cast<CPHCharacter*>(user_data_2);
+        geom_2 = &dummy_g2;
+    }
+
+
+    if (mtl_1 == GAMEMTL_NONE_IDX || mtl_1 >= GMLib.CountMaterial())
+        mtl_1 = GMLib.GetMaterialIdx("default_object");
+    if (mtl_2 == GAMEMTL_NONE_IDX || mtl_2 >= GMLib.CountMaterial())
+        mtl_2 = GMLib.GetMaterialIdx("default");
+
+    SGameMtl* g_mtl1 = GMLib.GetMaterialByIdx(mtl_1);
+    SGameMtl* g_mtl2 = GMLib.GetMaterialByIdx(mtl_2);
+    struct ContactScope {
+        CPhysicsGeom* geometry;
+        const NativePhysicsContact* previous;
+        ContactScope(CPhysicsGeom* value, const NativePhysicsContact& contact)
+            : geometry(value), previous(value->contact_response) { geometry->contact_response = &contact; }
+        ~ContactScope() { geometry->contact_response = previous; }
+    } firstResponse(geom_1, contact), secondResponse(geom_2, contact);
+
+    if (!g_mtl1 || !g_mtl2) return true;
+    auto collectEffector = [&norm, &contact](CPhysicsGeom* geometry, SGameMtl* material, bool first) {
+        const auto body = first ? contact.body1 : contact.body2;
+        if (body == INVALID_BODY_HANDLE || !geometry->collide_fluids() ||
+            !material->Flags.test(SGameMtl::flSlowDown)) return;
+        const auto [entry, added] = native_contact_effectors.try_emplace(body);
+        Fvector normal = norm;
+        if (!first) normal.invert();
+        if (added) entry->second.Init(body, normal, contact.depth, material);
+        else entry->second.Merge(normal, contact.depth, material);
+    };
+    if (layer_1 == 1 || layer_1 == 3) collectEffector(geom_1, g_mtl2, true);
+    if (layer_2 == 1 || layer_2 == 3) collectEffector(geom_2, g_mtl1, false);
+
+    bool bo1 = (layer_1 == 1 || layer_1 == 2 || (holder_1 != nullptr && holder_2 == nullptr));
+
+    bool do_collide = true;
+    if (layer_1 == 6 && user_data_1) {
+        auto* character = static_cast<CPHCharacter*>(user_data_1);
+        if (layer_2 == 5 && user_data_2)
+            static_cast<CPHStaticGeomShell*>(user_data_2)->near_callback(character);
+        character->DispatchNativeContacts(do_collide, true, geom_1, geom_2, norm, pos, g_mtl1, g_mtl2);
+        if (do_collide || g_mtl2->Flags.test(SGameMtl::flPassable)) {
+            auto resolved = contact;
+            resolved.material1 = mtl_1;
+            resolved.material2 = mtl_2;
+            character->ProcessNativeContact(resolved);
+        }
+    }
+    if (layer_2 == 6 && user_data_2) {
+        auto* character = static_cast<CPHCharacter*>(user_data_2);
+        character->DispatchNativeContacts(do_collide, false, geom_1, geom_2, norm, pos, g_mtl1, g_mtl2);
+        auto resolved = contact;
+        std::swap(resolved.body1, resolved.body2);
+        std::swap(resolved.object1, resolved.object2);
+        std::swap(resolved.kind1, resolved.kind2);
+        std::swap(resolved.geometry1, resolved.geometry2);
+        std::swap(resolved.triangle1, resolved.triangle2);
+        resolved.material1 = mtl_2;
+        resolved.material2 = mtl_1;
+        resolved.normal.invert();
+        if (do_collide || g_mtl1->Flags.test(SGameMtl::flPassable))
+            character->ProcessNativeContact(resolved);
+    }
+    if (geom_1 && geom_1->object_callbacks)
+        geom_1->object_callbacks->Call(do_collide, true, geom_1, geom_2, norm, pos, g_mtl1, g_mtl2);
+    if (geom_2 && geom_2->object_callbacks)
+        geom_2->object_callbacks->Call(do_collide, false, geom_1, geom_2, norm, pos, g_mtl1, g_mtl2);
+    if (geom_1 && geom_1->contact_callback)
+        geom_1->contact_callback(do_collide, true, geom_1, geom_2, norm, pos, g_mtl1, g_mtl2);
+    else if (geom_2 && geom_2->contact_callback)
+        geom_2->contact_callback(do_collide, false, geom_1, geom_2, norm, pos, g_mtl1, g_mtl2);
+    else if (layer_1 != 6 && layer_2 != 6 && ph_world->default_contact_shotmark())
+        ph_world->default_contact_shotmark()(do_collide, bo1, geom_1, geom_2, norm, pos, g_mtl1, g_mtl2);
+    return do_collide;
+}
 
 IPHWorld* physics_world() { return ph_world; }
-void create_physics_world(
-    bool mt, CObjectSpace* os, CObjectList* lo)
+void create_physics_world(bool mt, CObjectSpace* os, CObjectList* lo)
 {
     ZoneScoped;
     ph_world = xr_new<CPHWorld>();
     VERIFY(os);
-    //		VERIFY( lo );
     ph_world->Create(mt, os, lo);
 }
 
@@ -63,31 +301,66 @@ void destroy_physics_world()
 }
 
 void destroy_object_space(CObjectSpace*& os) { xr_delete(os); }
-void CPHMesh::Create(dSpaceID space, dWorldID world)
-{
-    Geom = dCreateTriList(space, 0, 0);
-    CPHGeometryBits::init_geom(*this);
-}
-/////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////
+void CPHMesh::Create(CObjectSpace& space)
+{
+    const auto* model = space.GetStaticModel();
+    model->syncronize();
+    m_mesh_handle = model->acquire_physics_shape();
+    if (!m_mesh_handle)
+        m_mesh_handle = GetPhysicsCore()->BuildCDBModel(model->get_verts(), model->get_verts_count(),
+            model->get_tris(), model->get_tris_count());
+    R_ASSERT2(m_mesh_handle, "Jolt level collision shape creation failed");
+    m_body = GetPhysicsCore()->CreateStaticBody(m_mesh_handle, Fvector().set(0, 0, 0));
+    R_ASSERT2(m_body != INVALID_BODY_HANDLE, "Jolt level collision body creation failed");
+}
+
+static bool NativeCollisionFilter(void* first, u16 firstKind, void* second, u16 secondKind)
+{
+    auto object = [](void* data, u16 kind) -> CPHObject* {
+        if (!data) return nullptr;
+        if (kind == 0 || kind == 1 || kind == 3)
+            return static_cast<CPHElement*>(data)->ph_shell();
+        if (kind == 5) return static_cast<CPHStaticGeomShell*>(data);
+        if (kind == 6) return static_cast<CPHCharacter*>(data);
+        return nullptr;
+    };
+    auto* object1 = object(first, firstKind);
+    auto* object2 = object(second, secondKind);
+    // ODE's object broad phase excludes an object paired with itself. Jolt
+    // sees individual bodies, so apply the same rule to every shell element.
+    if (object1 && object1 == object2) return false;
+    if (object1 && object2) return CPHCollideValidator::DoCollide(*object1, *object2);
+    if (object1 && secondKind == 0) return CPHCollideValidator::DoCollideStatic(*object1);
+    if (object2 && firstKind == 0) return CPHCollideValidator::DoCollideStatic(*object2);
+    return true;
+}
+
+static bool NativeQueryFilter(void* data, u16 kind, void* ignored, bool camera)
+{
+    IPhysicsShellHolder* holder = nullptr;
+    if (data && (kind == 0 || kind == 1 || kind == 3))
+        holder = static_cast<CPHElement*>(data)->PhysicsRefObject();
+    else if (data && kind == 5)
+        holder = static_cast<CPHStaticGeomShell*>(data)->PhysicsRefObject();
+    else if (data && kind == 7)
+        holder = static_cast<IPhysicsShellHolder*>(data);
+    return !holder || (holder != ignored && (!camera || holder->IsCollideWithActorCamera()));
+}
 
 void CPHMesh::Destroy()
 {
-    dGeomDestroy(Geom);
-    dTriListClass = -1;
+    if (m_body != INVALID_BODY_HANDLE) {
+        GetPhysicsCore()->DestroyBody(m_body);
+        m_body = INVALID_BODY_HANDLE;
+    }
+    if (m_mesh_handle) {
+        GetPhysicsCore()->DestroyCDBModel(m_mesh_handle);
+        m_mesh_handle = nullptr;
+    }
 }
 
-////////////////////////////////////////////////////////////////////////////
-///////////CPHWorld/////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
-//#define PH_PLAIN
-#ifdef PH_PLAIN
-dGeomID plane;
-#endif
-
 #ifdef DEBUG
-
 void CPHWorld::OnRender() { debug_output().PH_DBG_Render(); }
 #endif
 
@@ -111,13 +384,10 @@ CPHWorld::CPHWorld()
     m_gravity = default_world_gravity;
     b_exist = false;
 }
+
 void CPHWorld::SetStep(float s)
 {
     fixed_step = s;
-    world_cfm = CFM(SPRING_S(base_cfm, base_erp, base_fixed_step), DAMPING(base_cfm, base_erp));
-    world_erp = ERP(SPRING_S(base_cfm, base_erp, base_fixed_step), DAMPING(base_cfm, base_erp));
-    world_spring = 1.0f * SPRING(world_cfm, world_erp);
-    world_damping = 1.0f * DAMPING(world_cfm, world_erp);
     if (ph_world && ph_world->Exist())
     {
         float frame_time = Device.fTimeDelta;
@@ -127,114 +397,78 @@ void CPHWorld::SetStep(float s)
         ph_world->m_frame_time = frame_time;
     }
 }
+
 void CPHWorld::Create(bool mt, CObjectSpace* os, CObjectList* lo)
 {
     ZoneScoped;
-
+    GetPhysicsCore()->Initialize();
+    GetPhysicsCore()->SetBodyActivationCallback(OnJoltBodyActivation);
+    GetPhysicsCore()->SetRigidBodyContactCallback(OnJoltRBContact);
+    GetPhysicsCore()->SetCollisionFilter(NativeCollisionFilter);
+    GetPhysicsCore()->SetPreIntegrationCallback(ApplyNativeContactEffectors);
+    GetPhysicsCore()->SetQueryFilter(NativeQueryFilter);
+    GetPhysicsCore()->SetCharacterPairShapeCallback(NativeCharacterPairShape);
     LoadParams();
-    dWorldID phWorld = 0;
     m_object_space = os;
     m_level_objects = lo;
     Device.AddSeqFrame(this, mt);
     m_commander = xr_new<CPHCommander>();
 
-// dVector3 extensions={2048,256,2048};
-/*
-Fbox	level_box		=	Level().ObjectSpace.GetBoundingVolume();
-Fvector level_size,level_center;
-level_box				.	getsize		(level_size);
-level_box				.	getcenter	(level_center);
-dVector3 extensions		=	{ level_size.x ,256.f,level_size.z};
-dVector3 center			=	{level_center.x,0.f,level_center.z};
-*/
-
-#ifdef ODE_SLOW_SOLVER
-#else
-
-    dWorldSetAutoEnableDepthSF1(phWorld, 100000000);
-/// dWorldSetContactSurfaceLayer(phWorld,0.f);
-// phWorld->contactp.min_depth =0.f;
-
-#endif
-    ContactGroup = dJointGroupCreate(0);
-    dWorldSetGravity(phWorld, 0, -Gravity(), 0); //-2.f*9.81f
-    Mesh.Create(0, phWorld);
-#ifdef PH_PLAIN
-    plane = dCreatePlane(Space, 0, 1, 0, 0.3f);
+    Mesh.Create(*os);
+    GetPhysicsCore()->SetSimulationParameters(m_gravity, phIterations);
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    m_benchmark = xr_new<GameplayBenchmark>();
 #endif
 
-    // const  dReal k_p=2400000.f;//550000.f;///1000000.f;
-    // const dReal k_d=200000.f;
-    dWorldSetERP(phWorld, ERP(world_spring, world_damping));
-    dWorldSetCFM(phWorld, CFM(world_spring, world_damping));
-    // dWorldSetERP(phWorld,  0.2f);
-    // dWorldSetCFM(phWorld,  0.000001f);
     disable_count = 0;
-    m_motion_ray = dCreateRayMotions(0);
     phBoundaries.set(inl_ph_world().ObjectSpace().GetBoundingVolume());
     phBoundaries.y1 -= 30.f;
     CPHCollideValidator::Init();
     b_exist = true;
 
-    StepNumIterations(phIterations);
     SetStep(ph_console::ph_step_time);
 }
-
-/////////////////////////////////////////////////////////////////////////////
 
 void CPHWorld::Destroy()
 {
     ZoneScoped;
-
+    GetPhysicsCore()->SetBodyActivationCallback(nullptr);
+    GetPhysicsCore()->SetRigidBodyContactCallback(nullptr);
+    GetPhysicsCore()->SetCollisionFilter(nullptr);
+    GetPhysicsCore()->SetPreIntegrationCallback(nullptr);
+    native_contact_effectors.clear();
+    GetPhysicsCore()->SetQueryFilter(nullptr);
+    GetPhysicsCore()->SetCharacterPairShapeCallback(nullptr);
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    xr_delete(m_benchmark);
+#endif
     r_spatial.clear();
     xr_delete(m_commander);
     Mesh.Destroy();
-#ifdef PH_PLAIN
-    dGeomDestroy(plane);
-#endif
-#ifdef DEBUG
-    debug_output().PH_DBG_Clear();
-#endif
-    dGeomDestroy(m_motion_ray);
-    dJointGroupEmpty(ContactGroup);
-    dJointGroupDestroy(ContactGroup);
-    ContactFeedBacks.clear();
-    ContactEffectors.clear();
-    dCloseODE();
-    dCylinderClassUser = -1;
-    dRayMotionsClassUser = -1;
+
+    // Очистка физического мира от объектов текущего уровня
+    GetPhysicsCore()->Clear();
+
     Device.RemoveSeqFrame(this);
     b_exist = false;
 }
+
 void CPHWorld::SetGravity(float g)
 {
     m_gravity = g;
-    dWorldID phWorld = 0;
-    dWorldSetGravity(phWorld, 0, -m_gravity, 0); //-2.f*9.81f
+    GetPhysicsCore()->SetSimulationParameters(g, phIterations);
 }
 
 void CPHWorld::OnFrame()
 {
     ZoneScoped;
     stats.FrameStart();
-// Msg									("------------- physics: %d / %d",u32(Device.dwFrame),u32(m_steps_num));
-//calculate the flight of bullets
-/*
-Device.Statistic->TEST0.Begin		();
-Level().BulletManager().Update		();
-Device.Statistic->TEST0.End			();
-*/
-#ifdef DEBUG
-// DBG_DrawFrameStart();
-// DBG_DrawStatBeforeFrameStep();
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    m_benchmark->Frame();
 #endif
     stats.MovCollision.Begin();
     FrameStep(Device.fTimeDelta);
     stats.MovCollision.End();
-#ifdef DEBUG
-// DBG_DrawStatAfterFrameStep();
-
-#endif
     stats.FrameEnd();
 }
 
@@ -250,16 +484,16 @@ void CPHWorld::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
         alert->Print(font, "Physics   > 5ms:  %3.1f", stats.MovCollision.result);
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// static dReal frame_time=0.f;
 static u32 start_time = 0;
 void CPHWorld::Step()
 {
-#ifdef DEBUG
-    debug_output().dbg_reused_queries_per_step() = 0;
-    debug_output().dbg_new_queries_per_step() = 0;
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    const bool capturing = m_benchmark->Active();
+    if (capturing)
+        m_benchmark->MaintainWorkload(fixed_step);
+    GameplayBenchmark::StepSample sample{};
+    const auto captureStart = GameplayBenchmark::Clock::now();
 #endif
-
     VERIFY(b_processing || IsFreezed());
 
     PH_OBJECT_I i_object;
@@ -285,105 +519,39 @@ void CPHWorld::Step()
     for (i_object = m_objects.begin(); m_objects.end() != i_object;)
     {
         CPHObject* obj = (*i_object);
-#ifdef DEBUG
-        debug_output().DBG_ObjBeforeCollision(obj);
-#endif
-        obj->Collide();
-#ifdef DEBUG
-        debug_output().DBG_ObjAfterCollision(obj);
-#endif
         ++i_object;
+        obj->Collide();
+        obj->PhTune(fixed_step);
     }
 
     stats.Collision.End();
 
-#ifdef DEBUG
-    for (i_object = m_objects.begin(); m_objects.end() != i_object;)
-    {
-        CPHObject* obj = (*i_object);
-        if (debug_output().ph_dbg_draw_mask().test(phDbgDrawEnabledAABBS))
-            debug_output().DBG_DrawPHObject(obj);
-        ++i_object;
-    }
-#endif
-
-    for (i_object = m_objects.begin(); m_objects.end() != i_object;)
-    {
-        CPHObject* obj = (*i_object);
-        ++i_object;
-
-#ifdef DEBUG
-        debug_output().DBG_ObjBeforePhTune(obj);
-#endif
-
-        obj->PhTune(fixed_step);
-
-#ifdef DEBUG
-        debug_output().DBG_ObjeAfterPhTune(obj);
-#endif
-    }
-
     for (i_update_object = m_update_objects.begin(); m_update_objects.end() != i_update_object;)
     {
-        CPHUpdateObject* obj = (*i_update_object);
+        (*i_update_object)->PhTune(fixed_step);
         ++i_update_object;
-        obj->PhTune(fixed_step);
     }
 
     stats.Core.Begin();
-
-#ifdef DEBUG
-    debug_output().dbg_bodies_num() = 0;
-    debug_output().dbg_joints_num() = 0;
-    debug_output().dbg_islands_num() = 0;
-#endif
-    //////////////////////////////////////////////////////////////////////
     m_commander->update_threadsafety();
-    //////////////////////////////////////////////////////////////////////
-    for (i_object = m_objects.begin(); m_objects.end() != i_object;)
-    {
-        CPHObject* obj = (*i_object);
-        ++i_object;
-#ifdef DEBUG
-        if (debug_output().ph_dbg_draw_mask().test(phDbgDrawObjectStatistics))
-        {
-            if (obj->Island().IsActive())
-            {
-                debug_output().dbg_islands_num()++;
-                debug_output().dbg_joints_num() += obj->Island().nj;
-                debug_output().dbg_bodies_num() += obj->Island().nb;
-            }
-        }
-#endif
 
-#ifdef DEBUG
-        debug_output().DBG_ObjBeforeStep(obj);
+    // --- ГЛОБАЛЬНЫЙ ШАГ JOLT ---
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    const auto captureCoreStart = GameplayBenchmark::Clock::now();
 #endif
-        obj->IslandStep(fixed_step);
-
-#ifdef DEBUG
-        debug_output().DBG_ObjAfterStep(obj);
+    GetPhysicsCore()->Step(fixed_step);
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    const auto captureCoreEnd = GameplayBenchmark::Clock::now();
 #endif
-    }
 
     stats.Core.End();
 
+    // Синхронизируем результаты обратно в движок
     for (i_object = m_objects.begin(); m_objects.end() != i_object;)
     {
         CPHObject* obj = (*i_object);
         ++i_object;
-        obj->IslandReinit();
-
-#ifdef DEBUG
-        debug_output().DBG_ObjBeforePhDataUpdate(obj);
-#endif
-
         obj->PhDataUpdate(fixed_step);
-
-#ifdef DEBUG
-        debug_output().DBG_ObjAfterPhDataUpdate(obj);
-#endif
-
         obj->spatial_move();
     }
 
@@ -394,18 +562,30 @@ void CPHWorld::Step()
         obj->PhDataUpdate(fixed_step);
     }
 
-#ifdef DEBUG
-    debug_output().dbg_contacts_num() = ContactGroup->num;
-#endif
-    dJointGroupEmpty(ContactGroup); // this is to be called after PhDataUpdate!!!-the order is critical!!!
-    ContactFeedBacks.empty();
-    ContactEffectors.empty();
-
     if (physics_step_time_callback)
     {
         physics_step_time_callback(start_time, start_time + u32(fixed_step * 1000));
         start_time += u32(fixed_step * 1000);
     };
+#ifdef XRAY_GAMEPLAY_BENCHMARK
+    if (capturing) {
+        sample.step = m_steps_num;
+        sample.dt = fixed_step;
+        sample.total = GameplayBenchmark::Milliseconds(GameplayBenchmark::Clock::now() - captureStart);
+        // Native collision detection and constraint solving occur in the same
+        // Jolt update. solver_ms reports their combined time, including callbacks.
+        sample.solver = GameplayBenchmark::Milliseconds(captureCoreEnd - captureCoreStart);
+        sample.collision = GameplayBenchmark::Milliseconds(captureCoreStart - captureStart);
+        const auto nativeStats = GetPhysicsCore()->GetStatistics();
+        sample.nativePreparation = nativeStats.contact_preparation_ms;
+        sample.nativeIntegration = nativeStats.integration_ms;
+        sample.nativeFeedback = nativeStats.feedback_ms;
+        sample.bodies = nativeStats.active_bodies + nativeStats.characters;
+        sample.joints = nativeStats.active_constraints;
+        sample.contacts = nativeStats.contact_points;
+        m_benchmark->Record(sample);
+    }
+#endif
 }
 
 void CPHWorld::StepTouch()
@@ -413,9 +593,7 @@ void CPHWorld::StepTouch()
     PH_OBJECT_I i_object;
     for (i_object = m_objects.begin(); m_objects.end() != i_object;)
     {
-        CPHObject* obj = (*i_object);
-        obj->Collide();
-
+        (*i_object)->Collide();
         ++i_object;
     }
 
@@ -423,18 +601,8 @@ void CPHWorld::StepTouch()
     {
         CPHObject* obj = (*i_object);
         ++i_object;
-        obj->Island().Enable();
-    }
-    for (i_object = m_objects.begin(); m_objects.end() != i_object;)
-    {
-        CPHObject* obj = (*i_object);
-        ++i_object;
-        obj->IslandReinit();
         obj->spatial_move();
     }
-    dJointGroupEmpty(ContactGroup);
-    ContactFeedBacks.empty();
-    ContactEffectors.empty();
 }
 
 u32 CPHWorld::CalcNumSteps(u32 dTime)
@@ -442,38 +610,21 @@ u32 CPHWorld::CalcNumSteps(u32 dTime)
     if (dTime < m_frame_time * 1000)
         return 0;
     u32 res = iCeil((float(dTime) - m_frame_time * 1000) / (fixed_step * 1000));
-    //	if (dTime < fixed_step*1000) return 0;
-    //	u32 res = iFloor((float(dTime) / 1000 / fixed_step)+0.5f);
     return res;
 };
 
-void CPHWorld::FrameStep(dReal step)
+void CPHWorld::FrameStep(float step)
 {
     if (IsFreezed())
         return;
 
     VERIFY(_valid(step));
     step *= phTimefactor;
-    // compute contact joints and forces
 
-    // step+=astep;
-
-    // const  dReal k_p=24000000.f;//550000.f;///1000000.f;
-    // const dReal k_d=400000.f;
     u32 it_number;
     float frame_time = m_frame_time;
     frame_time += step;
-// m_frame_sum+=step;
-#ifdef DEBUG
-    if (debug_output().ph_dbg_draw_mask().test(phDbgDrawObjectStatistics))
-    {
-        static float dbg_iterations = 0.f;
-        dbg_iterations = dbg_iterations * 0.9f + step / fixed_step * 0.1f;
-        b_processing = true;
-        debug_output().DBG_OutText("phys steps per frame %2.1f", dbg_iterations);
-        b_processing = false;
-    }
-#endif
+
     if (!(frame_time < fixed_step))
     {
         it_number = iFloor(frame_time / fixed_step);
@@ -487,79 +638,60 @@ void CPHWorld::FrameStep(dReal step)
         m_frame_time = frame_time;
         return;
     }
-// for(UINT i=0;i<(m_reduce_delay+1);++i)
-#ifdef DEBUG
-    debug_output().DBG_DrawFrameStart();
-    debug_output().DBG_DrawStatBeforeFrameStep();
-#endif
+
     b_processing = true;
 
-    start_time = Device.dwTimeGlobal; // - u32(m_frame_time*1000);
+    start_time = Device.dwTimeGlobal;
     if (ph_console::g_bDebugDumpPhysicsStep && it_number > 20)
         Msg("!!! TOO MANY PHYSICS STEPS PER FRAME = %d !!!", it_number);
+
     for (u32 i = 0; i < it_number; ++i)
         Step();
+
     b_processing = false;
-#ifdef DEBUG
-    debug_output().DBG_DrawStatAfterFrameStep();
-#endif
 }
 
-void CPHWorld::AddObject(CPHObject* object)
-{
-    m_objects.push_back(object);
-    // xr_list <CPHObject*> ::iterator i= m_objects.end();
-    // return (--m_objects.end());
-};
+void CPHWorld::AddObject(CPHObject* object) { m_objects.push_back(object); }
 void CPHWorld::AddRecentlyDisabled(CPHObject* object) { m_recently_disabled_objects.push_back(object); }
 void CPHWorld::RemoveFromRecentlyDisabled(PH_OBJECT_I i) { m_recently_disabled_objects.erase(i); }
-void CPHWorld::AddUpdateObject(CPHUpdateObject* object)
-{
-    //.	if(object->IsFreezed())m_freezed_update_objects.erase(i);
-    m_update_objects.push_back(object);
-}
-
+void CPHWorld::AddUpdateObject(CPHUpdateObject* object) { m_update_objects.push_back(object); }
 void CPHWorld::RemoveUpdateObject(PH_UPDATE_OBJECT_I i) { m_update_objects.erase(i); }
 void CPHWorld::RemoveObject(PH_OBJECT_I i) { m_objects.erase((i)); };
 void CPHWorld::AddFreezedObject(CPHObject* obj) { m_freezed_objects.push_back(obj); }
 void CPHWorld::RemoveFreezedObject(PH_OBJECT_I i) { m_freezed_objects.erase(i); }
+
 void CPHWorld::Freeze()
 {
-    R_ASSERT2(!b_world_freezed, "already freezed!!!");
+    R_ASSERT2(!b_world_freezed, "Physics world is already frozen");
     m_freezed_objects.move_items(m_objects);
-
-    PH_OBJECT_I iter = m_freezed_objects.begin(), e = m_freezed_objects.end();
-
-    for (; e != iter; ++iter)
-        (*iter)->FreezeContent();
-
+    for (auto* object : m_freezed_objects)
+        object->FreezeContent();
     m_freezed_update_objects.move_items(m_update_objects);
-
     b_world_freezed = true;
 }
+
 void CPHWorld::UnFreeze()
 {
-    R_ASSERT2(b_world_freezed, "is not freezed!!!");
-    PH_OBJECT_I iter = m_freezed_objects.begin(), e = m_freezed_objects.end();
-    for (; e != iter; ++iter)
-        (*iter)->UnFreezeContent();
-
+    R_ASSERT2(b_world_freezed, "Physics world is not frozen");
+    for (auto* object : m_freezed_objects)
+        object->UnFreezeContent();
     m_objects.move_items(m_freezed_objects);
-
     m_update_objects.move_items(m_freezed_update_objects);
     b_world_freezed = false;
 }
+
 bool CPHWorld::IsFreezed() { return b_world_freezed; }
+
 void CPHWorld::CutVelocity(float l_limit, float a_limit)
 {
     PH_OBJECT_I i_object;
     for (i_object = m_objects.begin(); m_objects.end() != i_object;)
     {
-        CPHObject* obj = (*i_object);
-        obj->CutVelocity(l_limit, a_limit);
+        (*i_object)->CutVelocity(l_limit, a_limit);
         ++i_object;
     }
 }
+
 void CPHWorld::NetRelcase(CPhysicsShell* s)
 {
     CPHReqComparerHasShell c(s);
@@ -571,7 +703,6 @@ void CPHWorld::NetRelcase(CPhysicsShell* s)
         CPHUpdateObject* obj = (*i_update_object);
         ++i_update_object;
         obj->NetRelcase(s);
-        // obj->PhTune(fixed_step);
     }
 }
 
@@ -582,6 +713,7 @@ void CPHWorld::AddCall(CPHCondition* c,CPHAction* a)
 
 u16 CPHWorld::ObjectsNumber() { return m_objects.count(); }
 u16 CPHWorld::UpdateObjectsNumber() { return m_update_objects.count(); }
+
 void CPHWorld::GetState(V_PH_WORLD_STATE& state)
 {
     state.clear();
@@ -601,4 +733,8 @@ void CPHWorld::GetState(V_PH_WORLD_STATE& state)
     }
 }
 
-void CPHWorld::StepNumIterations(int num_it) { dWorldSetQuickStepNumIterations(NULL, num_it); }
+void CPHWorld::StepNumIterations(int num_it)
+{
+    R_ASSERT(num_it > 0);
+    GetPhysicsCore()->SetSimulationParameters(m_gravity, num_it);
+}

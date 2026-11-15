@@ -1,12 +1,12 @@
 #pragma once
 
-#include <ode/common.h>
+#include "xrPhysicsCore/IPhysicsCore.h"
 
 class CPHBaseBodyEffector
 {
 protected:
-    dBodyID m_body;
+    CharacterVirtualHandle m_char_handle = INVALID_CHARACTER_VIRTUAL_HANDLE;
 
 public:
-    void Init(dBodyID body) { m_body = body; }
+    void Init(CharacterVirtualHandle body) { m_char_handle = body; }
 };
