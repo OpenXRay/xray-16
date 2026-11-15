@@ -836,51 +836,45 @@ bool CRelationMapLocation::Update()
         LoadSpot(sname.c_str());
         m_curr_spot_name = sname;
     }
+
     // update visibility
     bool vis_res = true;
-    if (m_last_relation == ALife::eRelationTypeEnemy || m_last_relation == ALife::eRelationTypeWorstEnemy)
+    if (!bAlive)
     {
-        IGameObject* _object_ = Level().Objects.net_Find(m_objectID);
-        if (_object_)
+        // Show dead bodies only if they're on the ~same floor or visible to the actor.
+        const auto* go = smart_cast<const CGameObject*>(Level().Objects.net_Find(m_objectID));
+        const auto* actor = smart_cast<const CActor*>(Level().Objects.net_Find(m_pInvOwnerActorID));
+        if (go && actor)
+            vis_res = abs(go->Position().y - actor->Position().y) < 3.0f || actor->memory().visual().visible_now(go);
+        else
+            vis_res = false;
+    }
+    else switch (m_last_relation)
+    {
+    case ALife::eRelationTypeEnemy:
+    case ALife::eRelationTypeWorstEnemy:
+    {
+        const auto* go = smart_cast<const CGameObject*>(Level().Objects.net_Find(m_objectID));
+        const auto* actor = smart_cast<const CActor*>(Level().Objects.net_Find(m_pInvOwnerActorID));
+        if (go && actor)
         {
-            CEntityAlive* ea = smart_cast<CEntityAlive*>(_object_);
-            if (ea && !ea->g_Alive())
-                vis_res = true;
-            else
+            // Show enemies only if they're visible to the actor or within the helmet's sensor range.
+            const auto* helm = smart_cast<const CHelmet*>(actor->inventory().ItemFromSlot(HELMET_SLOT));
+            if (helm && helm->m_fShowNearestEnemiesDistance > 0.0f)
             {
-                const CGameObject* pObj = smart_cast<const CGameObject*>(_object_);
-                CActor* pAct = smart_cast<CActor*>(Level().Objects.net_Find(m_pInvOwnerActorID));
-                CHelmet* helm = smart_cast<CHelmet*>(pAct->inventory().ItemFromSlot(HELMET_SLOT));
-                if (helm && helm->m_fShowNearestEnemiesDistance)
-                {
-                    if (pAct->Position().distance_to(pObj->Position()) < helm->m_fShowNearestEnemiesDistance)
-                        vis_res = true;
-                    else
-                        vis_res = Actor()->memory().visual().visible_now(pObj);
-                }
+                if (actor->Position().distance_to(go->Position()) < helm->m_fShowNearestEnemiesDistance)
+                    vis_res = true;
                 else
-                    vis_res = Actor()->memory().visual().visible_now(pObj);
+                    vis_res = actor->memory().visual().visible_now(go);
             }
-        }
-        else
-            vis_res = false;
-    }
-
-    if (bAlive == false)
-    {
-        IGameObject* _object_ = Level().Objects.net_Find(m_objectID);
-        if (_object_)
-        {
-            const CGameObject* pObj = smart_cast<const CGameObject*>(_object_);
-            CActor* pAct = smart_cast<CActor*>(Level().Objects.net_Find(m_pInvOwnerActorID));
-            if (abs(pObj->Position().y - pAct->Position().y) < 3.0f || pAct->memory().visual().visible_now(pObj))
-                vis_res = true;
             else
-                vis_res = false;
+                vis_res = actor->memory().visual().visible_now(go);
         }
         else
             vis_res = false;
+        break;
     }
+    } // switch (m_last_relation)
 
     if (m_b_visible == false && vis_res == true)
         m_minimap_spot->ResetXformAnimation();
