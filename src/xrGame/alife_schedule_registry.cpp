@@ -19,7 +19,7 @@ void CALifeScheduleRegistry::add(CSE_ALifeDynamicObject* object)
     if (!schedulable->need_update(object))
         return;
 
-    inherited::add(object->ID, schedulable);
+    inherited::add(object->ID, schedulable, true); // tolerant: object may already be registered
 }
 
 void CALifeScheduleRegistry::remove(CSE_ALifeDynamicObject* object, bool no_assert)

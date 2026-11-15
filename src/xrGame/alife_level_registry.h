@@ -29,7 +29,7 @@ protected:
 public:
     IC CALifeLevelRegistry(const GameGraph::_LEVEL_ID& level_id);
     IC void add(CSE_ALifeDynamicObject* tpALifeDynamicObject);
-    IC void remove(CSE_ALifeDynamicObject* tpALifeDynamicObject, bool no_assert = false);
+    IC void remove(CSE_ALifeDynamicObject* tpALifeDynamicObject, bool no_assert = true);
     template <typename _update_predicate>
     IC void update(const _update_predicate& predicate, bool const iterate_as_first_time_next_time);
     IC GameGraph::_LEVEL_ID level_id() const;

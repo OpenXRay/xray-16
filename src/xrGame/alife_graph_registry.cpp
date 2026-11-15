@@ -166,7 +166,7 @@ void CALifeGraphRegistry::add(CSE_ALifeDynamicObject* object, GameGraph::_GRAPH_
     if (!object->m_bOnline && object->used_ai_locations() /**&& object->interactive()**/)
     {
         VERIFY(ai().game_graph().valid_vertex_id(game_vertex_id));
-        m_objects[game_vertex_id].objects().add(object->ID, object);
+        m_objects[game_vertex_id].objects().add(object->ID, object, true); // tolerant: may already be registered
         object->m_tGraphID = game_vertex_id;
     }
     else if (!m_level && update)
@@ -190,8 +190,11 @@ void CALifeGraphRegistry::remove(CSE_ALifeDynamicObject* object, GameGraph::_GRA
                 game_vertex_id);
         }
 #endif
-        m_objects[game_vertex_id].objects().remove(object->ID);
+        // Tolerant removal: some scripts (e.g. CoC surge teleport) teleport objects
+        // that are not registered in the expected graph point bucket. Skipping the
+        // removal in that case matches the behaviour of the original CoC engine.
+        m_objects[game_vertex_id].objects().remove(object->ID, true);
     }
     if (update && m_level)
-        level().remove(object, ai().game_graph().vertex(game_vertex_id)->level_id() != level().level_id());
+        level().remove(object, true); // tolerant: object may be absent from the level registry
 }
