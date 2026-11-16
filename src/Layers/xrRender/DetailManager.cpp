@@ -234,6 +234,13 @@ void CDetailManager::Load()
 void CDetailManager::Unload()
 {
     ZoneScoped;
+
+    if (m_calc_task)
+    {
+        TaskScheduler->Wait(*m_calc_task);
+        m_calc_task = nullptr;
+    }
+
     if (UseVS())
         hw_Unload();
     else
@@ -408,7 +415,8 @@ void CDetailManager::Render(CBackend& cmd_list, const Fsphere* bounds)
 
     ZoneScoped;
 
-    TaskScheduler->Wait(*m_calc_task);
+    if (m_calc_task)
+        TaskScheduler->Wait(*m_calc_task);
 
     RImplementation.BasicStats.DetailRender.Begin();
     g_pGamePersistent->m_pGShaderConstants->m_blender_mode.w = 1.0f; //--#SM+#-- Флаг начала рендера травы [begin of grass render]
@@ -434,6 +442,8 @@ void CDetailManager::Render(CBackend& cmd_list, const Fsphere* bounds)
 
 void CDetailManager::DispatchMTCalc()
 {
+    R_ASSERT1_CURE(!m_calc_task || m_calc_task->IsFinished(), { return; });
+
     m_calc_task = &TaskScheduler->AddTask([this]
     {
 #ifndef _EDITOR
