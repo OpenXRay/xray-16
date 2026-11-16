@@ -14,4 +14,6 @@ public:
     void Init(dBodyID body, const dContact& contact, SGameMtl* material);
     void Merge(const dContact& contact, SGameMtl* material);
     void Apply();
+    void Detach();
+    static void InvalidateBody(dBodyID body);
 };

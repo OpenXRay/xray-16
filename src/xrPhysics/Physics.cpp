@@ -60,6 +60,12 @@ dJointGroupID ContactGroup;
 CBlockAllocator<dJointFeedback, 128> ContactFeedBacks;
 CBlockAllocator<CPHContactBodyEffector, 128> ContactEffectors;
 
+void ClearContactBodyEffectors()
+{
+    ContactEffectors.for_each([](CPHContactBodyEffector* effector) { effector->Detach(); });
+    ContactEffectors.empty();
+}
+
 ///////////////////////////////////////////////////////////
 class SApplyBodyEffectorPred
 {
