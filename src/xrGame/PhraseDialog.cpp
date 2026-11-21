@@ -154,34 +154,16 @@ CPhrase* CPhraseDialog::GetPhrase(const shared_str& phrase_id)
 LPCSTR CPhraseDialog::GetPhraseText(const shared_str& phrase_id, bool current_speaking)
 {
     // CPhraseGraph::CVertex* phrase_vertex = data()->m_PhraseGraph.vertex(phrase_id);
-    // THROW(phrase_vertex);
+    // THROW(phrase_vertex); pcstr CDialogScriptHelper::GetScriptText(cpcstr str_to_translate, const CGameObject* pSpeakerGO1,
+    //const CGameObject* pSpeakerGO2, cpcstr dialog_id, cpcstr phrase_id)
     // CPhrase*	ph = phrase_vertex->data();
     CPhrase* ph = GetPhrase(phrase_id);
 
     CGameObject* pSpeakerGO1 = (current_speaking) ? smart_cast<CGameObject*>(FirstSpeaker()) : NULL;
     CGameObject* pSpeakerGO2 = (current_speaking) ? smart_cast<CGameObject*>(SecondSpeaker()) : NULL;
     CGameObject* pSpeakerGO = NULL;
-
-    if (smart_cast<CActor*>(pSpeakerGO1))
-    {
-        pSpeakerGO = pSpeakerGO2;
-    }
-    else
-        pSpeakerGO = pSpeakerGO1;
-
-    if (ph->m_script_text_id.length() > 0)
-    {
-        luabind::functor<LPCSTR> lua_function;
-        [[maybe_unused]] bool functor_exists = GEnv.ScriptEngine->functor(ph->m_script_text_id.c_str(), lua_function);
-        THROW3(functor_exists, "Cannot find function", ph->m_script_text_id.c_str());
-
-        ph->m_script_text_val =
-            lua_function((pSpeakerGO) ? pSpeakerGO->lua_game_object() : NULL, m_DialogId.c_str(), phrase_id.c_str());
-        return ph->m_script_text_val.c_str();
-    }
-    else
-        return ph->GetScriptHelper()->GetScriptText(
-            ph->GetText(), pSpeakerGO1, pSpeakerGO2, m_DialogId.c_str(), phrase_id.c_str());
+    Msg(ph->GetText());
+    return ph->GetScriptHelper()->GetScriptText(ph->GetText(),pSpeakerGO1, pSpeakerGO2, m_DialogId.c_str(), phrase_id.c_str());
 }
 
 LPCSTR CPhraseDialog::DialogCaption() { return data()->m_sCaption.size() ? data()->m_sCaption.c_str() : GetPhraseText("0"); }
