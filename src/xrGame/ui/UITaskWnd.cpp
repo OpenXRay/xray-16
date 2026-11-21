@@ -45,6 +45,7 @@ bool CUITaskWnd::Init()
         xr_delete(m_filters);
     else
     {
+        m_filters->SetAutoDelete(true);
         AttachChild(m_filters);
         m_filters->SetMessageTarget(this);
     }

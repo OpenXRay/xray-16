@@ -582,9 +582,6 @@ bool CActor::net_Spawn(CSE_Abstract* DC)
     CSE_ALifeTraderAbstract* pTA = smart_cast<CSE_ALifeTraderAbstract*>(e);
     set_money(pTA->m_dwMoney, false);
 
-    // clear artefacts on belt
-    m_ArtefactsOnBelt.clear();
-
     ROS()->force_mode(IRender_ObjectSpecific::TRACE_ALL);
 
     // mstate_wishful = E->mstate;
@@ -774,9 +771,8 @@ void CActor::net_Destroy()
     m_holder = NULL;
     m_holderID = u16(-1);
 
-    m_ArtefactsOnBelt.clear();
     if (Level().CurrentViewEntity() == this && CurrentGameUI()->UIMainIngameWnd->UIArtefactPanel)
-        CurrentGameUI()->UIMainIngameWnd->UIArtefactPanel->InitIcons(m_ArtefactsOnBelt);
+        CurrentGameUI()->UIMainIngameWnd->UIArtefactPanel->Clear();
 
     SetDefaultVisualOutfit(NULL);
 

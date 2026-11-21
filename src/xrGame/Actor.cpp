@@ -1789,6 +1789,10 @@ void CActor::OnItemDrop(CInventoryItem* inventory_item, bool just_before_destroy
 {
     CInventoryOwner::OnItemDrop(inventory_item, just_before_destroy);
 
+    const auto artefact = smart_cast<CArtefact*>(inventory_item);
+    if (artefact && artefact->m_ItemCurrPlace.type == eItemPlaceBelt)
+        UpdateArtefactPanel();
+
     CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(inventory_item);
     if (outfit && inventory_item->m_ItemCurrPlace.type == eItemPlaceSlot)
     {
@@ -1811,10 +1815,6 @@ void CActor::OnItemDrop(CInventoryItem* inventory_item, bool just_before_destroy
         if (grenade)
             inventory().Slot(GRENADE_SLOT, grenade, true, true);
     }
-
-    CArtefact* artefact = smart_cast<CArtefact*>(inventory_item);
-    if (artefact && artefact->m_ItemCurrPlace.type == eItemPlaceBelt)
-        MoveArtefactBelt(artefact, false);
 }
 
 void CActor::OnItemDropUpdate()
@@ -1830,37 +1830,35 @@ void CActor::OnItemRuck(CInventoryItem* inventory_item, const SInvItemPlace& pre
 {
     CInventoryOwner::OnItemRuck(inventory_item, previous_place);
 
-    CArtefact* artefact = smart_cast<CArtefact*>(inventory_item);
-    if (artefact && previous_place.type == eItemPlaceBelt)
-        MoveArtefactBelt(artefact, false);
+    if (previous_place.type == eItemPlaceBelt && smart_cast<CArtefact*>(inventory_item))
+        UpdateArtefactPanel();
 }
 
 void CActor::OnItemBelt(CInventoryItem* inventory_item, const SInvItemPlace& previous_place)
 {
     CInventoryOwner::OnItemBelt(inventory_item, previous_place);
 
-    CArtefact* artefact = smart_cast<CArtefact*>(inventory_item);
-    if (artefact)
-        MoveArtefactBelt(artefact, true);
+    if (smart_cast<CArtefact*>(inventory_item))
+        UpdateArtefactPanel();
 }
 
-void CActor::MoveArtefactBelt(const CArtefact* artefact, bool on_belt)
+void CActor::UpdateArtefactPanel()
 {
-    VERIFY(artefact);
+    if (Level().CurrentViewEntity() != this || !CurrentGameUI()->UIMainIngameWnd->UIArtefactPanel)
+        return;
 
-    if (on_belt)
+    const auto& belt = inventory().m_belt;
+    const auto belt_size = belt.size();
+
+    buffer_vector<pcstr> temp{ xr_alloca(belt_size * sizeof(pcstr)), belt_size };
+
+    for (const auto& item : belt)
     {
-        VERIFY(m_ArtefactsOnBelt.end() == std::find(m_ArtefactsOnBelt.begin(), m_ArtefactsOnBelt.end(), artefact));
-        m_ArtefactsOnBelt.push_back(artefact);
+        if (const auto artefact = smart_cast<CArtefact*>(item))
+            temp.push_back(artefact->cNameSect().c_str());
     }
-    else
-    {
-        auto it = std::remove(m_ArtefactsOnBelt.begin(), m_ArtefactsOnBelt.end(), artefact);
-        VERIFY(it != m_ArtefactsOnBelt.end());
-        m_ArtefactsOnBelt.erase(it);
-    }
-    if (Level().CurrentViewEntity() && Level().CurrentViewEntity() == this && CurrentGameUI()->UIMainIngameWnd->UIArtefactPanel)
-        CurrentGameUI()->UIMainIngameWnd->UIArtefactPanel->InitIcons(m_ArtefactsOnBelt);
+
+    CurrentGameUI()->UIMainIngameWnd->UIArtefactPanel->InitIcons(temp);
 }
 
 #define ARTEFACTS_UPDATE_TIME 0.100f
