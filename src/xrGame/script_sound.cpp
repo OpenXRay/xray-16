@@ -46,6 +46,46 @@ Fvector CScriptSound::GetPosition() const
     }
 }
 
+float CScriptSound::GetFrequency() const
+{
+    VERIFY(m_sound._handle() || m_bIsNoSound);
+    const CSound_params* params = m_sound.get_params();
+    if (params)
+        return params->freq;
+    GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Sound was not launched, can't get frequency!");
+    return 0.f;
+}
+
+float CScriptSound::GetMinDistance() const
+{
+    VERIFY(m_sound._handle() || m_bIsNoSound);
+    const CSound_params* params = m_sound.get_params();
+    if (params)
+        return params->min_distance;
+    GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Sound was not launched, can't get min_distance!");
+    return 0.f;
+}
+
+float CScriptSound::GetMaxDistance() const
+{
+    VERIFY(m_sound._handle() || m_bIsNoSound);
+    const CSound_params* params = m_sound.get_params();
+    if (params)
+        return params->max_distance;
+    GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Sound was not launched, can't get max_distance!");
+    return 0.f;
+}
+
+float CScriptSound::GetVolume() const
+{
+    VERIFY(m_sound._handle() || m_bIsNoSound);
+    const CSound_params* params = m_sound.get_params();
+    if (params)
+        return params->volume;
+    GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Sound was not launched, can't get volume!");
+    return 0.f;
+}
+
 void CScriptSound::Play(CScriptGameObject* object, float delay, int flags)
 {
     THROW3(m_sound._handle() || m_bIsNoSound, "There is no sound", m_caSoundToPlay.c_str());
