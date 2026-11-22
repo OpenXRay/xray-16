@@ -812,6 +812,9 @@ void CScriptGameObject::AllowBreakTalkDialog(bool b)
     CInventoryOwner* inv_owner = smart_cast<CInventoryOwner*>(&object());
     VERIFY(inv_owner);
     inv_owner->bDisableBreakDialog = !b;
+
+    if (CUIGameSP* sp = smart_cast<CUIGameSP*>(CurrentGameUI()))
+        sp->SetTalkBreakDisabled(!b);  
 }
 
 void CScriptGameObject::RunTalkDialog(CScriptGameObject* pToWho, bool disable_break)

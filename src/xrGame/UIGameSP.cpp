@@ -223,6 +223,10 @@ void CUIGameSP::StartTalk(bool disable_break)
     TalkMenu->ShowDialog(true);
 }
 
+void CUIGameSP::SetTalkBreakDisabled(bool disable_break) {
+    TalkMenu->b_disable_break = disable_break;
+}
+
 void CUIGameSP::StartCarBody(CInventoryOwner* pActorInv, CInventoryOwner* pOtherOwner) // Deadbody search
 {
     if (TopInputReceiver())

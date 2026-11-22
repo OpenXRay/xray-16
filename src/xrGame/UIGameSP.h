@@ -32,6 +32,7 @@ public:
     virtual void OnFrame();
     void OnUIReset() override;
 
+    void SetTalkBreakDisabled(bool disable_break);
     void StartTalk(bool disable_break);
     void StartTrade(CInventoryOwner* pActorInv, CInventoryOwner* pOtherOwner);
     void StartUpgrade(CInventoryOwner* pActorInv, CInventoryOwner* pMech);
