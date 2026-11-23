@@ -170,6 +170,14 @@ void CLevel::IR_OnKeyboardPress(int key)
         Console->Show();
         return;
 
+    case kTOGGLE_HUD:
+        if (b_ui_exist && !CurrentGameUI()->TopInputReceiver())
+        {
+            psHUD_Flags.invert(HUD_INDICATORS_RT);
+            return;
+        }
+        break;
+
     case kQUIT:
     {
         if (b_ui_exist && CurrentGameUI()->TopInputReceiver() && !Device.Paused())
