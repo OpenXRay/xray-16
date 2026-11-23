@@ -29,37 +29,17 @@ IC void CScriptSound::PlayAtPos(CScriptGameObject* object, const Fvector& positi
 IC void CScriptSound::SetMinDistance(const float fMinDistance)
 {
     VERIFY(m_sound._handle() || m_bIsNoSound);
+    if (!m_sound._feedback())
+        return;
     m_sound.set_range(fMinDistance, GetMaxDistance());
 }
 
 IC void CScriptSound::SetMaxDistance(const float fMaxDistance)
 {
     VERIFY(m_sound._handle() || m_bIsNoSound);
+    if (!m_sound._feedback())
+        return;
     m_sound.set_range(GetMinDistance(), fMaxDistance);
-}
-
-IC float CScriptSound::GetFrequency() const
-{
-    VERIFY(m_sound._handle() || m_bIsNoSound);
-    return (m_sound.get_params()->freq);
-}
-
-IC float CScriptSound::GetMinDistance() const
-{
-    VERIFY(m_sound._handle() || m_bIsNoSound);
-    return (m_sound.get_params()->min_distance);
-}
-
-IC float CScriptSound::GetMaxDistance() const
-{
-    VERIFY(m_sound._handle() || m_bIsNoSound);
-    return (m_sound.get_params()->max_distance);
-}
-
-IC float CScriptSound::GetVolume() const
-{
-    VERIFY(m_sound._handle() || m_bIsNoSound);
-    return (m_sound.get_params()->volume);
 }
 
 IC bool CScriptSound::IsPlaying() const
