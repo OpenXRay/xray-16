@@ -29,7 +29,6 @@ CUITalkWnd::CUITalkWnd() : CUIDialogWnd(CUITalkWnd::GetDebugType())
 
     InitTalkWnd();
     m_bNeedToUpdateQuestions = false;
-    b_disable_break = false;
 }
 
 void CUITalkWnd::InitTalkWnd()
@@ -72,7 +71,7 @@ void CUITalkWnd::InitTalkDialog()
     UITalkDialogWnd->mechanic_mode = m_pOthersInvOwner->SpecificCharacter().upgrade_mechanic();
     UITalkDialogWnd->SetOsoznanieMode(m_pOthersInvOwner->NeedOsoznanieMode());
     UITalkDialogWnd->Show();
-    UITalkDialogWnd->UpdateButtonsLayout(b_disable_break, m_pOthersInvOwner->IsTradeEnabled());
+    UITalkDialogWnd->UpdateButtonsLayout(!CanStopTalk(), m_pOthersInvOwner->IsTradeEnabled());
 }
 
 void CUITalkWnd::InitOthersStartDialog()
@@ -217,7 +216,7 @@ void CUITalkWnd::Update()
     inherited::Update();
     UpdateCameraDirection(smart_cast<CGameObject*>(m_pOthersInvOwner));
 
-    UITalkDialogWnd->UpdateButtonsLayout(b_disable_break, m_pOthersInvOwner->IsTradeEnabled());
+    UITalkDialogWnd->UpdateButtonsLayout(!CanStopTalk(), m_pOthersInvOwner->IsTradeEnabled());
 
     if (playing_sound())
     {
@@ -358,7 +357,7 @@ bool CUITalkWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     {
         if (IsBinded(kUSE, dik) || IsBinded(kQUIT, dik) || IsBinded(kUI_BACK, dik, EKeyContext::UI))
         {
-            if (!b_disable_break)
+            if (CanStopTalk())
             {
                 HideDialog();
                 return true;
@@ -483,3 +482,8 @@ void CUITalkWnd::AddIconedMessage(pcstr caption, pcstr text, pcstr texture_name,
 
 void CUITalkWnd::StopTalk() { HideDialog(); }
 void CUITalkWnd::Stop() {}
+
+bool CUITalkWnd::CanStopTalk() const
+{
+    return !m_pOurInvOwner->bDisableBreakDialog && !m_pOthersInvOwner->bDisableBreakDialog;
+}

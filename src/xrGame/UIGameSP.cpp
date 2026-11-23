@@ -214,12 +214,11 @@ void CUIGameSP::StartUpgrade(CInventoryOwner* pActorInv, CInventoryOwner* pMech)
     ActorMenu->ShowDialog(true);
 }
 
-void CUIGameSP::StartTalk(bool disable_break)
+void CUIGameSP::StartTalk()
 {
     RemoveCustomStatic("main_task");
     RemoveCustomStatic("secondary_task");
 
-    TalkMenu->b_disable_break = disable_break;
     TalkMenu->ShowDialog(true);
 }
 

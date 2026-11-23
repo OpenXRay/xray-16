@@ -32,7 +32,7 @@ public:
     virtual void OnFrame();
     void OnUIReset() override;
 
-    void StartTalk(bool disable_break);
+    void StartTalk();
     void StartTrade(CInventoryOwner* pActorInv, CInventoryOwner* pOtherOwner);
     void StartUpgrade(CInventoryOwner* pActorInv, CInventoryOwner* pMech);
     void StartCarBody(CInventoryOwner* pActorInv, CInventoryOwner* pOtherOwner);
