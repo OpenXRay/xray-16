@@ -112,6 +112,7 @@ void CPHCommander::update()
         }
         catch (...)
         {
+            Msg("! [PHCommander] call removed after an exception in its check");
             remove_call(m_calls.begin() + i);
             i--;
             continue;
