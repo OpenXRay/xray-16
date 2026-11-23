@@ -79,7 +79,7 @@ void CALifeSimulatorBase::unregister_object(CSE_ALifeDynamicObject* object, bool
     else if (object->ID_Parent == 0xffff)
     {
         //			if (object->used_ai_locations())
-        graph().level().remove(object, !object->used_ai_locations());
+        graph().level().remove(object, true); // tolerant: object may be absent from the level registry
     }
 }
 

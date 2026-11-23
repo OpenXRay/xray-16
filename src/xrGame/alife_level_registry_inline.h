@@ -23,7 +23,7 @@ IC void CALifeLevelRegistry::add(CSE_ALifeDynamicObject* object)
         Msg("[LSS] adding object [%s][%d] to current level", object->name_replace(), object->ID);
     }
 #endif
-    inherited::add(object->ID, object);
+    inherited::add(object->ID, object, true); // tolerant: object may already be registered
 }
 
 IC void CALifeLevelRegistry::remove(CSE_ALifeDynamicObject* object, bool no_assert)
