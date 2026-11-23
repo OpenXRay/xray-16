@@ -1,0 +1,11 @@
+{
+    "runtime":  "OptimizedNative4",
+    "repetition":  2,
+    "source_commit":  "82307c47d6bda8050eb7c7d4113c3b6620f038fc",
+    "reason":  "Reload completed all 12 checks and DONE, then exited with access violation",
+    "reload_exit_code":  -1073741819,
+    "main_exit_code":  null,
+    "physics_sha256":  "7B90B513DFF68ED22488FB33BECD70684EC42ED150D255681890956AE603F0D9",
+    "core_sha256":  "9ECCAD1B4FD46713DEA2BA1EF3BFD9B098F375756CAB67CE0F1D7C49FCCD187D",
+    "game_sha256":  "D0864B84B784EF4E200F925F68984CC8AEC2A1880D4B66CC81891A5E70A417EE"
+}

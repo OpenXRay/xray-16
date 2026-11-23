@@ -1,7 +1,8 @@
 #pragma once
 
 #include "DisablingParams.h"
-#include <ode/common.h>
+#include "xrPhysicsCore/IPhysicsCore.h"
+struct NativeBodyState;
 
 struct SDisableVector
 {
@@ -15,6 +16,7 @@ struct SDisableVector
 
     SDisableVector();
 };
+
 struct SDisableUpdateState
 {
     bool disable;
@@ -46,12 +48,14 @@ protected:
     }
 
     void Disabling();
+    bool BeginDisabling();
+    void EndDisabling(const Fvector& force, const Fvector& torque);
     void Reinit();
     virtual void Disable() = 0;
     virtual void ReEnable() = 0;
     virtual void UpdateL1() = 0;
     virtual void UpdateL2() = 0;
-    virtual dBodyID get_body() = 0;
+    virtual CharacterVirtualHandle get_body() = 0; // dBodyID -> CharacterVirtualHandle
 };
 
 class CPHDisablingBase : public virtual CBaseDisableData
@@ -96,9 +100,11 @@ public:
     virtual void set_DisableParams(const SAllDDOParams& params);
 };
 
-class CPHDisablingFull : public CPHDisablingTranslational, public CPHDisablingRotational
+class CPHDisablingFull : public CPHDisablingRotational, public CPHDisablingTranslational
 {
 public:
+    using CBaseDisableData::Disabling;
+    void Disabling(const NativeBodyState& state);
     void Reinit();
     virtual void UpdateL1();
     virtual void UpdateL2();
