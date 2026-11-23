@@ -2,7 +2,7 @@
 #include "hud_item_object.h"
 #include "HudSound.h"
 
-struct dContact;
+class CPhysicsGeom;
 struct SGameMtl;
 class CMissile : public CHudItemObject
 {
@@ -107,5 +107,8 @@ public:
     IC u32 destroy_time() const { return m_dwDestroyTime; }
     IC int time_from_begin_throw() const { return (Device.dwTimeGlobal + m_dwDestroyTimeMax - m_dwDestroyTime); }
     static void ExitContactCallback(
-        bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/);
+        bool& do_colide, bool bo1,
+        CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+        const Fvector& contact_normal, const Fvector& contact_pos,
+        SGameMtl* material_1, SGameMtl* material_2);
 };

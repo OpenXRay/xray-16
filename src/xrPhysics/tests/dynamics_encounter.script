@@ -1,0 +1,69 @@
+-- Optional Call of Pripyat gameplay probe. Copy to gamedata/scripts and run
+-- `run_script dynamics_encounter` from an active level. Spawns and kills one
+-- temporary NPC; use an isolated test save/root.
+
+local function report(message)
+    log1("DYNAMICS_ENCOUNTER " .. message)
+end
+
+local function wait(milliseconds)
+    local finish = time_global() + milliseconds
+    while time_global() < finish do coroutine.yield() end
+end
+
+function main()
+    report("START")
+    local actor = db.actor
+    if not actor then report("FAIL no actor"); return end
+    local origin = actor:position()
+    local facing = actor:direction()
+    local position = vector():set(origin.x + facing.x * 4,
+                                  origin.y, origin.z + facing.z * 4)
+    local vertex = level.vertex_id(position)
+    if not level.valid_vertex(vertex) then report("FAIL invalid spawn vertex"); return end
+    local server = alife():create("sim_default_stalker_0", position,
+                                  vertex, actor:game_vertex_id())
+    if not server then report("FAIL NPC create"); return end
+    local id = server.id
+    report("SPAWN id=" .. tostring(id))
+    wait(3000)
+    local npc = level.object_by_id(id)
+    if not npc or not npc:alive() then report("FAIL NPC not online/alive"); return end
+    report("NPC_ONLINE alive=true")
+
+    local p = npc:position()
+    local ray_origin = vector():set(origin.x, origin.y + 1.5, origin.z)
+    local direction = vector():set(p.x - ray_origin.x, p.y + 1 - ray_origin.y, p.z - ray_origin.z)
+    local distance = direction:magnitude()
+    direction:normalize()
+    local result = rq_result()
+    local ray_hit = level.ray_pick(ray_origin, direction, distance + 2,
+                                   rq_target.rqtBoth, result, actor)
+    if not ray_hit or not result.object or result.object:id() ~= id then
+        report("FAIL NPC ray target")
+        return
+    end
+    report(string.format("RAY object=%d range=%.3f", result.object:id(), result.range))
+
+    local impact = hit()
+    impact.power = 100
+    impact.impulse = 30
+    impact.direction = vector():set(0, 1, 0)
+    impact.draftsman = actor
+    impact.type = hit.wound
+    npc:hit(impact)
+    wait(5000)
+    npc = level.object_by_id(id)
+    if not npc or npc:alive() then report("FAIL NPC did not become a corpse"); return end
+    p = vector():set(npc:position())
+    report(string.format("RAGDOLL alive=false x=%.3f y=%.3f z=%.3f", p.x, p.y, p.z))
+    wait(3000)
+    local q = npc:position()
+    local movement = p:distance_to(q)
+    if movement ~= movement or movement > 10 then
+        report("FAIL non-finite or runaway ragdoll")
+        return
+    end
+    report(string.format("RAGDOLL movement_over_3s=%.4f", movement))
+    report("PASS")
+end

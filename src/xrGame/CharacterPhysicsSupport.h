@@ -17,7 +17,7 @@ class CIKLimbsController;
 class interactive_motion;
 class interactive_animation;
 class physics_shell_animated;
-class CODEGeom;
+class CPhysicsGeom;
 class CPhysicsElement;
 class activating_character_delay;
 
@@ -79,7 +79,7 @@ private:
     interactive_animation* m_interactive_animation{};
     physics_shell_animated* m_physics_shell_animated{};
     activating_character_delay* m_collision_activating_delay{};
-    xr_vector<CODEGeom*> m_weapon_geoms;
+    xr_vector<CPhysicsGeom*> m_weapon_geoms;
     xr_vector<anim_bone_fix*> m_weapon_bone_fixes;
     CPhysicsElement* m_weapon_attach_bone{};
     CPhysicsShellHolder* m_active_item_obj{};
