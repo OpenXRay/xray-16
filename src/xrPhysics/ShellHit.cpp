@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "PHDynamicData.h"
 #include "Physics.h"
-#include "tri-colliderknoopc/dTriList.h"
 #include "PHShellSplitter.h"
 #include "PHFracture.h"
 #include "PHJointDestroyInfo.h"
@@ -13,7 +12,14 @@
 void CPHShell::applyHit(const Fvector& pos, const Fvector& dir, float val, const u16 id, ALife::EHitType hit_type)
 {
     if (id == u16(-1))
-        return; //
+        return;
+    if (fis_zero(val) || val <= 0.001f)
+        return;
+    if (hit_type == ALife::eHitTypeBurn || hit_type == ALife::eHitTypeLightBurn ||
+        hit_type == ALife::eHitTypeShock || hit_type == ALife::eHitTypeRadiation ||
+        hit_type == ALife::eHitTypeTelepatic || hit_type == ALife::eHitTypeChemicalBurn)
+        return;
+
 #pragma todo("Kosya to kosya:this code shold treat all hit types")
     if (!m_pKinematics)
     {
@@ -32,16 +38,12 @@ void CPHShell::ExplosionHit(const Fvector& pos, const Fvector& dir, float val, c
     if (!isActive())
         return;
     EnableObject(0);
-    // Fvector local_pos;local_pos.set(0.f,0.f,0.f);
+
     auto i = elements.begin(), e = elements.end();
     float impulse = val / _sqrt(_sqrt((float)elements.size()));
     for (; i != e; ++i)
     {
-        // Fvector max_area_dir;
         CPHElement* element = (*i);
-        // element->get_MaxAreaDir(max_area_dir);
-        // float	sign=max_area_dir.dotproduct(dir)>0.f ? 1.f : -1.f;
-        // max_area_dir.mul(sign);
         u16 gn = element->CPHGeometryOwner::numberOfGeoms();
         float g_impulse = impulse / gn;
         for (u16 j = 0; j < gn; ++j)
@@ -57,7 +59,7 @@ void CPHShell::ExplosionHit(const Fvector& pos, const Fvector& dir, float val, c
                 r_dir.add(dir);
             }
 
-            r_dir.normalize_safe(); // safe???
+            r_dir.normalize_safe();
             element->applyImpulseTrace(r_pos, r_dir, g_impulse, element->CPHGeometryOwner::Geom(j)->bone_id());
         }
     }

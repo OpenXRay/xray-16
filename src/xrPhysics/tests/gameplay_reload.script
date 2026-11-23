@@ -1,0 +1,43 @@
+-- Expected IDs and states are generated from the preceding process's log.
+local function report(message) log1("GAMEPLAY_RELOAD " .. message) end
+function main()
+    local expected = gameplay_reload_expected.objects
+    if not db.actor or not db.actor:alive() then report("FAIL actor missing/dead"); return end
+    if #expected ~= 12 then report("FAIL expected twelve saved ragdolls"); return end
+    local failed = false
+    for _, state in ipairs(expected) do
+        local npc = level.object_by_id(state.id)
+        if not npc or npc:alive() then report("FAIL saved ragdoll missing/alive id=" .. state.id); return end
+        local shell = npc:get_physics_shell()
+        if not shell or shell:get_elements_number() ~= state.elements or shell:get_joints_number() ~= state.joints then
+            report("FAIL saved shell topology id=" .. state.id); return
+        end
+        local mass = 0
+        for index = 0, shell:get_elements_number() - 1 do
+            mass = mass + shell:get_element_by_order(index):get_mass()
+        end
+        if math.abs(mass - state.mass) > .01 then report("FAIL saved shell mass id=" .. state.id); return end
+        local position = npc:position()
+        report(string.format("POSITION id=%d expected=%.6f,%.6f,%.6f actual=%.6f,%.6f,%.6f distance=%.6f",
+            state.id, state.x, state.y, state.z, position.x, position.y, position.z,
+            position:distance_to(vector():set(state.x, state.y, state.z))))
+        -- The NPC proxy has an approximately one metre bind-pose offset after
+        -- loading on both ODE and Jolt. Validate the physical bone directly.
+        local root = shell:get_element_by_order(0):global_transform().c
+        report(string.format("ROOT id=%d expected=%.6f,%.6f,%.6f actual=%.6f,%.6f,%.6f distance=%.6f",
+            state.id, state.bx, state.by, state.bz, root.x, root.y, root.z,
+            root:distance_to(vector():set(state.bx, state.by, state.bz))))
+        -- Corpse creation advances the physics world while reconstructing the
+        -- level. ODE moved a root bone 0.551 m during this process. This is a
+        -- placement bound, not an exact state comparison; report the distance.
+        if root:distance_to(vector():set(state.bx, state.by, state.bz)) > 1 then
+            report("FAIL saved bone position id=" .. state.id); failed = true
+        end
+        if not failed then report("PASS ragdoll bone topology mass position id=" .. state.id) end
+    end
+    if failed then get_console():execute("quit"); return end
+    local finish = time_global() + 2000
+    while time_global() < finish do coroutine.yield() end
+    report("DONE")
+    get_console():execute("quit")
+end

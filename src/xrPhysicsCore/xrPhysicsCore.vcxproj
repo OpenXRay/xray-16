@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\xray_project_configurations.props" />
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F40D703E-EB12-4E8B-BF21-233F2FCF570E}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="..\xray_project_configuration.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="..\xray.props" />
+  <Import Project="Jolt.props" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>_USRDLL;XRPHYSICSCORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="JoltPhysicsCore.cpp" />
+    <ClCompile Include="NativeContactServices.cpp" />
+    <ClCompile Include="NativeCharacterServices.cpp" />
+    <ClCompile Include="NativeJointServices.cpp" />
+    <ClCompile Include="JoltDebugRenderer.cpp" />
+    <ClCompile Include="stdafx.cpp"><PrecompiledHeader>Create</PrecompiledHeader></ClCompile>
+    <ClInclude Include="IPhysicsCore.h" />
+    <ClInclude Include="JoltPhysicsCore.h" />
+    <ClInclude Include="JoltLayers.h" />
+    <ClInclude Include="JoltDebugRenderer.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\xrCore\xrCore.vcxproj"><Project>{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}</Project></ProjectReference>
+    <ProjectReference Include="..\xrMaterialSystem\xrMaterialSystem.vcxproj"><Project>{2C419512-6EEE-4707-BC51-2E834855552E}</Project></ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

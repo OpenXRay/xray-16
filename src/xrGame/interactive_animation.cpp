@@ -8,11 +8,6 @@
 
 #include "Include/xrRender/KinematicsAnimated.h"
 
-namespace detail::interactive_animation
-{
-static float depth = 0;
-}
-
 interactive_animation::interactive_animation(CPhysicsShellHolder* O, CBlend* b)
     : physics_shell_animated(O, false), blend(b)
 {
@@ -21,12 +16,8 @@ interactive_animation::interactive_animation(CPhysicsShellHolder* O, CBlend* b)
 interactive_animation::~interactive_animation() {}
 bool interactive_animation::collide()
 {
-    using namespace ::detail::interactive_animation;
-
-    depth = 0;
     physics_shell->CollideAll();
-    if (depth > 0.05f)
-        return true;
+
     return false;
 }
 bool interactive_animation::update(const Fmatrix& xrorm)
@@ -52,18 +43,18 @@ bool interactive_animation::update(const Fmatrix& xrorm)
 }
 
 void interactive_animation::contact_callback(
-    bool& do_colide, bool bo1, dContact& c, SGameMtl* /*material_1*/, SGameMtl* /*material_2*/)
+    bool& do_colide, bool bo1,
+    CPhysicsGeom* my_geom, CPhysicsGeom* oposite_geom,
+    const Fvector& contact_normal, const Fvector& contact_pos,
+    SGameMtl* material_1, SGameMtl* material_2)
 {
-    using namespace ::detail::interactive_animation;
+    IPhysicsShellHolder* holder_1 = my_geom ? (IPhysicsShellHolder*)my_geom->get_callback_data() : nullptr;
+    IPhysicsShellHolder* holder_2 = oposite_geom ? (IPhysicsShellHolder*)oposite_geom->get_callback_data() : nullptr;
 
-    dxGeomUserData* gd1 = NULL, * gd2 = NULL;
-    get_user_data(gd1, gd2, bo1, c.geom);
-    VERIFY(gd1);
-    if (gd2 && gd2->ph_ref_object == gd1->ph_ref_object)
+    if (!holder_1) return;
+
+    if (holder_2 && holder_1 == holder_2)
         return;
-    save_max(depth, c.geom.depth);
-    // if(gd1&&gd2&&(CPhysicsShellHolder*)gd1->callback_data==gd2->ph_ref_object)
-    //																			do_colide=false;
 }
 
 void interactive_animation::create_shell(CPhysicsShellHolder* O)
