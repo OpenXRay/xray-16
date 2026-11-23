@@ -28,3 +28,9 @@
 [submodule "Externals/sse2rvv"]
 	path = Externals/sse2rvv
 	url = https://github.com/pattonkan/sse2rvv.git
+[submodule "Externals/GameNetworkingSockets"]
+	path = Externals/GameNetworkingSockets
+	url = https://github.com/yohjimane/GameNetworkingSockets.git
+[submodule "Externals/protobuf"]
+	path = Externals/protobuf
+	url = https://github.com/protocolbuffers/protobuf.git

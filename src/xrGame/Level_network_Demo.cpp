@@ -228,7 +228,7 @@ void CLevel::SimulateServerUpdate()
     {
         if (m_msg_filter)
             m_msg_filter->check_new_data(tmp_packet);
-        IPureClient::OnMessage(tmp_packet.B.data, tmp_packet.B.count);
+        NET_CLIENT_CLASS::OnMessage(tmp_packet.B.data, tmp_packet.B.count);
     }
 }
 

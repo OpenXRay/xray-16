@@ -9,9 +9,10 @@ class Lock;
 
 struct GameDescriptionData
 {
-    string128 map_name;
-    string128 map_version;
-    string512 download_url;
+    string128 map_name = "";
+    string128 map_version = "";
+    string512 download_url = "";
+    bool coop_enabled = false;
 };
 
 #define NET_MERGE_PACKETS 1
@@ -33,6 +34,16 @@ struct GameDescriptionData
 #define NET_GUARANTEEDPACKET_IGNORE 1
 #define NET_GUARANTEEDPACKET_SEPARATE 2
 
+#define	GAMESPY_QR2_BASEPORT 5445
+#define GAMESPY_BROWSER_MAX_UPDATES 20
+
+#define START_PORT 0
+#define END_PORT 65535
+#define START_PORT_LAN GAMESPY_QR2_BASEPORT
+#define START_PORT_LAN_SV START_PORT_LAN + 1
+#define START_PORT_LAN_CL START_PORT_LAN + 2
+#define END_PORT_LAN START_PORT_LAN + 250 //GameSpy only process 500 ports
+
 extern XRNETSERVER_API int psNET_GuaranteedPacketMode;
 
 /*#ifdef DEBUG
@@ -46,10 +57,9 @@ class XRNETSERVER_API MultipacketSender
 public:
     MultipacketSender();
     virtual ~MultipacketSender();
-
-protected:
     void SendPacket(const void* packet_data, u32 packet_sz, u32 flags, u32 timeout);
     void FlushSendBuffer(u32 timeout);
+protected:
     virtual void _SendTo_LL(const void* data, u32 size, u32 flags, u32 timeout) = 0;
 
 private:
@@ -81,4 +91,21 @@ protected:
 };
 
 //==============================================================================
+
+struct SClientConnectData
+{
+	ClientID clientID;
+	string64 name;
+	string64 pass;
+	u32 process_id;
+
+	SClientConnectData()
+	{
+		name[0] = pass[0] = 0;
+		process_id = 0;
+	}
+};
+
+//==============================================================================
+
 #endif // _INCDEF_NETCOMMON_H_
