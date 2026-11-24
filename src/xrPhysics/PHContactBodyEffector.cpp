@@ -22,6 +22,9 @@ void CPHContactBodyEffector::Merge(const dContact& contact, SGameMtl* material)
 
 void CPHContactBodyEffector::Apply()
 {
+    if (!m_body)
+        return;
+
     const dReal* linear_velocity = dBodyGetLinearVel(m_body);
     dReal linear_velocity_smag = dDOT(linear_velocity, linear_velocity);
     dReal linear_velocity_mag = _sqrt(linear_velocity_smag);
@@ -49,5 +52,26 @@ void CPHContactBodyEffector::Apply()
         }
         dBodyAddForce(m_body, force[0], force[1], force[2]);
     }
-    dBodySetData(m_body, NULL);
+    Detach();
+}
+
+void CPHContactBodyEffector::Detach()
+{
+    if (!m_body)
+        return;
+
+    if (dBodyGetData(m_body) == this)
+        dBodySetData(m_body, nullptr);
+    m_body = nullptr;
+}
+
+void CPHContactBodyEffector::InvalidateBody(dBodyID body)
+{
+    if (auto* effector = static_cast<CPHContactBodyEffector*>(dBodyGetData(body)))
+    {
+        if (effector->m_body == body)
+            effector->Detach();
+        else
+            dBodySetData(body, nullptr);
+    }
 }

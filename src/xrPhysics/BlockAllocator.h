@@ -18,14 +18,15 @@ public:
     }
     IC void empty()
     {
-        block_count = 0;
         if (blocks.size())
         {
+            block_count = 1;
             block_position = 0;
             current_block = blocks[0];
         }
         else
         {
+            block_count = 0;
             block_position = block_size;
         }
     }
@@ -63,15 +64,13 @@ public:
     {
         if (!current_block)
             return;
-        auto i = blocks.begin();
-        auto e = blocks.begin() + block_count;
         u32 j;
-        for (; i != e; ++i)
+        for (u32 i = 0; i + 1 < block_count; ++i)
         {
             for (j = 0; j < block_size; ++j)
-                pred.operator()((*i) + j);
+                pred.operator()(blocks[i] + j);
         }
-        for (j = 0; j < block_position; ++j)
+        for (j = 0; block_count && j < block_position; ++j)
         {
             pred.operator()(current_block + j);
         }
